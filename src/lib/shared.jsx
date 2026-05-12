@@ -372,40 +372,202 @@ export function TabBar({ active = 'today', theme }) {
       </svg>
     )},
   ];
+  // ───── Long-press liquid-orb drag interaction ─────
+  const itemRefs = React.useRef([]);
+  const orbRef = React.useRef(null);
+  const pressTimerRef = React.useRef(null);
+  const dragPosRef = React.useRef({ x: 0, y: 0, tx: 0, ty: 0 });
+  const rafRef = React.useRef(0);
+  const originIdxRef = React.useRef(null);
+  const [dragActive, setDragActive] = React.useState(false);
+  const [nearIdx, setNearIdx] = React.useState(null);
+  const [absorbIdx, setAbsorbIdx] = React.useState(null);
+
+  const startDrag = (idx, clientX, clientY) => {
+    const ref = itemRefs.current[idx];
+    if (!ref) return;
+    const r = ref.getBoundingClientRect();
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+    dragPosRef.current = { x: cx, y: cy, tx: clientX, ty: clientY };
+    originIdxRef.current = idx;
+    setDragActive(true);
+  };
+
+  const onPointerDown = (e, idx) => {
+    e.preventDefault();
+    const cx = e.clientX, cy = e.clientY;
+    pressTimerRef.current = setTimeout(() => {
+      startDrag(idx, cx, cy);
+    }, 500);
+    // Track if pointer moves significantly — cancel long-press
+    const start = { x: cx, y: cy };
+    const onMove = (ev) => {
+      const d = Math.hypot(ev.clientX - start.x, ev.clientY - start.y);
+      if (d > 8) {
+        clearTimeout(pressTimerRef.current);
+        window.removeEventListener('pointermove', onMove);
+      }
+    };
+    window.addEventListener('pointermove', onMove);
+    const cleanup = () => {
+      clearTimeout(pressTimerRef.current);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', cleanup);
+    };
+    window.addEventListener('pointerup', cleanup);
+  };
+
+  const onClickItem = (idx) => {
+    // Suppress click if we just finished a drag
+    if (dragActive || absorbIdx !== null) return;
+    typeof window !== 'undefined' && window.__archiveGo && window.__archiveGo(items[idx].id);
+  };
+
+  // Global pointer-move + pointer-up while drag active
+  React.useEffect(() => {
+    if (!dragActive) return;
+    const onMove = (e) => {
+      dragPosRef.current.tx = e.clientX;
+      dragPosRef.current.ty = e.clientY;
+    };
+    const onUp = () => {
+      // Release behaviour: if over a nav item → absorb + navigate, else snap back & dissolve
+      const target = findNearestIdx(dragPosRef.current.x, dragPosRef.current.y, itemRefs.current, 36);
+      setDragActive(false);
+      if (target !== null) {
+        setAbsorbIdx(target);
+        setTimeout(() => {
+          typeof window !== 'undefined' && window.__archiveGo && window.__archiveGo(items[target].id);
+          setAbsorbIdx(null);
+        }, 220);
+      }
+      setNearIdx(null);
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+    };
+  }, [dragActive]);
+
+  // RAF loop — lerp orb toward finger at 15% per frame (85% speed) + update proximity highlight
+  React.useEffect(() => {
+    if (!dragActive) return;
+    const tick = () => {
+      const p = dragPosRef.current;
+      p.x += (p.tx - p.x) * 0.20;
+      p.y += (p.ty - p.y) * 0.20;
+      if (orbRef.current) {
+        orbRef.current.style.transform = `translate3d(${p.x - 26}px, ${p.y - 26}px, 0)`;
+      }
+      // Proximity check
+      const near = findNearestIdx(p.x, p.y, itemRefs.current, 30);
+      setNearIdx(prev => (prev === near ? prev : near));
+      // Liquid-morph border-radius hint based on which direction we're stretching
+      if (orbRef.current) {
+        if (near !== null) {
+          const r = itemRefs.current[near].getBoundingClientRect();
+          const dx = (r.left + r.width / 2) - p.x;
+          // Stretch horizontally toward the target item
+          const stretch = Math.sign(dx);
+          orbRef.current.style.borderRadius = stretch < 0
+            ? '60% 40% 40% 60% / 50% 50% 50% 50%'  // stretch toward left
+            : '40% 60% 60% 40% / 50% 50% 50% 50%'; // stretch toward right
+        } else {
+          orbRef.current.style.borderRadius = '50%';
+        }
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [dragActive]);
+
   return (
-    <div style={{
-      position: 'absolute', bottom: 'max(16px, var(--archive-safe-bottom, 16px))', left: 0, right: 0, zIndex: 30,
-      display: 'flex', justifyContent: 'center', pointerEvents: 'none',
-    }}>
-      <div className="nav-bar" style={{
-        pointerEvents: 'auto',
-        width: '82%',
-        padding: '8px 24px',
-        borderRadius: 32,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-around',
+    <React.Fragment>
+      {/* Floating liquid orb — only visible during drag */}
+      {dragActive && (
+        <div ref={orbRef} style={{
+          position: 'fixed', top: 0, left: 0,
+          width: 52, height: 52,
+          background: 'rgba(255, 255, 255, 0.15)',
+          backdropFilter: 'blur(20px) saturate(200%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(200%)',
+          border: '1px solid rgba(255, 255, 255, 0.30)',
+          borderRadius: '50%',
+          boxShadow: '0 0 20px rgba(255,255,255,0.15), inset 0 1px 0 rgba(255,255,255,0.4)',
+          pointerEvents: 'none',
+          zIndex: 1000,
+          willChange: 'transform, border-radius',
+          transition: 'border-radius 80ms ease',
+        }} />
+      )}
+
+      <div style={{
+        position: 'absolute', bottom: 'max(16px, var(--archive-safe-bottom, 16px))', left: 0, right: 0, zIndex: 30,
+        display: 'flex', justifyContent: 'center', pointerEvents: 'none',
       }}>
-        {items.map(it => {
-          const isActive = it.id === active;
-          return (
-            <div key={it.id} onClick={() => typeof window !== 'undefined' && window.__archiveGo && window.__archiveGo(it.id)} style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
-              color: '#FFFFFF',
-              opacity: isActive ? 1 : 0.55,
-              padding: '2px 8px',
-              transition: 'opacity .2s', cursor: 'pointer', userSelect: 'none',
-            }}>
-              <div>{it.icon}</div>
-              <div style={{
-                fontFamily: '"DM Sans", sans-serif',
-                fontSize: 9, fontWeight: isActive ? 700 : 500, letterSpacing: 0.5, textTransform: 'uppercase',
-                color: '#FFFFFF', opacity: isActive ? 1 : 0.7, lineHeight: 1,
-              }}>{it.label}</div>
-            </div>
-          );
-        })}
+        <div className="nav-bar" style={{
+          pointerEvents: 'auto',
+          width: '82%',
+          padding: '8px 24px',
+          borderRadius: 32,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-around',
+        }}>
+          {items.map((it, i) => {
+            const isActive = it.id === active;
+            const isNear = nearIdx === i;
+            const isAbsorb = absorbIdx === i;
+            const scale = isAbsorb ? 1.15 : isNear ? 1.08 : 1;
+            return (
+              <div
+                key={it.id}
+                ref={el => itemRefs.current[i] = el}
+                onPointerDown={(e) => onPointerDown(e, i)}
+                onClick={() => onClickItem(i)}
+                style={{
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+                  color: '#FFFFFF',
+                  opacity: isActive ? 1 : 0.55,
+                  padding: '2px 8px',
+                  cursor: 'pointer', userSelect: 'none',
+                  transform: `scale(${scale})`,
+                  transition: isAbsorb ? 'transform 150ms ease' : 'transform 200ms cubic-bezier(.2,.8,.2,1), opacity .2s',
+                  touchAction: 'none',
+                }}>
+                <div>{it.icon}</div>
+                <div style={{
+                  fontFamily: '"DM Sans", sans-serif',
+                  fontSize: 9, fontWeight: isActive ? 700 : 500, letterSpacing: 0.5, textTransform: 'uppercase',
+                  color: '#FFFFFF', opacity: isActive ? 1 : 0.7, lineHeight: 1,
+                }}>{it.label}</div>
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </React.Fragment>
   );
+}
+
+// Helper: find the index of the nearest nav item within `threshold` px
+function findNearestIdx(x, y, refs, threshold) {
+  let bestIdx = null;
+  let bestDist = threshold;
+  for (let i = 0; i < refs.length; i++) {
+    const ref = refs[i];
+    if (!ref) continue;
+    const r = ref.getBoundingClientRect();
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+    const dist = Math.hypot(cx - x, cy - y);
+    if (dist < bestDist) { bestDist = dist; bestIdx = i; }
+  }
+  return bestIdx;
 }
 
 // iOS-style status bar — 54px tall, with time, Dynamic Island, and signal/wifi/battery icons.
