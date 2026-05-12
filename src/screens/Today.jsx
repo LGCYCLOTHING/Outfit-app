@@ -411,7 +411,7 @@ export default function ScreenToday() {
         <div className="lg-active lg-spotlight" style={{ borderRadius: 24, overflow: 'hidden', position: 'relative' }}>
           <div onClick={() => window.__archiveGo && window.__archiveGo('detail')} style={{ position: 'relative', padding: 18, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', cursor: 'pointer' }}>
             <div style={{ borderRadius: 18, overflow: 'hidden', position: 'relative' }}>
-              <PhotoPlaceholder ratio="4/5" radius={18} photoId={3} />
+              <PhotoPlaceholder ratio="4/5" radius={18} photoId={3} photoKey={ymd(new Date())} />
               {typeof window !== 'undefined' && window.__archiveEmpty &&
                 <div style={{
                   position: 'absolute', inset: 0,
@@ -503,17 +503,21 @@ export default function ScreenToday() {
           <span onClick={() => window.__archiveGo && window.__archiveGo('archive')} style={{ fontSize: 15, color: accent, fontWeight: 500, cursor: 'pointer' }}>See all</span>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-          {[0, 1, 2, 3, 4, 5].map((idx) =>
-            <div key={idx} onClick={() => window.__archiveGo && window.__archiveGo('detail')} style={{ cursor: 'pointer', position: 'relative' }}>
-              <PhotoPlaceholder ratio="3/4" radius={12} photoId={idx + 5} />
-              <div style={{
-                position: 'absolute', bottom: 7, left: 9,
-                fontSize: 14, color: '#F5F0E8',
-                fontWeight: 500, letterSpacing: -0.1,
-                textShadow: '0 1px 4px rgba(0,0,0,0.6)'
-              }}>{['Yesterday', 'Sat', 'Fri', 'Thu', 'Wed', 'Tue'][idx]}</div>
-            </div>
-          )}
+          {[0, 1, 2, 3, 4, 5].map((idx) => {
+            const d = new Date();
+            d.setDate(d.getDate() - (idx + 1));
+            return (
+              <div key={idx} onClick={() => window.__archiveGo && window.__archiveGo('detail')} style={{ cursor: 'pointer', position: 'relative' }}>
+                <PhotoPlaceholder ratio="3/4" radius={12} photoId={idx + 5} photoKey={ymd(d)} />
+                <div style={{
+                  position: 'absolute', bottom: 7, left: 9,
+                  fontSize: 14, color: '#F5F0E8',
+                  fontWeight: 500, letterSpacing: -0.1,
+                  textShadow: '0 1px 4px rgba(0,0,0,0.6)'
+                }}>{['Yesterday', 'Sat', 'Fri', 'Thu', 'Wed', 'Tue'][idx]}</div>
+              </div>
+            );
+          })}
         </div>
 
         <div style={{ marginTop: 32, display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
