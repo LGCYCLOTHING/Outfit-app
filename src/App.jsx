@@ -177,15 +177,15 @@ function FloatingNav({ current, go }) {
 
       <div className="liquid-glass" style={{
         position: 'absolute',
-        top: 0, left: 0, right: 0, bottom: 0,
+        top: 0, left: 0, right: 0,
         zIndex: 100,
         borderBottomLeftRadius: 24,
         borderBottomRightRadius: 24,
-        padding: 'calc(20px + var(--archive-safe-top, 0px)) 22px calc(24px + var(--archive-safe-bottom, 0px))',
+        padding: 'calc(20px + var(--archive-safe-top, 0px)) 22px 24px',
         boxSizing: 'border-box',
         transform: open ? 'translateY(0)' : 'translateY(-100%)',
         transition: 'transform .28s ease-out',
-        overflow: 'auto',
+        overflow: 'hidden',
       }}>
         {/* Top row — wordmark + close */}
         <div style={{
