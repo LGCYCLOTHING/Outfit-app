@@ -121,7 +121,11 @@ body.archive-clean #stage {
     --sa-bottom: env(safe-area-inset-bottom, 0px);
   }
   .device-island, .device-side { display: none; }
+  /* No black workspace on touch phones — hide the external icon */
+  #external-app-icon { display: none !important; }
 }
+/* Inside the secondary-preview iframe, also hide it */
+body.archive-clean #external-app-icon { display: none !important; }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro', system-ui, sans-serif;

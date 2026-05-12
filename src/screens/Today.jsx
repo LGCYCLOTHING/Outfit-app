@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   useTheme, bgColor, fgColor,
-  ArchiveBurger, AppIcon, StatusBar, GlowCard, Glass, TabBar, PhotoPlaceholder, fitGradient, fitBorder,
+  ArchiveBurger, StatusBar, GlowCard, Glass, TabBar, PhotoPlaceholder, fitGradient, fitBorder,
 } from '../lib/shared.jsx';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
 import { useWeather, WeatherIcon } from '../lib/weather.jsx';
@@ -151,9 +151,8 @@ export default function ScreenToday() {
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 marginTop: 8, marginBottom: 12,
               }}>
-                {/* LEFT GROUP — app icon, hamburger, weather */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <AppIcon size={26} onClick={() => window.__archiveGo && window.__archiveGo('you')} />
+                {/* LEFT GROUP — hamburger menu, then weather right next to it */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                   <div
                     onClick={() => window.__archiveToggleNav && window.__archiveToggleNav()}
                     className="archive-pressable"

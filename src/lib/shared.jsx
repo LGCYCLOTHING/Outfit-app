@@ -233,20 +233,18 @@ export function AppIcon({ size = 24, onClick }) {
 
 export function ArchiveBurger() {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-      <AppIcon size={26} onClick={() => typeof window !== 'undefined' && window.__archiveGo && window.__archiveGo('you')} />
-      <div
-        className="archive-pressable"
-        onClick={() => typeof window !== 'undefined' && window.__archiveToggleNav && window.__archiveToggleNav()}
-        style={{
-          width: 28, height: 22,
-          display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 5,
-          cursor: 'pointer',
-        }}>
-        <div style={{ width: 20, height: 2.5, borderRadius: 1.5, background: '#FFFFFF' }} />
-        <div style={{ width: 20, height: 2.5, borderRadius: 1.5, background: '#FFFFFF' }} />
-        <div style={{ width: 20, height: 2.5, borderRadius: 1.5, background: '#FFFFFF' }} />
-      </div>
+    <div
+      className="archive-pressable"
+      onClick={() => typeof window !== 'undefined' && window.__archiveToggleNav && window.__archiveToggleNav()}
+      style={{
+        width: 28, height: 22,
+        display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 5,
+        cursor: 'pointer',
+        flexShrink: 0,
+      }}>
+      <div style={{ width: 20, height: 2.5, borderRadius: 1.5, background: '#FFFFFF' }} />
+      <div style={{ width: 20, height: 2.5, borderRadius: 1.5, background: '#FFFFFF' }} />
+      <div style={{ width: 20, height: 2.5, borderRadius: 1.5, background: '#FFFFFF' }} />
     </div>
   );
 }

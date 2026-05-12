@@ -31,6 +31,18 @@
   <img id="archive-bg-dusk"   src="/themes/bg-5.png" alt="" />
   <img id="archive-bg-ember"  src="/themes/bg-6.png" alt="" />
 </div>
+<!-- External app icon preview — sits on the black workspace OUTSIDE the iPhone bezel.
+     Auto-updates to match the active theme; user override saved in localStorage 'aevum_app_icon'. -->
+<div id="external-app-icon" aria-hidden="true"
+  style="position:fixed;top:22px;left:22px;z-index:200;
+         display:flex;flex-direction:column;align-items:center;gap:8px;
+         pointer-events:none;font-family:'Inter',sans-serif;">
+  <img id="external-app-icon-img" src="/icons/icon-ivory.png" alt=""
+    style="width:56px;height:56px;border-radius:14px;object-fit:cover;display:block;
+           box-shadow:0 12px 32px rgba(0,0,0,0.6),inset 0 0.5px 0 rgba(255,255,255,0.18);" />
+  <div style="font-size:10px;font-weight:500;letter-spacing:1.6px;color:rgba(255,255,255,0.6);">AĒVUM</div>
+</div>
+
 <!-- Side toggle: hide / show the SECONDARY preview iPhone (left edge) -->
 <button id="toggle-secondary" type="button" aria-label="Toggle secondary preview"
   style="position:fixed;left:14px;top:50%;transform:translateY(-50%);z-index:1000;

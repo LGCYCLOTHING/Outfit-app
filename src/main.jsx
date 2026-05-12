@@ -3,6 +3,30 @@ import ReactDOM from 'react-dom/client';
 import './styles.css';
 import App from './App.jsx';
 
+// External icon (rendered outside the bezel by index.html) — sync to active theme/override
+function updateExternalAppIcon() {
+  if (typeof window === 'undefined') return;
+  const img = document.getElementById('external-app-icon-img');
+  if (!img) return;
+  let id = 'ivory';
+  try {
+    const override = localStorage.getItem('aevum_app_icon');
+    id = override || window.__archiveTheme || 'ivory';
+  } catch (e) { id = window.__archiveTheme || 'ivory'; }
+  img.src = `/icons/icon-${id}.png`;
+}
+if (typeof window !== 'undefined') {
+  window.addEventListener('archive:themechange', updateExternalAppIcon);
+  window.addEventListener('archive:iconchange', updateExternalAppIcon);
+  // Hide the external icon inside the secondary preview iframe (clean mode)
+  try {
+    if (new URLSearchParams(location.search).get('clean') === '1') {
+      const el = document.getElementById('external-app-icon');
+      if (el) el.style.display = 'none';
+    }
+  } catch (e) {}
+}
+
 if (typeof window !== 'undefined') {
   // One-shot localStorage migration: archive_* -> aevum_* (preserve user data
   // through the brand rename). Runs once per device, then sets a flag.
@@ -34,6 +58,7 @@ if (typeof window !== 'undefined') {
       window.__archiveEmpty = true;
     }
   } catch (e) {}
+  updateExternalAppIcon();
 }
 
 function fitFrame() {
