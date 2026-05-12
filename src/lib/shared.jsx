@@ -335,28 +335,25 @@ export function LiquidGlassButton({ children, accent, accentRgba, onClick, style
   );
 }
 
-// Luxury tab bar — final iteration from ARCHIVE-mobile.html (hairline icons + always-visible uppercase labels)
+// Luxury tab bar — sliding glass bubble + 5 nav items, icons-only
 export function TabBar({ active = 'today', theme }) {
   const t = theme || useTheme();
   const items = [
     { id: 'today', label: 'Today', icon: (
-      // Minimal sparkle / spark — fresh and modern
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
         <path d="M12 8.5l1.5 2.5L16 12.5 13.5 14 12 16.5 10.5 14 8 12.5l2.5-1.5z"/>
       </svg>
     )},
     { id: 'archive', label: 'Archive', icon: (
-      // Photo stack — three offset rectangles
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="5" y="8" width="14" height="12" rx="2"/>
         <path d="M7 5h10"/>
         <path d="M9 2h6"/>
       </svg>
     )},
     { id: 'mix', label: 'Mix', icon: (
-      // Shuffle — two crossing arrows
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M16 4l4 4-4 4"/>
         <path d="M16 16l4 4-4-4"/>
         <path d="M4 8h2.5c1 0 1.9.5 2.5 1.3l5 6.4c.6.8 1.5 1.3 2.5 1.3H20"/>
@@ -364,9 +361,16 @@ export function TabBar({ active = 'today', theme }) {
         <path d="M4 17h2.5c1 0 1.9-.5 2.5-1.3"/>
       </svg>
     )},
+    { id: 'pieces', label: 'Pieces', icon: (
+      // Hanger — wardrobe pieces
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 8a2 2 0 1 1 2-2"/>
+        <path d="M12 8v2"/>
+        <path d="M12 10L3 17c-.5.4-.3 1.2.3 1.2h17.4c.6 0 .8-.8.3-1.2L12 10z"/>
+      </svg>
+    )},
     { id: 'you', label: 'You', icon: (
-      // Minimal person — circle head + shoulders
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="8.5" r="3.5"/>
         <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/>
       </svg>
@@ -507,50 +511,139 @@ export function TabBar({ active = 'today', theme }) {
         }} />
       )}
 
-      <div style={{
-        position: 'absolute', bottom: 'max(16px, var(--archive-safe-bottom, 16px))', left: 0, right: 0, zIndex: 30,
-        display: 'flex', justifyContent: 'center', pointerEvents: 'none',
-      }}>
-        <div className="nav-bar" style={{
+      <SlidingBubbleNav
+        items={items}
+        active={active}
+        itemRefs={itemRefs}
+        onPointerDown={onPointerDown}
+        onClickItem={onClickItem}
+        nearIdx={nearIdx}
+        absorbIdx={absorbIdx}
+      />
+    </React.Fragment>
+  );
+}
+
+// Inner — Sliding glass bubble nav (icons only, spring overshoot animation)
+function SlidingBubbleNav({ items, active, itemRefs, onPointerDown, onClickItem, nearIdx, absorbIdx }) {
+  const activeIdx = items.findIndex(it => it.id === active);
+  const containerRef = React.useRef(null);
+  const [bubble, setBubble] = React.useState({ left: 0, width: 60 });
+  const [stretching, setStretching] = React.useState(false);
+  const prevActiveRef = React.useRef(activeIdx);
+
+  // Measure the active item and reposition the bubble
+  const measure = React.useCallback(() => {
+    const el = itemRefs.current[activeIdx];
+    const container = containerRef.current;
+    if (!el || !container) return;
+    const elRect = el.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    setBubble({
+      left: elRect.left - containerRect.left,
+      width: elRect.width,
+    });
+  }, [activeIdx, itemRefs]);
+
+  React.useLayoutEffect(() => {
+    measure();
+    // Trigger stretch only on actual active-index change (not initial mount)
+    if (prevActiveRef.current !== activeIdx) {
+      setStretching(true);
+      const t = setTimeout(() => setStretching(false), 380);
+      prevActiveRef.current = activeIdx;
+      return () => clearTimeout(t);
+    }
+  }, [activeIdx, measure]);
+
+  React.useEffect(() => {
+    const onResize = () => measure();
+    window.addEventListener('resize', onResize);
+    window.addEventListener('archive:resize', onResize);
+    return () => {
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('archive:resize', onResize);
+    };
+  }, [measure]);
+
+  return (
+    <div style={{
+      position: 'absolute', bottom: 'max(16px, var(--archive-safe-bottom, 16px))', left: 0, right: 0, zIndex: 30,
+      display: 'flex', justifyContent: 'center', pointerEvents: 'none',
+    }}>
+      <div
+        ref={containerRef}
+        style={{
           pointerEvents: 'auto',
+          position: 'relative',
           width: '82%',
-          padding: '8px 24px',
-          borderRadius: 32,
+          padding: '6px 8px',
+          borderRadius: 999,
+          background: 'rgba(255, 240, 220, 0.04)',
+          border: '1px solid rgba(255, 240, 220, 0.08)',
+          boxShadow:
+            'inset 0 2px 10px rgba(255,255,255,0.25), ' +
+            '0 100px 180px -20px rgba(200,149,108,0.15)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-around',
         }}>
-          {items.map((it, i) => {
-            const isActive = it.id === active;
-            const isNear = nearIdx === i;
-            const isAbsorb = absorbIdx === i;
-            const scale = isAbsorb ? 1.15 : isNear ? 1.08 : 1;
-            return (
-              <div
-                key={it.id}
-                ref={el => itemRefs.current[i] = el}
-                onPointerDown={(e) => onPointerDown(e, i)}
-                onClick={() => onClickItem(i)}
-                style={{
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
-                  color: '#FFFFFF',
-                  opacity: isActive ? 1 : 0.55,
-                  padding: '2px 8px',
-                  cursor: 'pointer', userSelect: 'none',
-                  transform: `scale(${scale})`,
-                  transition: isAbsorb ? 'transform 150ms ease' : 'transform 200ms cubic-bezier(.2,.8,.2,1), opacity .2s',
-                  touchAction: 'none',
-                }}>
-                <div>{it.icon}</div>
-                <div style={{
-                  fontFamily: '"DM Sans", sans-serif',
-                  fontSize: 9, fontWeight: isActive ? 700 : 500, letterSpacing: 0.5, textTransform: 'uppercase',
-                  color: '#FFFFFF', opacity: isActive ? 1 : 0.7, lineHeight: 1,
-                }}>{it.label}</div>
-              </div>
-            );
-          })}
-        </div>
+        {/* Sliding glass bubble — sits behind the active item */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: bubble.left,
+            width: bubble.width,
+            height: 36,
+            transform: `translateY(-50%) scaleX(${stretching ? 1.3 : 1})`,
+            transformOrigin: 'center',
+            background: 'rgba(255, 255, 255, 0.12)',
+            backdropFilter: 'blur(20px) saturate(200%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(200%)',
+            border: '1px solid rgba(255,255,255,0.25)',
+            borderRadius: 999,
+            boxShadow:
+              'inset 0 1px 0 rgba(255,255,255,0.4), ' +
+              'inset 0 -1px 0 rgba(255,255,255,0.1), ' +
+              '0 0 20px rgba(200,149,108,0.2)',
+            transition:
+              'left 800ms cubic-bezier(0.34, 1.56, 0.64, 1), ' +
+              'width 800ms cubic-bezier(0.34, 1.56, 0.64, 1), ' +
+              'transform 800ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
+        />
+
+        {/* Icon-only nav items, no text labels */}
+        {items.map((it, i) => {
+          const isActive = it.id === active;
+          const isNear = nearIdx === i;
+          const isAbsorb = absorbIdx === i;
+          const scale = isAbsorb ? 1.15 : isNear ? 1.08 : 1;
+          return (
+            <div
+              key={it.id}
+              ref={el => itemRefs.current[i] = el}
+              onPointerDown={(e) => onPointerDown(e, i)}
+              onClick={() => onClickItem(i)}
+              style={{
+                position: 'relative', zIndex: 1,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: '8px 14px',
+                color: isActive ? '#F5F0E8' : 'rgba(245,240,232,0.25)',
+                cursor: 'pointer', userSelect: 'none',
+                transform: `scale(${scale})`,
+                transition: 'color 400ms ease, transform 200ms cubic-bezier(.2,.8,.2,1)',
+                touchAction: 'none',
+              }}>
+              {it.icon}
+            </div>
+          );
+        })}
       </div>
-    </React.Fragment>
+    </div>
   );
 }
 
