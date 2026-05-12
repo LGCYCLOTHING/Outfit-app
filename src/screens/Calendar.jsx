@@ -1,6 +1,27 @@
 import React from 'react';
-import { useTheme, bgColor, fgColor, StatusBar, TabBar, fitGradient } from '../lib/shared.jsx';
+import { useTheme, bgColor, fgColor, StatusBar, TabBar, fitGradient, fitBorder } from '../lib/shared.jsx';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
+
+// Soft outer-glow rgba palette — index-matched to FIT_BORDERS in shared.jsx
+// (lavender, teal, coral, sky, pink, mint, amber, indigo, rose, sage, slate-blue, magenta)
+const AMBIENT_GLOWS = [
+  'rgba(138,123,216,0.45)',
+  'rgba(77,184,160,0.45)',
+  'rgba(224,122,74,0.45)',
+  'rgba(107,163,224,0.45)',
+  'rgba(224,122,176,0.45)',
+  'rgba(107,200,144,0.45)',
+  'rgba(224,176,96,0.45)',
+  'rgba(96,128,224,0.45)',
+  'rgba(224,128,112,0.45)',
+  'rgba(160,180,128,0.45)',
+  'rgba(112,128,149,0.45)',
+  'rgba(192,96,160,0.45)',
+];
+function ambientGlow(id) {
+  const n = typeof id === 'number' ? id : String(id).split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  return AMBIENT_GLOWS[Math.abs(n) % AMBIENT_GLOWS.length];
+}
 
 function DotsMenu({ color = 'rgba(245,240,232,0.85)' }) {
   return (
@@ -64,19 +85,28 @@ export default function ScreenCalendar() {
           </div>
         </div>
 
-        {/* Month cards — stacked, each with a big watermark month name over a warm gradient */}
-        <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {months.map((m, i) => (
+        {/* Month cards — stacked, each with a big watermark month name + colored ambient ring */}
+        <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {months.map((m, i) => {
+            const glow = ambientGlow(m.fitId);
+            return (
             <div key={m.name}
               onClick={() => window.__archiveGo && window.__archiveGo('archive')}
-              className="archive-pressable"
+              className="archive-pressable lg-border-gradient"
               style={{
                 position: 'relative',
                 aspectRatio: '16/9',
                 borderRadius: 22,
                 overflow: 'hidden',
                 background: fitGradient(m.fitId),
-                boxShadow: '0 8px 24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(245,240,232,0.08), inset 0 -1px 0 rgba(0,0,0,0.25)',
+                '--grad-border': fitBorder(m.fitId),
+                boxShadow:
+                  `0 0 0 1px rgba(255,255,255,0.04), ` +
+                  `0 0 60px -10px ${glow}, ` +
+                  `0 18px 40px -8px ${glow}, ` +
+                  `0 8px 24px rgba(0,0,0,0.45), ` +
+                  `inset 0 1px 0 rgba(245,240,232,0.08), ` +
+                  `inset 0 -1px 0 rgba(0,0,0,0.25)`,
                 cursor: 'pointer',
               }}>
 
@@ -154,7 +184,8 @@ export default function ScreenCalendar() {
                 <DotsMenu />
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Footer streak summary — keeps some of the original info */}
