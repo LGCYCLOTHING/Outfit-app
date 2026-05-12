@@ -30,6 +30,19 @@ export default function ScreenYou() {
     window.dispatchEvent(new CustomEvent('archive:themechange', { detail: id }));
   };
 
+  // Manual icon override — null = follow the active theme
+  const [iconOverride, setIconOverride] = React.useState(() => {
+    try { return localStorage.getItem('aevum_app_icon'); } catch (e) { return null; }
+  });
+  const pickIcon = (id) => {
+    try {
+      if (id) localStorage.setItem('aevum_app_icon', id);
+      else localStorage.removeItem('aevum_app_icon');
+    } catch (e) {}
+    setIconOverride(id);
+    window.dispatchEvent(new CustomEvent('archive:iconchange', { detail: id }));
+  };
+
   const isLight = !!window.__archiveLight;
   const toggleLight = () => {
     window.__archiveLight = !window.__archiveLight;
@@ -169,6 +182,67 @@ export default function ScreenYou() {
                 }}>
                   {s.name.toUpperCase()}
                 </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ────────── APP ICON PICKER ────────── */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 26, marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
+            <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
+              APP ICON
+            </span>
+          </div>
+          <div
+            onClick={() => pickIcon(null)}
+            className="archive-pressable lg-pill"
+            style={{
+              padding: '6px 12px', borderRadius: 100, cursor: 'pointer',
+              fontSize: 11, color: iconOverride === null ? accent : 'var(--text-secondary)',
+              fontWeight: 500, letterSpacing: 0.3,
+              boxShadow: iconOverride === null ? `inset 0 0 0 1px ${accent}` : undefined,
+            }}>
+            Match theme
+          </div>
+        </div>
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8,
+          marginBottom: 22,
+        }}>
+          {swatches.map(s => {
+            const isPicked = iconOverride === s.id;
+            return (
+              <div key={s.id}
+                onClick={() => pickIcon(s.id)}
+                className="archive-pressable"
+                style={{
+                  position: 'relative', aspectRatio: '1', borderRadius: 14,
+                  overflow: 'hidden', cursor: 'pointer',
+                  border: isPicked ? `1.5px solid ${s.light}` : '1px solid rgba(255,255,255,0.08)',
+                  boxShadow: isPicked
+                    ? `0 0 0 2px rgba(0,0,0,0.4), 0 6px 14px -4px rgba(${s.softRgba},0.45)`
+                    : '0 2px 8px rgba(0,0,0,0.3)',
+                  transition: 'border-color .2s, box-shadow .2s',
+                }}>
+                <img
+                  src={`/icons/icon-${s.id}.png`}
+                  alt=""
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+                {isPicked && (
+                  <div style={{
+                    position: 'absolute', top: 5, right: 5,
+                    width: 14, height: 14, borderRadius: 7,
+                    background: s.light,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12l5 5L20 7"/>
+                    </svg>
+                  </div>
+                )}
               </div>
             );
           })}

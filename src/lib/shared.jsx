@@ -190,20 +190,63 @@ export function GlowCard({ children, glow = 'br', accent, radius = 28, style = {
   );
 }
 
+/* App icon — small badge that auto-matches the current theme (or honors the
+   user's manual override saved in localStorage 'aevum_app_icon'). Re-renders
+   on both 'archive:themechange' and 'archive:iconchange' events. */
+export function getActiveIconId() {
+  if (typeof window === 'undefined') return 'ivory';
+  try {
+    const override = localStorage.getItem('aevum_app_icon');
+    if (override) return override;
+  } catch (e) {}
+  return window.__archiveTheme || 'ivory';
+}
+
+export function AppIcon({ size = 24, onClick }) {
+  const [, force] = React.useReducer(x => x + 1, 0);
+  React.useEffect(() => {
+    window.addEventListener('archive:themechange', force);
+    window.addEventListener('archive:iconchange', force);
+    return () => {
+      window.removeEventListener('archive:themechange', force);
+      window.removeEventListener('archive:iconchange', force);
+    };
+  }, []);
+  const id = getActiveIconId();
+  return (
+    <img
+      src={`/icons/icon-${id}.png`}
+      alt=""
+      onClick={onClick}
+      style={{
+        width: size, height: size,
+        borderRadius: Math.round(size * 0.22),
+        objectFit: 'cover',
+        flexShrink: 0,
+        cursor: onClick ? 'pointer' : 'default',
+        display: 'block',
+        boxShadow: '0 2px 6px rgba(0,0,0,0.35)',
+      }}
+    />
+  );
+}
+
 export function ArchiveBurger() {
   return (
-    <div
-      className="archive-pressable"
-      onClick={() => typeof window !== 'undefined' && window.__archiveToggleNav && window.__archiveToggleNav()}
-      style={{
-        width: 28, height: 22,
-        display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 5,
-        cursor: 'pointer',
-        flexShrink: 0,
-      }}>
-      <div style={{ width: 20, height: 2.5, borderRadius: 1.5, background: '#FFFFFF' }} />
-      <div style={{ width: 20, height: 2.5, borderRadius: 1.5, background: '#FFFFFF' }} />
-      <div style={{ width: 20, height: 2.5, borderRadius: 1.5, background: '#FFFFFF' }} />
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+      <AppIcon size={26} onClick={() => typeof window !== 'undefined' && window.__archiveGo && window.__archiveGo('you')} />
+      <div
+        className="archive-pressable"
+        onClick={() => typeof window !== 'undefined' && window.__archiveToggleNav && window.__archiveToggleNav()}
+        style={{
+          width: 28, height: 22,
+          display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 5,
+          cursor: 'pointer',
+        }}>
+        <div style={{ width: 20, height: 2.5, borderRadius: 1.5, background: '#FFFFFF' }} />
+        <div style={{ width: 20, height: 2.5, borderRadius: 1.5, background: '#FFFFFF' }} />
+        <div style={{ width: 20, height: 2.5, borderRadius: 1.5, background: '#FFFFFF' }} />
+      </div>
     </div>
   );
 }

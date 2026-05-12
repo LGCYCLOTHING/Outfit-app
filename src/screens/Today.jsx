@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   useTheme, bgColor, fgColor,
-  ArchiveBurger, StatusBar, GlowCard, Glass, TabBar, PhotoPlaceholder, fitGradient, fitBorder,
+  ArchiveBurger, AppIcon, StatusBar, GlowCard, Glass, TabBar, PhotoPlaceholder, fitGradient, fitBorder,
 } from '../lib/shared.jsx';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
 import { useWeather, WeatherIcon } from '../lib/weather.jsx';
@@ -151,8 +151,9 @@ export default function ScreenToday() {
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 marginTop: 8, marginBottom: 12,
               }}>
-                {/* LEFT GROUP — hamburger menu, then "12 Tuesday" right next to it */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                {/* LEFT GROUP — app icon, hamburger, weather */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <AppIcon size={26} onClick={() => window.__archiveGo && window.__archiveGo('you')} />
                   <div
                     onClick={() => window.__archiveToggleNav && window.__archiveToggleNav()}
                     className="archive-pressable"
@@ -161,9 +162,9 @@ export default function ScreenToday() {
                       display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 6,
                       cursor: 'pointer',
                     }}>
-                    <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: '#F5F0E8' }} />
-                    <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: '#F5F0E8' }} />
-                    <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: '#F5F0E8' }} />
+                    <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: 'var(--text-primary)' }} />
+                    <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: 'var(--text-primary)' }} />
+                    <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: 'var(--text-primary)' }} />
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <WeatherIcon type={weather.icon} size={22} color="#F5F0E8" />
