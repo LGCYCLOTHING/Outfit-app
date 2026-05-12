@@ -215,14 +215,14 @@ export default function ScreenToday() {
                 </div>
               </div>
 
-              {/* Week strip — shorter glass card, thicker text inside */}
+              {/* Week strip — compact glass card */}
               <div style={{
                 background: 'rgba(255, 240, 220, 0.04)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
                 border: '1px solid rgba(255, 240, 220, 0.07)',
-                borderRadius: 16,
-                padding: '8px 16px 10px',
+                borderRadius: 14,
+                padding: '6px 14px',
                 margin: '10px 0 18px',
                 boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
               }}>
@@ -232,28 +232,30 @@ export default function ScreenToday() {
                   {weekDays.map((d, i) => (
                     <div key={i} style={{
                       display: 'flex', flexDirection: 'column',
-                      alignItems: 'center', gap: 5,
+                      alignItems: 'center', gap: 2,
                     }}>
-                      {/* Tall pill — wraps BOTH letter AND date for current day */}
+                      {/* Compact pill — letter + date stacked tight */}
                       <div style={{
                         background: d.isToday ? `rgba(${accentRgba}, 0.22)` : 'transparent',
-                        borderRadius: 14,
-                        padding: '4px 0',
-                        width: 28,
+                        borderRadius: 11,
+                        padding: '3px 0',
+                        width: 26,
                         display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', gap: 2,
+                        alignItems: 'center', gap: 0,
                       }}>
                         <span style={{
-                          fontSize: 11,
+                          fontSize: 10,
                           color: d.isToday ? accent : '#B5A89A',
                           letterSpacing: '0.05em',
+                          lineHeight: 1.1,
                         }}>
                           {d.letter}
                         </span>
                         <span style={{
-                          fontSize: 14,
+                          fontSize: 13,
                           color: d.isToday ? accent : '#D4C8B8',
                           letterSpacing: '-0.02em',
+                          lineHeight: 1.1,
                         }}>
                           {d.dateNum}
                         </span>
