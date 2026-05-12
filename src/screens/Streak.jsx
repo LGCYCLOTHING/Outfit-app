@@ -312,11 +312,11 @@ export default function ScreenStreak() {
         </div>
 
         {/* Milestone badges row — all earned + locked */}
-        <div style={{ marginBottom: 14 }}>
+        <div className="lg-card no-scroll" style={{ marginBottom: 14, padding: '14px 14px 12px', borderRadius: 18 }}>
           <div style={{ fontSize: 10, color: 'var(--text-secondary)', letterSpacing: 1.4, marginBottom: 12, paddingLeft: 4 }}>
             MILESTONES
           </div>
-          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 4 }}>
+          <div className="no-scroll" style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 4 }}>
             <style>{`.no-scroll::-webkit-scrollbar{display:none}`}</style>
             {MILESTONES.map((m, i) => {
               const earned = streak >= m.days;
@@ -324,20 +324,20 @@ export default function ScreenStreak() {
                 <div key={i} style={{
                   flex: '0 0 auto',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-                  opacity: earned ? 1 : 0.4,
+                  opacity: earned ? 1 : 0.55,
                 }}>
                   <div style={{
                     width: 52, height: 52, borderRadius: 26,
-                    background: earned ? `rgba(${accentRgba}, 0.20)` : 'rgba(245,240,232,0.04)',
-                    border: earned ? `1px solid ${accent}` : '1px dashed rgba(245,240,232,0.15)',
+                    background: earned ? `rgba(${accentRgba}, 0.22)` : 'rgba(255,255,255,0.08)',
+                    border: earned ? `1px solid ${accent}` : '1px dashed rgba(255,255,255,0.25)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 22, color: earned ? accent : 'rgba(245,240,232,0.3)',
+                    fontSize: 22, color: earned ? accent : 'var(--text-secondary)',
                   }}>
                     {m.icon}
                   </div>
                   <div style={{
                     fontSize: 9, letterSpacing: 1, textTransform: 'uppercase',
-                    color: earned ? '#F5F0E8' : '#5C5248',
+                    color: earned ? 'var(--text-primary)' : 'var(--text-muted)',
                   }}>
                     {m.label}
                   </div>
