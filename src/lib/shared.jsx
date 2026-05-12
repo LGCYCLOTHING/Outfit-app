@@ -610,23 +610,18 @@ function SlidingBubbleNav({ items, active, itemRefs, onPointerDown, onClickItem,
     }}>
       <div
         ref={containerRef}
+        className="nav-bar"
         style={{
           pointerEvents: 'auto',
           position: 'relative',
           width: '82%',
           padding: '6px 8px',
           borderRadius: 999,
-          background: 'rgba(255, 240, 220, 0.04)',
-          border: '1px solid rgba(255, 240, 220, 0.08)',
-          boxShadow:
-            'inset 0 2px 10px rgba(255,255,255,0.25), ' +
-            '0 100px 180px -20px rgba(200,149,108,0.15)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-around',
         }}>
-        {/* Sliding glass bubble — sits behind the active item */}
+        {/* Sliding glass bubble — sits behind the active item (premium glass treatment) */}
         <div
+          className="nav-active-bubble"
           style={{
             position: 'absolute',
             top: '50%',
@@ -635,15 +630,16 @@ function SlidingBubbleNav({ items, active, itemRefs, onPointerDown, onClickItem,
             height: 36,
             transform: `translateY(-50%) scaleX(${stretching ? 1.3 : 1})`,
             transformOrigin: 'center',
-            background: 'rgba(255, 255, 255, 0.12)',
-            backdropFilter: 'blur(20px) saturate(200%)',
-            WebkitBackdropFilter: 'blur(20px) saturate(200%)',
-            border: '1px solid rgba(255,255,255,0.25)',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 100%)',
+            backdropFilter: 'blur(40px) saturate(220%) brightness(1.15)',
+            WebkitBackdropFilter: 'blur(40px) saturate(220%) brightness(1.15)',
+            border: '1px solid rgba(255,255,255,0.2)',
             borderRadius: 999,
             boxShadow:
-              'inset 0 1px 0 rgba(255,255,255,0.4), ' +
-              'inset 0 -1px 0 rgba(255,255,255,0.1), ' +
-              '0 0 20px rgba(200,149,108,0.2)',
+              'inset 0 1px 0 rgba(255,255,255,0.3), ' +
+              'inset 0 -1px 0 rgba(255,255,255,0.05), ' +
+              '0 8px 32px rgba(0,0,0,0.4), ' +
+              '0 20px 60px rgba(0,0,0,0.2)',
             transition:
               'left 800ms cubic-bezier(0.34, 1.56, 0.64, 1), ' +
               'width 800ms cubic-bezier(0.34, 1.56, 0.64, 1), ' +

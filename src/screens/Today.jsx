@@ -216,15 +216,10 @@ export default function ScreenToday() {
               </div>
 
               {/* Week strip — compact glass card */}
-              <div style={{
-                background: 'rgba(255, 240, 220, 0.04)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 240, 220, 0.07)',
+              <div className="lg-card" style={{
                 borderRadius: 14,
                 padding: '6px 14px',
                 margin: '10px 0 18px',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
               }}>
                 <div style={{
                   display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)',

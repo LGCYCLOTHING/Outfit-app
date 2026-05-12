@@ -366,112 +366,260 @@ body * {
   --specular-bottom: inset 0 -1px 0 rgba(255,255,255,0.04);
   --depth-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.2);
 }
+/* ═════════════════════════════════════════════════════════════════
+   Premium liquid-glass system
+   - Surface gradient + boosted blur/saturate/brightness backdrop
+   - Layered inset glow (top, bottom, sides) for inner illumination
+   - ::before specular highlight arc on the top edge
+   - Drop shadow under the glass for depth
+   ═════════════════════════════════════════════════════════════════ */
 .nav-bar {
-  background: rgba(20, 18, 16, 0.45);
-  backdrop-filter: blur(8px) saturate(140%);
-  -webkit-backdrop-filter: blur(8px) saturate(140%);
-  border: 2px solid transparent;
+  position: relative;
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.06) 100%);
+  backdrop-filter: blur(40px) saturate(220%) brightness(1.15);
+  -webkit-backdrop-filter: blur(40px) saturate(220%) brightness(1.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow:
-    /* TOP edge — bright crisp shine */
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.70),
-    inset 0 4px 10px rgba(255, 255, 255, 0.14),
-    /* BOTTOM edge — slightly less bright shine */
-    inset 0 -1.5px 0 rgba(255, 255, 255, 0.38),
-    inset 0 -4px 12px rgba(0, 0, 0, 0.28),
-    /* very faint side dim — keeps the edge visible without a hard outline */
-    inset 1px 0 0 rgba(0, 0, 0, 0.06),
-    inset -1px 0 0 rgba(0, 0, 0, 0.06),
-    /* drop shadow under the glass */
-    0 12px 36px rgba(0, 0, 0, 0.45),
-    0 4px 10px rgba(0, 0, 0, 0.3);
+    inset 0 1px 0 rgba(255, 255, 255, 0.30),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+    inset 1px 0 0 rgba(255, 255, 255, 0.08),
+    inset -1px 0 0 rgba(255, 255, 255, 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 20px 60px rgba(0, 0, 0, 0.2);
 }
+.nav-bar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%;
+  width: 80%; height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 30%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.6) 70%,
+    transparent 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+}
+
 .liquid-glass {
-  background: rgba(255, 240, 220, 0.08);
-  backdrop-filter: blur(8px) saturate(140%);
-  -webkit-backdrop-filter: blur(8px) saturate(140%);
-  border: 2px solid transparent;
+  position: relative;
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.08) 100%);
+  backdrop-filter: blur(24px) saturate(200%) brightness(1.1);
+  -webkit-backdrop-filter: blur(24px) saturate(200%) brightness(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow:
-    /* TOP edge — bright crisp shine */
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.75),
-    inset 0 4px 11px rgba(255, 255, 255, 0.16),
-    /* BOTTOM edge — softer matching shine */
-    inset 0 -1.5px 0 rgba(255, 255, 255, 0.42),
-    inset 0 -4px 12px rgba(0, 0, 0, 0.30),
-    /* faint side dimming */
-    inset 1px 0 0 rgba(0, 0, 0, 0.06),
-    inset -1px 0 0 rgba(0, 0, 0, 0.06),
-    /* drop shadow */
-    0 12px 32px rgba(0, 0, 0, 0.5),
-    0 4px 10px rgba(0, 0, 0, 0.35);
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+    inset 1px 0 0 rgba(255, 255, 255, 0.08),
+    inset -1px 0 0 rgba(255, 255, 255, 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.2);
 }
-/* Default content box — top/bottom shine, no side outline */
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%;
+  width: 80%; height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 30%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.6) 70%,
+    transparent 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+}
+
 .lg-card {
-  background: rgba(255, 240, 220, 0.07);
-  backdrop-filter: blur(8px) saturate(140%);
-  -webkit-backdrop-filter: blur(8px) saturate(140%);
-  border: 2px solid transparent;
+  position: relative;
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.08) 100%);
+  backdrop-filter: blur(24px) saturate(200%) brightness(1.1);
+  -webkit-backdrop-filter: blur(24px) saturate(200%) brightness(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.65),
-    inset 0 4px 14px rgba(255, 255, 255, 0.12),
-    inset 0 -1.5px 0 rgba(255, 255, 255, 0.35),
-    inset 0 -4px 14px rgba(0, 0, 0, 0.28),
-    inset 1px 0 0 rgba(0, 0, 0, 0.05),
-    inset -1px 0 0 rgba(0, 0, 0, 0.05),
-    0 12px 30px rgba(0,0,0,0.5),
-    0 4px 10px rgba(0,0,0,0.32);
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+    inset 1px 0 0 rgba(255, 255, 255, 0.08),
+    inset -1px 0 0 rgba(255, 255, 255, 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.lg-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%;
+  width: 80%; height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 30%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.6) 70%,
+    transparent 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* Small compact box */
 .lg-chip {
-  background: rgba(255, 240, 220, 0.06);
-  backdrop-filter: blur(8px) saturate(140%);
-  -webkit-backdrop-filter: blur(8px) saturate(140%);
-  border: 2px solid transparent;
+  position: relative;
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.10) 0%,
+    rgba(255, 255, 255, 0.04) 50%,
+    rgba(255, 255, 255, 0.07) 100%);
+  backdrop-filter: blur(24px) saturate(200%) brightness(1.1);
+  -webkit-backdrop-filter: blur(24px) saturate(200%) brightness(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.60),
-    inset 0 3px 8px rgba(255, 255, 255, 0.10),
-    inset 0 -1.5px 0 rgba(255, 255, 255, 0.30),
-    inset 0 -3px 8px rgba(0, 0, 0, 0.22),
-    inset 1px 0 0 rgba(0, 0, 0, 0.04),
-    inset -1px 0 0 rgba(0, 0, 0, 0.04),
-    0 6px 18px rgba(0,0,0,0.35),
-    0 2px 6px rgba(0,0,0,0.25);
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+    inset 1px 0 0 rgba(255, 255, 255, 0.07),
+    inset -1px 0 0 rgba(255, 255, 255, 0.07),
+    0 6px 22px rgba(0, 0, 0, 0.32),
+    0 2px 6px rgba(0, 0, 0, 0.18);
+}
+.lg-chip::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%;
+  width: 80%; height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.55) 30%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(255, 255, 255, 0.55) 70%,
+    transparent 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* Pill / chip / tag */
 .lg-pill {
-  background: rgba(255, 240, 220, 0.09);
-  backdrop-filter: blur(8px) saturate(140%);
-  -webkit-backdrop-filter: blur(8px) saturate(140%);
-  border: 2px solid transparent;
+  position: relative;
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.13) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.09) 100%);
+  backdrop-filter: blur(24px) saturate(200%) brightness(1.1);
+  -webkit-backdrop-filter: blur(24px) saturate(200%) brightness(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.72),
-    inset 0 4px 10px rgba(255, 255, 255, 0.12),
-    inset 0 -1.5px 0 rgba(255, 255, 255, 0.40),
-    inset 0 -4px 10px rgba(0, 0, 0, 0.26),
-    inset 1px 0 0 rgba(0, 0, 0, 0.05),
-    inset -1px 0 0 rgba(0, 0, 0, 0.05),
-    0 6px 16px rgba(0,0,0,0.3);
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+    inset 1px 0 0 rgba(255, 255, 255, 0.08),
+    inset -1px 0 0 rgba(255, 255, 255, 0.08),
+    0 6px 22px rgba(0, 0, 0, 0.32),
+    0 2px 6px rgba(0, 0, 0, 0.18);
+}
+.lg-pill::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%;
+  width: 80%; height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 30%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.6) 70%,
+    transparent 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* Selected / highlighted state — sage outline (no outer glow) */
+/* Selected / highlighted state — sage tinted, keeps the premium glass surface */
 .lg-pill.active,
 .lg-active {
-  background: rgba(155, 184, 159, 0.10);
-  border: 2px solid transparent;
+  position: relative;
+  background: linear-gradient(135deg,
+    rgba(155, 184, 159, 0.18) 0%,
+    rgba(155, 184, 159, 0.06) 100%);
+  backdrop-filter: blur(24px) saturate(200%) brightness(1.1);
+  -webkit-backdrop-filter: blur(24px) saturate(200%) brightness(1.1);
+  border: 1px solid rgba(155, 184, 159, 0.45);
   box-shadow:
-    0 0 0 1.5px rgba(155, 184, 159, 0.5),
-    0 4px 24px rgba(0,0,0,0.4),
-    inset 0 1px 0 rgba(255,240,220,0.10);
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 1px rgba(155, 184, 159, 0.30),
+    0 8px 28px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.lg-pill.active::before,
+.lg-active::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%;
+  width: 80%; height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 30%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.6) 70%,
+    transparent 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* Bottom-sheet modal */
+/* Bottom-sheet modal — dark base, keeps the specular + inner glow */
 .lg-sheet {
-  background: rgba(20, 18, 16, 0.78);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-  border-top: 1px solid rgba(255, 240, 220, 0.35);
-  box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+  position: relative;
+  background:
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(255, 255, 255, 0.02) 100%),
+    rgba(20, 18, 16, 0.78);
+  backdrop-filter: blur(24px) saturate(200%) brightness(1.1);
+  -webkit-backdrop-filter: blur(24px) saturate(200%) brightness(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+    inset 1px 0 0 rgba(255, 255, 255, 0.06),
+    inset -1px 0 0 rgba(255, 255, 255, 0.06),
+    0 -8px 40px rgba(0, 0, 0, 0.5);
+}
+.lg-sheet::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%;
+  width: 80%; height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.5) 30%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0.5) 70%,
+    transparent 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Specular highlight arc for the sliding nav active bubble (highest quality treatment) */
+.nav-active-bubble::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%;
+  width: 80%; height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.7) 30%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.7) 70%,
+    transparent 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* Gradient outline ring — pair with --grad-border CSS var per element.
