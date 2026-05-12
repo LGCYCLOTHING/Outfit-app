@@ -32,7 +32,7 @@ export default function ScreenSplash({ onContinue }) {
           fontSize: 11, letterSpacing: '0.3em', color: '#C8956C',
           fontWeight: 600, marginBottom: 22,
         }}>
-          ARCHIVE
+          AĒVUM
         </div>
         <div style={{
           fontFamily: '"Inter", sans-serif',

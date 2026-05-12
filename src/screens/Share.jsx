@@ -50,7 +50,7 @@ export default function ScreenShare() {
           fontWeight: 500, letterSpacing: size === 'large' ? 4 : 2.2,
           color: isDark ? '#fff' : '#1a1612',
           fontFamily: '"DM Sans", sans-serif',
-        }}>ARCHIVE</div>
+        }}>AĒVUM</div>
 
         <div style={{
           position: 'absolute',

@@ -4,7 +4,7 @@ import LiquidMesh from '../lib/liquid-mesh.jsx';
 
 // Local helpers — same logic as Today's streak so numbers stay in sync
 function readLoggedDays() {
-  try { return JSON.parse(localStorage.getItem('archive_fits_logged') || '[]'); }
+  try { return JSON.parse(localStorage.getItem('aevum_fits_logged') || '[]'); }
   catch (e) { return []; }
 }
 function ymd(d) {

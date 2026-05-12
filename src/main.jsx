@@ -4,6 +4,27 @@ import './styles.css';
 import App from './App.jsx';
 
 if (typeof window !== 'undefined') {
+  // One-shot localStorage migration: archive_* -> aevum_* (preserve user data
+  // through the brand rename). Runs once per device, then sets a flag.
+  try {
+    if (!localStorage.getItem('aevum_migrated_from_archive')) {
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('archive_')) keys.push(k);
+      }
+      keys.forEach(k => {
+        const v = localStorage.getItem(k);
+        const newKey = 'aevum_' + k.slice('archive_'.length);
+        if (v != null && localStorage.getItem(newKey) == null) {
+          localStorage.setItem(newKey, v);
+        }
+        localStorage.removeItem(k);
+      });
+      localStorage.setItem('aevum_migrated_from_archive', '1');
+    }
+  } catch (e) {}
+
   if (new URLSearchParams(location.search).get('light') === '1') {
     window.__archiveLight = true;
   }

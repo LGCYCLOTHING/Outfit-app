@@ -9,7 +9,7 @@ import { useWeather, WeatherIcon } from '../lib/weather.jsx';
 // ─────────── Streak / week helpers (read from localStorage) ───────────
 function readLoggedDays() {
   try {
-    return JSON.parse(localStorage.getItem('archive_fits_logged') || '[]');
+    return JSON.parse(localStorage.getItem('aevum_fits_logged') || '[]');
   } catch (e) { return []; }
 }
 

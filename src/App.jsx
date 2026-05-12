@@ -19,7 +19,7 @@ import ScreenPieces from './screens/Pieces.jsx';
 
 const VALID_SCREENS = ['today','archive','mix','you','paywall','rating','detail','calendar','share','story','splash','onboarding','auth','settings','pieces','streak'];
 
-const ONBOARDED_KEY = 'archive_onboarded';
+const ONBOARDED_KEY = 'aevum_onboarded';
 function isOnboarded() {
   try { return !!localStorage.getItem(ONBOARDED_KEY); } catch (e) { return false; }
 }
@@ -28,7 +28,7 @@ function markOnboarded() {
 }
 
 function AppWordmark() {
-  return <div className="archive-wordmark">ARCHIVE</div>;
+  return <div className="archive-wordmark">AĒVUM</div>;
 }
 
 function FloatingNav({ current, go }) {
@@ -183,7 +183,7 @@ function FloatingNav({ current, go }) {
           fontSize: 9, color: 'rgba(255,255,255,0.4)',
           letterSpacing: 0.3, lineHeight: 1.5,
         }}>
-          ARCHIVE · Daily outfit tracker<br/>
+          AĒVUM · Daily outfit tracker<br/>
           Version 0.1.0 · Edition Noire
         </div>
       </div>

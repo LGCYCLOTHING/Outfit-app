@@ -69,6 +69,24 @@ export default function LiquidMesh({ seed = 0, intensity = 1 }) {
     @keyframes archive-bg-fade-out { from { opacity: 1; } to { opacity: 0; } }
   `;
 
+  // Each theme layer = gradient fallback + bg image on top.
+  // The whole layer fades in/out so gradient + image transition together.
+  const ThemeLayer = ({ themeId, anim }) => (
+    <div style={{ position: 'absolute', inset: 0, animation: anim || 'none' }}>
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: bgFor(themeId),
+      }} />
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: `url('/backgrounds/bg-${themeId}.png')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }} />
+    </div>
+  );
+
   // ─────────── LIGHT MODE ───────────
   if (isLight) {
     return (
@@ -76,11 +94,7 @@ export default function LiquidMesh({ seed = 0, intensity = 1 }) {
         position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none',
         background: '#F5F0E8',
       }}>
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: bgFor(current),
-          opacity: 0.30,
-        }} />
+        <ThemeLayer themeId={current} />
         <div style={{
           position: 'absolute', inset: 0,
           backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.4 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")`,
@@ -92,7 +106,7 @@ export default function LiquidMesh({ seed = 0, intensity = 1 }) {
     );
   }
 
-  // ─────────── DARK MODE — top-right glow + bottom-left secondary, with crossfade ───────────
+  // ─────────── DARK MODE — gradient + bg image, with crossfade ───────────
   return (
     <div data-liquid-mesh="true" style={{
       position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none',
@@ -102,24 +116,18 @@ export default function LiquidMesh({ seed = 0, intensity = 1 }) {
 
       {/* Previous theme — fades out over 400ms */}
       {previous && (
-        <div
+        <ThemeLayer
           key={`prev-${previous}`}
-          style={{
-            position: 'absolute', inset: 0,
-            background: bgFor(previous),
-            animation: 'archive-bg-fade-out 400ms ease forwards',
-          }}
+          themeId={previous}
+          anim="archive-bg-fade-out 400ms ease forwards"
         />
       )}
 
       {/* Current theme — fades in over 400ms (or static if no previous) */}
-      <div
+      <ThemeLayer
         key={`curr-${current}`}
-        style={{
-          position: 'absolute', inset: 0,
-          background: bgFor(current),
-          animation: previous ? 'archive-bg-fade-in 400ms ease forwards' : 'none',
-        }}
+        themeId={current}
+        anim={previous ? 'archive-bg-fade-in 400ms ease forwards' : null}
       />
 
       {/* Top vignette so status-bar reads clearly */}

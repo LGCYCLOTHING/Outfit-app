@@ -125,30 +125,13 @@ export default function ScreenYou() {
                   cursor: 'pointer',
                   transition: 'border-color .25s ease, box-shadow .25s ease',
                 }}>
-                {/* Soft-Horizon multi-color gradient — vivid sunset orb */}
+                {/* Per-theme icon as the swatch background */}
                 <div style={{
                   position: 'absolute', inset: 0,
-                  background: `radial-gradient(circle at 50% 42%,
-                    ${SUNSET[s.id].hi} 0%,
-                    ${SUNSET[s.id].mid1} 18%,
-                    ${SUNSET[s.id].mid2} 38%,
-                    ${SUNSET[s.id].deep} 65%,
-                    transparent 95%)`,
-                  opacity: 0.92,
-                  filter: 'blur(2px)',
-                }} />
-                {/* Secondary bloom for extra glow */}
-                <div style={{
-                  position: 'absolute', inset: 0,
-                  background: `radial-gradient(circle at 50% 38%, ${SUNSET[s.id].hi} 0%, transparent 25%)`,
-                  opacity: 0.5, mixBlendMode: 'screen', pointerEvents: 'none',
-                }} />
-
-                {/* Film grain — analog tactile feel */}
-                <div style={{
-                  position: 'absolute', inset: 0,
-                  backgroundImage: 'url("data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22140%22 height=%22140%22><filter id=%22n%22><feTurbulence baseFrequency=%220.85%22 numOctaves=%222%22 stitchTiles=%22stitch%22/><feColorMatrix values=%220 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/></svg>")',
-                  opacity: 0.35, mixBlendMode: 'overlay', pointerEvents: 'none',
+                  backgroundImage: `url('/icons/icon-${s.id}.png'), radial-gradient(circle at 50% 42%, ${SUNSET[s.id].mid2} 0%, ${SUNSET[s.id].deep} 70%)`,
+                  backgroundSize: 'cover, cover',
+                  backgroundPosition: 'center, center',
+                  backgroundRepeat: 'no-repeat, no-repeat',
                 }} />
 
                 {/* Bottom darkening for label legibility */}

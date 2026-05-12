@@ -93,7 +93,7 @@ export default function ScreenPaywall() {
 
         <div style={{ textAlign: 'center', marginBottom: 6 }}>
           <div style={{ fontSize: 13, color: accent, letterSpacing: -0.50, fontFamily: '"DM Sans", sans-serif', marginBottom: 8 }}>
-            ARCHIVE PRO
+            AĒVUM PRO
           </div>
           <div style={{ fontSize: 30, fontWeight: 300, letterSpacing: -0.5, lineHeight: 1.1 }}>
             Every fit. <span style={{ fontStyle: 'italic', fontWeight: 400 }}>Endlessly</span><br/>

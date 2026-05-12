@@ -76,11 +76,11 @@ export function fitBorder(id) {
 
 export function getSavedFitPhoto(key) {
   if (typeof window === 'undefined' || key == null) return null;
-  try { return localStorage.getItem('archive_fit_photo_' + key); } catch (e) { return null; }
+  try { return localStorage.getItem('aevum_fit_photo_' + key); } catch (e) { return null; }
 }
 export function saveFitPhoto(key, dataUrl) {
   if (typeof window === 'undefined' || key == null) return;
-  try { localStorage.setItem('archive_fit_photo_' + key, dataUrl); } catch (e) {}
+  try { localStorage.setItem('aevum_fit_photo_' + key, dataUrl); } catch (e) {}
 }
 
 export function FitPhoto({ id = 1, label, date, ratio = '3/4', radius = 18, showNumber = true, placeholder = false, onAdd, photoKey, style = {} }) {

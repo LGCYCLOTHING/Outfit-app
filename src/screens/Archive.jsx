@@ -33,11 +33,11 @@ function DotsMenu({ color = 'rgba(245,240,232,0.55)' }) {
 const SORT_MODES = ['Latest', 'Oldest', 'Most worn', 'Liked first'];
 
 function readLikedFits() {
-  try { return new Set(JSON.parse(localStorage.getItem('archive_liked_fits') || '[]')); }
+  try { return new Set(JSON.parse(localStorage.getItem('aevum_liked_fits') || '[]')); }
   catch (e) { return new Set(); }
 }
 function writeLikedFits(set) {
-  try { localStorage.setItem('archive_liked_fits', JSON.stringify(Array.from(set))); } catch (e) {}
+  try { localStorage.setItem('aevum_liked_fits', JSON.stringify(Array.from(set))); } catch (e) {}
 }
 
 export default function ScreenArchive() {

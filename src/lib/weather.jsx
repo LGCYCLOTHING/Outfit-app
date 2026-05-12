@@ -2,7 +2,7 @@
 // Cached in localStorage for 15 minutes per location.
 import React from 'react';
 
-const CACHE_KEY = 'archive_weather_cache';
+const CACHE_KEY = 'aevum_weather_cache';
 const TTL_MS = 15 * 60 * 1000;
 const DEFAULT = { temp: 61, condition: 'Clear', code: 0 };
 

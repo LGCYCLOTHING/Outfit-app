@@ -8,14 +8,14 @@ import LiquidMesh from '../lib/liquid-mesh.jsx';
 const CATEGORIES = ['Tops', 'Bottoms', 'Shoes', 'Accessories', 'Outerwear'];
 
 function readPieces() {
-  try { return JSON.parse(localStorage.getItem('archive_pieces') || '[]'); }
+  try { return JSON.parse(localStorage.getItem('aevum_pieces') || '[]'); }
   catch (e) { return []; }
 }
 function writePieces(arr) {
-  try { localStorage.setItem('archive_pieces', JSON.stringify(arr)); } catch (e) {}
+  try { localStorage.setItem('aevum_pieces', JSON.stringify(arr)); } catch (e) {}
 }
 function isPro() {
-  try { return !!localStorage.getItem('archive_pro'); } catch (e) { return false; }
+  try { return !!localStorage.getItem('aevum_pro'); } catch (e) { return false; }
 }
 
 function CategoryIcon({ cat, size = 18, color = 'rgba(245,240,232,0.55)' }) {
@@ -192,7 +192,7 @@ export default function ScreenPieces() {
           </div>
 
           <div
-            onClick={() => { try { localStorage.setItem('archive_pro', '1'); } catch (e) {} setPro(true); }}
+            onClick={() => { try { localStorage.setItem('aevum_pro', '1'); } catch (e) {} setPro(true); }}
             className="archive-pressable"
             style={{
               marginTop: 18, alignSelf: 'center', cursor: 'pointer',

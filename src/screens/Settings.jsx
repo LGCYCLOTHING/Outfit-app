@@ -185,10 +185,10 @@ export default function ScreenSettings() {
   const themeAccent = t.light;
 
   // Toggle states (persisted via localStorage)
-  const [dailyPick, setDailyPick] = useLocalToggle('archive_set_daily_pick', true);
-  const [streakReminder, setStreakReminder] = useLocalToggle('archive_set_streak_reminder', true);
-  const [aiCombos, setAiCombos] = useLocalToggle('archive_set_ai_combos', false);
-  const [photoBackup, setPhotoBackup] = useLocalToggle('archive_set_photo_backup', true);
+  const [dailyPick, setDailyPick] = useLocalToggle('aevum_set_daily_pick', true);
+  const [streakReminder, setStreakReminder] = useLocalToggle('aevum_set_streak_reminder', true);
+  const [aiCombos, setAiCombos] = useLocalToggle('aevum_set_ai_combos', false);
+  const [photoBackup, setPhotoBackup] = useLocalToggle('aevum_set_photo_backup', true);
 
   const [confirmReset, setConfirmReset] = React.useState(false);
 
@@ -199,7 +199,7 @@ export default function ScreenSettings() {
 
   const handleReset = () => {
     try {
-      Object.keys(localStorage).filter(k => k.startsWith('archive_')).forEach(k => localStorage.removeItem(k));
+      Object.keys(localStorage).filter(k => k.startsWith('aevum_')).forEach(k => localStorage.removeItem(k));
     } catch (e) {}
     setConfirmReset(false);
     location.reload();
@@ -280,7 +280,7 @@ export default function ScreenSettings() {
           onClick={() => window.__archiveGo && window.__archiveGo('paywall')} />
         <SettingsRow icon={I.person} title="Profile"         subtitle="absolutebeta786@gmail.com"
           onClick={() => alert('Profile')} />
-        <SettingsRow icon={I.share}  title="Share ARCHIVE"   subtitle="Invite friends"
+        <SettingsRow icon={I.share}  title="Share AĒVUM"     subtitle="Invite friends"
           onClick={() => window.__archiveGo && window.__archiveGo('share')} />
         <SettingsRow icon={I.info}   title="About"           subtitle="Version 1.0.0"
           right={null} />

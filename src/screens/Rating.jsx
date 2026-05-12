@@ -36,10 +36,10 @@ export default function ScreenRating() {
 
   const saveFit = () => {
     try {
-      const logged = JSON.parse(localStorage.getItem('archive_fits_logged') || '[]');
+      const logged = JSON.parse(localStorage.getItem('aevum_fits_logged') || '[]');
       if (!logged.includes(todayKey)) {
         logged.push(todayKey);
-        localStorage.setItem('archive_fits_logged', JSON.stringify(logged));
+        localStorage.setItem('aevum_fits_logged', JSON.stringify(logged));
       }
       if (typeof window !== 'undefined') window.__archiveEmpty = false;
     } catch (e) {}
