@@ -72,7 +72,7 @@ function FloatingNav({ current, go }) {
         padding: 'calc(40px + var(--archive-safe-top, 0px)) 26px calc(20px + var(--archive-safe-bottom, 0px))',
         boxSizing: 'border-box',
         transform: open ? 'translateY(0)' : 'translateY(-100%)',
-        transition: 'transform .28s ease-out',
+        transition: 'transform .45s cubic-bezier(.16,1,.3,1)',
         overflow: 'hidden',
       }}>
         <div
@@ -110,7 +110,7 @@ function FloatingNav({ current, go }) {
             { id: 'calendar', label: 'Calendar' },
             { id: 'streak',   label: 'Streak' },
             { id: 'you',      label: 'You' },
-          ].map((it, i) => {
+          ].map((it) => {
             const active = current === it.id;
             return (
               <div
@@ -125,9 +125,6 @@ function FloatingNav({ current, go }) {
                   letterSpacing: -0.4,
                   color: active ? accent : 'rgba(255,255,255,0.95)',
                   cursor: 'pointer',
-                  opacity: open ? 1 : 0,
-                  transform: open ? 'translateY(0)' : 'translateY(-8px)',
-                  transition: `opacity .3s ease ${0.05 + i * 0.04}s, transform .35s cubic-bezier(.2,.8,.2,1) ${0.05 + i * 0.04}s`,
                 }}>
                 {it.label}
               </div>
@@ -157,7 +154,7 @@ function FloatingNav({ current, go }) {
             { id: 'settings', label: 'Settings' },
             { id: 'rating',   label: 'Log fit' },
             { id: 'share',    label: 'Share' },
-          ].map((it, i) => (
+          ].map((it) => (
             <div
               key={it.id}
               className="archive-pressable"
@@ -169,9 +166,6 @@ function FloatingNav({ current, go }) {
                 lineHeight: 1.1, letterSpacing: -0.2,
                 color: 'rgba(255,255,255,0.85)',
                 cursor: 'pointer',
-                opacity: open ? 1 : 0,
-                transform: open ? 'translateY(0)' : 'translateY(-6px)',
-                transition: `opacity .3s ease ${0.22 + i * 0.04}s, transform .35s cubic-bezier(.2,.8,.2,1) ${0.22 + i * 0.04}s`,
               }}>
               {it.label}
               {it.badge && (
@@ -191,8 +185,6 @@ function FloatingNav({ current, go }) {
           fontFamily: '"DM Sans", sans-serif',
           fontSize: 9, color: 'rgba(255,255,255,0.4)',
           letterSpacing: 0.3, lineHeight: 1.5,
-          opacity: open ? 1 : 0,
-          transition: 'opacity .3s ease .35s',
         }}>
           ARCHIVE · Daily outfit tracker<br/>
           Version 0.1.0 · Edition Noire
