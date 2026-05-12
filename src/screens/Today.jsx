@@ -272,134 +272,47 @@ export default function ScreenToday() {
         })()}
 
 
-        <div style={{ marginTop: 36, marginBottom: 4 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18, paddingRight: 4 }}>
-            <span style={{
-              fontSize: 20, color: '#F5F0E8', fontWeight: 600, letterSpacing: '-0.03em',
-            }}>
-              This week
-            </span>
-            <span
-              onClick={() => window.__archiveGo && window.__archiveGo('archive')}
-              className="archive-pressable"
-              style={{
-                fontSize: 12, color: 'rgba(245,240,232,0.55)', fontWeight: 500,
-                cursor: 'pointer', letterSpacing: '-0.01em',
-                display: 'flex', alignItems: 'center', gap: 4,
+        {/* Simplified "This week" — single compact pill that opens story mode */}
+        <div
+          onClick={() => window.__archiveGo && window.__archiveGo('story')}
+          className="lg-card archive-pressable"
+          style={{
+            marginTop: 22, marginBottom: 22,
+            padding: '14px 16px', borderRadius: 14,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            cursor: 'pointer',
+          }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {/* Mini stacked story-glimpse indicator */}
+            <div style={{ position: 'relative', width: 40, height: 28 }}>
+              {[2, 1, 0].map((i) => (
+                <div key={i} style={{
+                  position: 'absolute', top: 0, left: i * 8,
+                  width: 24, height: 28, borderRadius: 6,
+                  background: 'linear-gradient(180deg, #1c1a1a 0%, #100e0e 100%)',
+                  border: '1px solid rgba(245,240,232,0.08)',
+                  zIndex: 3 - i,
+                  opacity: 1 - i * 0.18,
+                }} />
+              ))}
+            </div>
+            <div>
+              <div style={{
+                fontSize: 14, color: '#F5F0E8', letterSpacing: '-0.02em', lineHeight: 1.2,
               }}>
-              See all
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 6l6 6-6 6"/>
-              </svg>
-            </span>
+                This week's stories
+              </div>
+              <div style={{
+                fontSize: 11, color: '#A89880', marginTop: 3, letterSpacing: 0.4,
+                textTransform: 'uppercase',
+              }}>
+                6 fits · tap to view
+              </div>
+            </div>
           </div>
-
-          <div
-            ref={(el) => {
-              if (el && !el.__wheelBound) {
-                el.__wheelBound = true;
-                el.addEventListener('wheel', (e) => {
-                  if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-                    e.preventDefault();
-                    el.scrollLeft += e.deltaY;
-                  }
-                }, { passive: false });
-              }
-            }}
-            className="story-row"
-            style={{
-              margin: '0 -24px', padding: '6px 24px 10px',
-              display: 'flex', gap: 14, overflowX: 'auto', overflowY: 'hidden',
-              WebkitOverflowScrolling: 'touch',
-              scrollbarWidth: 'none',
-            }}>
-            <style>{`.story-row::-webkit-scrollbar{display:none}`}</style>
-            {[
-              { day: 'Mon', date: '27', isToday: true, empty: false, photoIdx: 0 },
-              { day: 'Sun', date: '26', isToday: false, empty: false, photoIdx: 4 },
-              { day: 'Sat', date: '25', isToday: false, empty: false, photoIdx: 9 },
-              { day: 'Fri', date: '24', isToday: false, empty: true,  photoIdx: 13 },
-              { day: 'Thu', date: '23', isToday: false, empty: false, photoIdx: 2 },
-              { day: 'Wed', date: '22', isToday: false, empty: false, photoIdx: 7 },
-              { day: 'Tue', date: '21', isToday: false, empty: false, photoIdx: 11 },
-            ].map((d) => {
-              const ringSize = d.isToday ? 78 : 66;
-              const innerSize = ringSize - 8;
-              return (
-                <div
-                  key={d.day}
-                  onClick={() => window.__archiveGo && window.__archiveGo('story')}
-                  className="archive-pressable"
-                  style={{
-                    flex: '0 0 auto',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
-                    cursor: 'pointer',
-                  }}>
-                  {/* Story ring — circular w/ gradient outline (or dashed if empty) */}
-                  {d.empty ? (
-                    <div style={{
-                      width: ringSize, height: ringSize, borderRadius: '50%',
-                      border: '1.5px dashed rgba(245,240,232,0.22)',
-                      background: 'rgba(255,255,255,0.02)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <svg width="22%" viewBox="0 0 24 24" fill="none"
-                        stroke="rgba(245,240,232,0.35)" strokeWidth="1.5" strokeLinecap="round">
-                        <path d="M12 5v14M5 12h14"/>
-                      </svg>
-                    </div>
-                  ) : (
-                    <div className="lg-border-gradient" style={{
-                      position: 'relative',
-                      width: ringSize, height: ringSize, borderRadius: '50%',
-                      background: fitGradient(d.photoIdx),
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      overflow: 'hidden',
-                      '--grad-border': d.isToday
-                        ? 'linear-gradient(135deg, #C8E0C9 0%, #9BB89F 50%, #4A6A4F 100%)'
-                        : fitBorder(d.photoIdx),
-                    }}>
-                      {/* Inner placeholder icon */}
-                      <svg style={{ width: '36%', opacity: 0.28, position: 'relative', zIndex: 1 }}
-                        viewBox="0 0 24 24" fill="none"
-                        stroke="rgba(245,240,232,0.95)" strokeWidth="1.2"
-                        strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="3" y="5" width="18" height="14" rx="2"/>
-                        <circle cx="8.5" cy="10" r="1.4"/>
-                        <path d="M21 15l-5-5-9 9"/>
-                      </svg>
-                      {/* Active day pulse dot */}
-                      {d.isToday && (
-                        <div style={{
-                          position: 'absolute', bottom: 5, right: 5,
-                          width: 9, height: 9, borderRadius: '50%',
-                          background: '#9BB89F',
-                          boxShadow: '0 0 0 2px #0a0807',
-                          zIndex: 2,
-                        }} />
-                      )}
-                    </div>
-                  )}
-                  {/* Day label */}
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{
-                      fontSize: 9, letterSpacing: 1.4, fontWeight: 600,
-                      color: d.isToday ? '#9BB89F' : 'rgba(245,240,232,0.45)',
-                    }}>
-                      {d.isToday ? 'TODAY' : d.day.toUpperCase()}
-                    </div>
-                    <div style={{
-                      fontSize: 13, fontWeight: 500, marginTop: 2,
-                      color: d.isToday ? '#F5F0E8' : 'rgba(245,240,232,0.7)',
-                      letterSpacing: '-0.02em',
-                    }}>
-                      {d.date}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A89880" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 6l6 6-6 6"/>
+          </svg>
         </div>
 
         {typeof window !== 'undefined' && window.__archiveEmpty &&
