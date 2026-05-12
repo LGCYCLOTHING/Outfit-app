@@ -155,18 +155,13 @@ export default function ScreenToday() {
                     onClick={() => window.__archiveToggleNav && window.__archiveToggleNav()}
                     className="archive-pressable"
                     style={{
-                      width: 26, height: 26,
-                      display: 'grid',
-                      gridTemplateColumns: '4px 4px',
-                      gridTemplateRows: '4px 4px',
-                      gap: 4,
-                      alignContent: 'center', justifyContent: 'center',
+                      width: 24, height: 22,
+                      display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 6,
                       cursor: 'pointer',
                     }}>
-                    <div style={{ width: 4, height: 4, borderRadius: 2, background: '#F5F0E8' }} />
-                    <div style={{ width: 4, height: 4, borderRadius: 2, background: '#F5F0E8' }} />
-                    <div style={{ width: 4, height: 4, borderRadius: 2, background: '#F5F0E8' }} />
-                    <div style={{ width: 4, height: 4, borderRadius: 2, background: '#F5F0E8' }} />
+                    <div style={{ width: 22, height: 1, borderRadius: 0.5, background: '#F5F0E8' }} />
+                    <div style={{ width: 22, height: 1, borderRadius: 0.5, background: '#F5F0E8' }} />
+                    <div style={{ width: 22, height: 1, borderRadius: 0.5, background: '#F5F0E8' }} />
                   </div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
                     <span style={{

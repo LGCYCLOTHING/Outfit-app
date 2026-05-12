@@ -76,19 +76,16 @@ function FloatingNav({ current, go }) {
         overflow: 'hidden',
       }}>
         <div
-          className="archive-pressable"
+          className={`archive-pressable morph-burger ${open ? 'is-x' : ''}`}
           onClick={() => setOpen(false)}
           style={{
             position: 'absolute',
-            top: 'calc(14px + var(--archive-safe-top, 0px))',
-            right: 18,
-            width: 40, height: 40,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer',
+            top: 'calc(20px + var(--archive-safe-top, 0px))',
+            left: 22,
           }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="1.5" strokeLinecap="round">
-            <path d="M5 5l14 14M19 5L5 19"/>
-          </svg>
+          <span className="morph-burger-line" />
+          <span className="morph-burger-line" />
+          <span className="morph-burger-line" />
         </div>
 
         <div style={{

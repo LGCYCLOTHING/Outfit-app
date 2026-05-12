@@ -707,3 +707,37 @@ body * {
   padding-bottom: 8px;
   background: transparent;
 }
+
+/* Morphing 3-line burger ↔ X — lives inside the drawer at top-left.
+   Lines animate to X via CSS transitions when .is-x is added. */
+.morph-burger {
+  width: 24px;
+  height: 22px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.morph-burger-line {
+  position: absolute;
+  left: 1px;
+  width: 22px;
+  height: 1.5px;
+  border-radius: 1px;
+  background: #F5F0E8;
+  transform-origin: center;
+  transition:
+    top .55s cubic-bezier(.16,1,.3,1),
+    transform .55s cubic-bezier(.16,1,.3,1),
+    opacity .25s ease;
+}
+.morph-burger-line:nth-child(1) { top: 4px; }
+.morph-burger-line:nth-child(2) { top: 10.25px; }
+.morph-burger-line:nth-child(3) { top: 16.5px; }
+.morph-burger.is-x .morph-burger-line:nth-child(1) {
+  top: 10.25px; transform: rotate(45deg);
+}
+.morph-burger.is-x .morph-burger-line:nth-child(2) {
+  opacity: 0;
+}
+.morph-burger.is-x .morph-burger-line:nth-child(3) {
+  top: 10.25px; transform: rotate(-45deg);
+}
