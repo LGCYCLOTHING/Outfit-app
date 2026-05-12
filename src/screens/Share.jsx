@@ -128,11 +128,9 @@ export default function ScreenShare() {
 
       <div style={{ position: 'relative', zIndex: 2, padding: 'calc(24px + var(--archive-safe-top, 0px)) 24px calc(40px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
-          <div onClick={() => window.__archiveGo && window.__archiveGo('today')} style={{
+          <div className="liquid-glass" onClick={() => window.__archiveGo && window.__archiveGo('today')} style={{
             width: 36, height: 36, borderRadius: 18,
-            background: 'rgba(255,255,255,0.05)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.08)',
             cursor: 'pointer',
           }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">

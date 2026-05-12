@@ -1,10 +1,10 @@
 import React from 'react';
 
-export const ARCHIVE_BG = '#06040F';
+export const ARCHIVE_BG = '#0C0A08';
 export const ARCHIVE_BG_LIGHT = '#f5f0e8';
-export const ARCHIVE_AMBER = '#f4a851';
-export const ARCHIVE_AMBER_HOT = '#ff8a3d';
-export const ARCHIVE_AMBER_DEEP = '#b85a1a';
+export const ARCHIVE_AMBER = '#C8956C';
+export const ARCHIVE_AMBER_HOT = '#A87852';
+export const ARCHIVE_AMBER_DEEP = '#200E06';
 
 export function useLight() {
   return typeof window !== 'undefined' && !!window.__archiveLight;
@@ -17,12 +17,12 @@ export function fgColor() {
 }
 
 export const THEMES = {
-  ivory:  { id:'ivory',  name:'Ivory',  sub:'warm cream',     light:'#f5e6c8', hot:'#e8cd95', deep:'#a48a5a', softRgba:'232,205,149', darkBg:'/themes/bg-2.png' },
-  slate:  { id:'slate',  name:'Slate',  sub:'cool blue-grey', light:'#9ec4d8', hot:'#7aa6c4', deep:'#3d5d75', softRgba:'122,166,196', darkBg:'/themes/bg-1.png' },
-  forest: { id:'forest', name:'Forest', sub:'deep olive',     light:'#9bbf7a', hot:'#6e9a4d', deep:'#3a5826', softRgba:'110,154,77',  darkBg:'/themes/bg-3.png' },
-  smoke:  { id:'smoke',  name:'Smoke',  sub:'silver chrome',  light:'#d8d8dc', hot:'#a8aab2', deep:'#5e6068', softRgba:'168,170,178', darkBg:'/themes/bg-4.png' },
-  dusk:   { id:'dusk',   name:'Dusk',   sub:'purple aura',    light:'#7C5CDB', hot:'#5B35C4', deep:'#3D1FA8', softRgba:'124,92,219',  darkBg:'/themes/bg-5.png' },
-  ember:  { id:'ember',  name:'Ember',  sub:'warm amber',     light:'#ffd28a', hot:'#ff8a3d', deep:'#b85a1a', softRgba:'255,138,61',  darkBg:'/themes/bg-6.png' },
+  ivory:  { id:'ivory',  name:'Ivory',  sub:'warm cream',     light:'#C8A97E', hot:'#A88D63', deep:'#2A2018', softRgba:'200,169,126', darkBg:'/themes/bg-2.png' },
+  slate:  { id:'slate',  name:'Slate',  sub:'cool blue-grey', light:'#8BA7B8', hot:'#6E89A0', deep:'#1A2830', softRgba:'139,167,184', darkBg:'/themes/bg-1.png' },
+  forest: { id:'forest', name:'Forest', sub:'deep olive',     light:'#4A7C59', hot:'#386649', deep:'#0F1F14', softRgba:'74,124,89',   darkBg:'/themes/bg-3.png' },
+  smoke:  { id:'smoke',  name:'Smoke',  sub:'silver chrome',  light:'#8C8880', hot:'#6E6A62', deep:'#181614', softRgba:'140,136,128', darkBg:'/themes/bg-4.png' },
+  dusk:   { id:'dusk',   name:'Dusk',   sub:'muted twilight', light:'#7C6E9E', hot:'#5F5380', deep:'#14101E', softRgba:'124,110,158', darkBg:'/themes/bg-5.png' },
+  ember:  { id:'ember',  name:'Ember',  sub:'warm amber',     light:'#C8956C', hot:'#A87852', deep:'#200E06', softRgba:'200,149,108', darkBg:'/themes/bg-6.png' },
 };
 export const DEFAULT_THEME = 'dusk';
 
@@ -50,28 +50,7 @@ export function fitGradient(id) {
   return FIT_PALETTES[n % FIT_PALETTES.length];
 }
 
-const STOCK_PHOTOS = [
-  'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=600&q=80',
-  'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=600&q=80',
-  'https://images.unsplash.com/photo-1520975954732-35dd22299614?w=600&q=80',
-  'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=600&q=80',
-  'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=600&q=80',
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80',
-  'https://images.unsplash.com/photo-1492447166138-50c3889fccb1?w=600&q=80',
-  'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80',
-  'https://images.unsplash.com/photo-1542327897-d73f4005b533?w=600&q=80',
-  'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600&q=80',
-  'https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?w=600&q=80',
-  'https://images.unsplash.com/photo-1543132220-3ec99c6094dc?w=600&q=80',
-  'https://images.unsplash.com/photo-1578932750294-f5075e85f44a?w=600&q=80',
-  'https://images.unsplash.com/photo-1495105787522-5334e3ffa0ef?w=600&q=80',
-  'https://images.unsplash.com/photo-1593032465175-481ac7f401a0?w=600&q=80',
-  'https://images.unsplash.com/photo-1516826957135-700dedea698c?w=600&q=80',
-];
-export function stockPhoto(id) {
-  const n = typeof id === 'number' ? id : (String(id).split('').reduce((a, c) => a + c.charCodeAt(0), 0));
-  return STOCK_PHOTOS[Math.abs(n) % STOCK_PHOTOS.length];
-}
+// (Removed: stock Unsplash people photos. PhotoPlaceholder now renders warm gradient blocks instead.)
 
 export function FitPhoto({ id = 1, label, date, ratio = '3/4', radius = 18, showNumber = true, placeholder = false, onAdd, style = {} }) {
   if (placeholder) {
@@ -185,7 +164,7 @@ export function ArchiveBurger() {
 }
 
 export function PhotoPlaceholder({ ratio = '3/4', radius = 18, onAdd, photoId, empty = false, style = {} }) {
-  const pid = photoId != null ? photoId : Math.floor(Math.random() * STOCK_PHOTOS.length);
+  const pid = photoId != null ? photoId : Math.floor(Math.random() * 12);
   if (typeof window !== 'undefined' && window.__archiveEmpty) {
     return (
       <div style={{
@@ -247,26 +226,25 @@ export function PhotoPlaceholder({ ratio = '3/4', radius = 18, onAdd, photoId, e
       </div>
     );
   }
+  // Warm gradient block — no people photos
   return (
     <div style={{
       position: 'relative', width: '100%', aspectRatio: ratio,
       borderRadius: radius, overflow: 'hidden',
-      background: '#1a1a1e',
-      boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)',
+      background: fitGradient(pid),
+      boxShadow: 'inset 0 0 0 0.5px rgba(255,240,220,0.06), inset 0 -40px 60px rgba(0,0,0,0.35)',
       ...style,
     }}>
-      <img
-        src={stockPhoto(pid)}
-        loading="lazy"
-        style={{
-          width: '100%', height: '100%', objectFit: 'cover',
-          display: 'block',
-        }}
-        alt=""
-      />
+      {/* fine film-grain texture */}
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(180deg, rgba(0,0,0,0) 60%, rgba(0,0,0,0.35) 100%)',
+        backgroundImage: 'url("data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence baseFrequency=%220.9%22 numOctaves=%222%22 stitchTiles=%22stitch%22/><feColorMatrix values=%220 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>")',
+        mixBlendMode: 'overlay', opacity: 0.3, pointerEvents: 'none',
+      }} />
+      {/* warm bottom vignette per spec */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(to top, rgba(12,10,8,0.7) 0%, transparent 45%)',
         pointerEvents: 'none',
       }} />
     </div>
@@ -326,33 +304,35 @@ export function TabBar({ active = 'today', theme }) {
   const t = theme || useTheme();
   const items = [
     { id: 'today', label: 'Today', icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="4.25"/>
-        <circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/>
-        <path d="M12 2.4v2.2 M12 19.4v2.2 M2.4 12h2.2 M19.4 12h2.2"/>
-        <path d="M5.2 5.2l1.55 1.55 M17.25 17.25l1.55 1.55 M5.2 18.8l1.55-1.55 M17.25 6.75l1.55-1.55" opacity="0.55"/>
+      // Minimal sparkle / spark — fresh and modern
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
+        <path d="M12 8.5l1.5 2.5L16 12.5 13.5 14 12 16.5 10.5 14 8 12.5l2.5-1.5z"/>
       </svg>
     )},
     { id: 'archive', label: 'Archive', icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 7.5a2 2 0 1 1 1.6-3.2"/>
-        <path d="M12 7.5v1.6"/>
-        <path d="M12 9.1L3.6 14.4a0.6 0.6 0 0 0 0.32 1.1h16.16a0.6 0.6 0 0 0 0.32-1.1L12 9.1z"/>
-        <circle cx="12" cy="9.1" r="0.55" fill="currentColor" stroke="none"/>
+      // Photo stack — three offset rectangles
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="5" y="8" width="14" height="12" rx="2"/>
+        <path d="M7 5h10"/>
+        <path d="M9 2h6"/>
       </svg>
     )},
     { id: 'mix', label: 'Mix', icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="8.5" cy="12" r="5.25"/>
-        <circle cx="15.5" cy="12" r="5.25"/>
-        <circle cx="12" cy="12" r="0.9" fill="currentColor" stroke="none"/>
+      // Shuffle — two crossing arrows
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M16 4l4 4-4 4"/>
+        <path d="M16 16l4 4-4-4"/>
+        <path d="M4 8h2.5c1 0 1.9.5 2.5 1.3l5 6.4c.6.8 1.5 1.3 2.5 1.3H20"/>
+        <path d="M20 8h-3.5c-1 0-1.9.5-2.5 1.3"/>
+        <path d="M4 17h2.5c1 0 1.9-.5 2.5-1.3"/>
       </svg>
     )},
     { id: 'you', label: 'You', icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-        <ellipse cx="12" cy="7.6" rx="3.1" ry="3.6"/>
-        <path d="M6 21c0.6-4.6 3.1-7.4 6-7.4s5.4 2.8 6 7.4"/>
-        <path d="M9.4 13.9c0.7 1 1.6 1.5 2.6 1.5s1.9-0.5 2.6-1.5" opacity="0.55"/>
+      // Minimal person — circle head + shoulders
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="8.5" r="3.5"/>
+        <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/>
       </svg>
     )},
   ];

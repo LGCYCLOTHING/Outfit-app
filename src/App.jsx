@@ -48,14 +48,10 @@ function FloatingNav({ current, go }) {
         }}
       />
 
-      <div style={{
+      <div className="liquid-glass" style={{
         position: 'absolute',
         top: 0, left: 0, right: 0,
         zIndex: 100,
-        background: 'rgba(6, 4, 15, 0.75)',
-        backdropFilter: 'blur(40px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
         borderBottomLeftRadius: 24,
         borderBottomRightRadius: 24,
         padding: 'calc(60px + var(--archive-safe-top, 0px)) 28px calc(32px + var(--archive-safe-bottom, 0px))',
@@ -104,9 +100,9 @@ function FloatingNav({ current, go }) {
                 className="archive-pressable"
                 onClick={() => { go(it.id); setOpen(false); }}
                 style={{
-                  fontFamily: '"Cormorant Garamond", serif',
+                  fontFamily: '"DM Sans", -apple-system, system-ui, sans-serif',
                   fontSize: 36,
-                  fontWeight: 600,
+                  fontWeight: 700,
                   lineHeight: 1,
                   letterSpacing: -0.5,
                   color: active ? accent : 'rgba(255,255,255,0.95)',
@@ -149,8 +145,8 @@ function FloatingNav({ current, go }) {
               onClick={() => { if (it.id === 'paywall') { go('paywall'); setOpen(false); } else { setOpen(false); } }}
               style={{
                 display: 'flex', alignItems: 'center', gap: 10,
-                fontFamily: '"Cormorant Garamond", serif',
-                fontSize: 22, fontWeight: 500,
+                fontFamily: '"DM Sans", -apple-system, system-ui, sans-serif',
+                fontSize: 22, fontWeight: 600,
                 lineHeight: 1.1, letterSpacing: -0.3,
                 color: 'rgba(255,255,255,0.85)',
                 cursor: 'pointer',
@@ -229,7 +225,6 @@ export default function App() {
 
   return (
     <>
-      <AppWordmark />
       <div style={{ position: 'absolute', inset: 0 }}>
         {Object.keys(screens).map(id => (
           <div key={id} className={'screen-wrap archive-screen' + (screen === id ? '' : ' hidden')}>

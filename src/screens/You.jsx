@@ -15,6 +15,16 @@ export default function ScreenYou() {
 
   const swatches = ['ivory', 'slate', 'forest', 'smoke', 'dusk', 'ember'].map(id => THEMES[id]);
 
+  // Vivid Soft-Horizon gradient stops — brighter highlight + saturated middle + deep edge
+  const SUNSET = {
+    ember:  { hi: '#FFE0B0', mid1: '#FFAE63', mid2: '#FF6B35', deep: '#C2391F' },
+    dusk:   { hi: '#E8C9FF', mid1: '#B093E6', mid2: '#7A52D6', deep: '#3D2380' },
+    forest: { hi: '#D6EFC2', mid1: '#9BC78C', mid2: '#5C9762', deep: '#1F4225' },
+    slate:  { hi: '#D4E4ED', mid1: '#94B8CE', mid2: '#5285AE', deep: '#1F3D60' },
+    smoke:  { hi: '#EAE5DC', mid1: '#B5AFA4', mid2: '#807870', deep: '#3D3833' },
+    ivory:  { hi: '#FFEED1', mid1: '#F0CC92', mid2: '#B98D52', deep: '#5A4628' },
+  };
+
   const setTheme = (id) => {
     window.__archiveTheme = id;
     window.dispatchEvent(new CustomEvent('archive:themechange', { detail: id }));
@@ -95,50 +105,91 @@ export default function ScreenYou() {
           </span>
         </div>
 
-        <Glass radius={22} style={{ padding: 20, marginBottom: 18 }}>
-          <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '20px 12px',
-          }}>
-            {swatches.map(s => {
-              const isActive = s.id === activeId;
-              return (
-                <div key={s.id}
-                  onClick={() => setTheme(s.id)}
-                  style={{
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-                    cursor: 'pointer',
-                  }}>
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10,
+          marginBottom: 18,
+        }}>
+          {swatches.map(s => {
+            const isActive = s.id === activeId;
+            return (
+              <div key={s.id}
+                onClick={() => setTheme(s.id)}
+                className="archive-pressable"
+                style={{
+                  position: 'relative', aspectRatio: '1', borderRadius: 24, overflow: 'hidden',
+                  background: '#0F0D0B',
+                  border: isActive ? `1.5px solid ${s.light}` : '1px solid rgba(245,240,232,0.08)',
+                  boxShadow: isActive
+                    ? `0 0 28px rgba(${s.softRgba}, 0.32), 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(245,240,232,0.08)`
+                    : '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(245,240,232,0.06), inset 0 -1px 0 rgba(0,0,0,0.2)',
+                  cursor: 'pointer',
+                  transition: 'border-color .25s ease, box-shadow .25s ease',
+                }}>
+                {/* Soft-Horizon multi-color gradient — vivid sunset orb */}
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  background: `radial-gradient(circle at 50% 42%,
+                    ${SUNSET[s.id].hi} 0%,
+                    ${SUNSET[s.id].mid1} 18%,
+                    ${SUNSET[s.id].mid2} 38%,
+                    ${SUNSET[s.id].deep} 65%,
+                    transparent 95%)`,
+                  opacity: 0.92,
+                  filter: 'blur(2px)',
+                }} />
+                {/* Secondary bloom for extra glow */}
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  background: `radial-gradient(circle at 50% 38%, ${SUNSET[s.id].hi} 0%, transparent 25%)`,
+                  opacity: 0.5, mixBlendMode: 'screen', pointerEvents: 'none',
+                }} />
+
+                {/* Film grain — analog tactile feel */}
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  backgroundImage: 'url("data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22140%22 height=%22140%22><filter id=%22n%22><feTurbulence baseFrequency=%220.85%22 numOctaves=%222%22 stitchTiles=%22stitch%22/><feColorMatrix values=%220 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/></svg>")',
+                  opacity: 0.35, mixBlendMode: 'overlay', pointerEvents: 'none',
+                }} />
+
+                {/* Bottom darkening for label legibility */}
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  background: 'linear-gradient(to top, rgba(12,10,8,0.55) 0%, transparent 45%)',
+                  pointerEvents: 'none',
+                }} />
+
+                {/* Active indicator dot — top-left */}
+                {isActive && (
                   <div style={{
-                    position: 'relative',
-                    width: 56, height: 56, borderRadius: 28,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    {isActive && (
-                      <div style={{
-                        position: 'absolute', inset: -5, borderRadius: 33,
-                        boxShadow: `inset 0 0 0 1.5px ${s.light}`,
-                      }} />
-                    )}
-                    <div style={{
-                      width: 48, height: 48, borderRadius: 24,
-                      background: `radial-gradient(circle at 30% 30%, ${s.light} 0%, ${s.hot} 50%, ${s.deep} 100%)`,
-                      boxShadow: `0 0 ${isActive ? 22 : 12}px rgba(${s.softRgba},${isActive ? 0.65 : 0.35}), inset 0 1px 1px rgba(255,255,255,0.25)`,
-                    }} />
-                  </div>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: 14, fontWeight: isActive ? 600 : 500, color: isActive ? s.light : '#fff' }}>
-                      {s.name}
-                    </div>
-                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.92)', marginTop: 2, letterSpacing: 0.2 }}>
-                      {s.sub}
-                    </div>
-                  </div>
+                    position: 'absolute', top: 14, left: 14,
+                    width: 7, height: 7, borderRadius: 4,
+                    background: '#F5F0E8',
+                    boxShadow: `0 0 10px ${s.light}, inset 0 0 0 1px ${s.light}`,
+                  }} />
+                )}
+
+                {/* 4-dot grip — top-right */}
+                <div style={{
+                  position: 'absolute', top: 14, right: 14,
+                  display: 'grid', gridTemplateColumns: '3px 3px', gridTemplateRows: '3px 3px', gap: 3,
+                }}>
+                  {[0,1,2,3].map(k => <div key={k} style={{ width: 3, height: 3, borderRadius: 1.5, background: 'rgba(245,240,232,0.35)' }} />)}
                 </div>
-              );
-            })}
-          </div>
-        </Glass>
+
+                {/* Label — centered bottom, spaced caps */}
+                <div style={{
+                  position: 'absolute', bottom: 18, left: 0, right: 0,
+                  textAlign: 'center',
+                  fontSize: 11, letterSpacing: 1.6, fontWeight: 600,
+                  color: '#F5F0E8',
+                  textShadow: '0 1px 6px rgba(0,0,0,0.55)',
+                }}>
+                  {s.name.toUpperCase()}
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, marginTop: 22 }}>
           <svg width="11" height="13" viewBox="0 0 12 14" fill={accent}>
@@ -196,27 +247,64 @@ export default function ScreenYou() {
             ACCOUNT
           </span>
         </div>
-        <Glass radius={18} style={{ overflow: 'hidden' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {[
-            { label: 'Notifications', sub: 'Daily pick at 7:30 am' },
-            { label: 'Photo backup', sub: 'iCloud · 2.4 GB' },
-            { label: 'Export archive', sub: 'PDF · 312 fits' },
-          ].map((row, i, arr) => (
-            <div key={row.label} style={{
-              padding: '14px 16px',
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              borderBottom: i < arr.length - 1 ? '0.5px solid rgba(255,255,255,0.06)' : 'none',
+            {
+              label: 'Notifications',
+              sub: 'Daily pick at 7:30 am',
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5F0E8" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+                  <path d="M10 21a2 2 0 0 0 4 0"/>
+                </svg>
+              ),
+            },
+            {
+              label: 'Photo backup',
+              sub: 'iCloud · 2.4 GB',
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5F0E8" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 16.5a4.5 4.5 0 0 0-1.5-8.7 6 6 0 0 0-11.6 1.5A4 4 0 0 0 7 17h13"/>
+                </svg>
+              ),
+            },
+            {
+              label: 'Export archive',
+              sub: 'PDF · 312 fits',
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5F0E8" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 3v12M7 8l5-5 5 5M5 21h14"/>
+                </svg>
+              ),
+            },
+          ].map((row) => (
+            <div key={row.label} className="lg-pill archive-pressable" style={{
+              padding: '12px 14px 12px 12px', borderRadius: 100,
+              display: 'flex', alignItems: 'center', gap: 14,
+              cursor: 'pointer',
             }}>
-              <div>
-                <div style={{ fontSize: 16, fontWeight: 500 }}>{row.label}</div>
-                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.92)', marginTop: 2 }}>{row.sub}</div>
+              {/* Circular icon container — like the reference's chat/info bubbles */}
+              <div className="lg-chip" style={{
+                width: 40, height: 40, borderRadius: 20,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0,
+              }}>
+                {row.icon}
               </div>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="1" strokeLinecap="round">
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 15, fontWeight: 600, color: '#F5F0E8', letterSpacing: -0.2, lineHeight: 1.2 }}>
+                  {row.label}
+                </div>
+                <div style={{ fontSize: 12, color: 'rgba(245,240,232,0.55)', marginTop: 3, lineHeight: 1.2 }}>
+                  {row.sub}
+                </div>
+              </div>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.4)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 6l6 6-6 6"/>
               </svg>
             </div>
           ))}
-        </Glass>
+        </div>
       </div>
 
       <TabBar active="you" />

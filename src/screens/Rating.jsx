@@ -74,9 +74,8 @@ export default function ScreenRating() {
             <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.92)', letterSpacing: -0.40, fontFamily: '"DM Sans", sans-serif' }}>
               FIT 024 · LOGGED 09:14
             </div>
-            <div onClick={() => window.__archiveGo && window.__archiveGo('today')} style={{
+            <div className="liquid-glass" onClick={() => window.__archiveGo && window.__archiveGo('today')} style={{
               width: 28, height: 28, borderRadius: 14,
-              background: 'rgba(255,255,255,0.06)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
             }}>

@@ -34,23 +34,11 @@ body {
   border-radius: 54px;
   background: #000;
   overflow: hidden;
-  /* Fake safe-area so the design clears the Dynamic Island and bottom curve */
-  --sa-top: 50px;
+  /* Fake safe-area so the design clears the top/bottom curves of the screen */
+  --sa-top: 28px;
   --sa-bottom: 20px;
 }
-.device-island {
-  display: block;
-  position: absolute;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 120px;
-  height: 34px;
-  background: #000;
-  border-radius: 20px;
-  z-index: 100;
-  pointer-events: none;
-}
+.device-island { display: none; }
 /* Side buttons hidden in this minimal mockup style */
 .device-side { display: none; }
 
@@ -75,13 +63,18 @@ body {
 }
 
 body {
-  font-family: 'DM Sans', -apple-system, system-ui, sans-serif;
-  font-feature-settings: 'ss01' on;
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'SF Pro', system-ui, sans-serif;
+  font-feature-settings: 'ss01' on, 'cv11' on;
   color: #fff;
   -webkit-tap-highlight-color: transparent;
   -webkit-user-select: none;
   user-select: none;
   overscroll-behavior: none;
+}
+/* Force Geist everywhere (overrides inline fontFamily set in JSX). */
+body, body *,
+input, button, textarea, select {
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'SF Pro', system-ui, sans-serif !important;
 }
 body.archive-light { background: #f5f0e8; color: #0a0a0a; }
 body.archive-light .archive-screen { color: #0a0a0a; }
@@ -92,16 +85,16 @@ body.archive-light .archive-screen::before {
 }
 body.archive-light .archive-screen > * { color: inherit; }
 .h-display {
-  font-family: 'Cormorant Garamond', 'Canela', Georgia, serif;
-  font-weight: 500;
-  letter-spacing: -0.02em;
+  font-family: 'Geist', -apple-system, system-ui, sans-serif !important;
+  font-weight: 600;
+  letter-spacing: -0.04em;
   line-height: 0.95;
 }
 .h-display em, .h-display i {
-  font-family: 'Cormorant Garamond', 'Cormorant Garamond', Georgia, serif;
+  font-family: 'Geist', -apple-system, system-ui, sans-serif !important;
   font-weight: 400;
-  font-style: italic;
-  letter-spacing: -0.02em;
+  font-style: normal;
+  letter-spacing: -0.04em;
 }
 * { box-sizing: border-box; }
 #root { position: relative; width: 100%; height: 100%; }
@@ -117,6 +110,9 @@ html, body { height: 100%; }
   overflow: hidden;
   --sa-top: env(safe-area-inset-top, 0px);
   --sa-bottom: env(safe-area-inset-bottom, 0px);
+  /* 3D perspective so screen transitions have real depth */
+  perspective: 1600px;
+  perspective-origin: 50% 45%;
 }
 @supports (height: 100dvh) { #stage { height: 100dvh; } }
 @media all and (display-mode: standalone) { #stage { height: 100vh; } }
@@ -140,21 +136,27 @@ html, body { height: 100%; }
   font-family: 'DM Sans', -apple-system, system-ui, sans-serif;
   pointer-events: none;
 }
+/* Instant tab switching — no transition */
 .screen-wrap {
   position: absolute; inset: 0;
-  transition: opacity .42s cubic-bezier(.4,0,.2,1),
-              transform .55s cubic-bezier(.2,.8,.2,1),
-              filter .42s cubic-bezier(.4,0,.2,1);
-  will-change: opacity, transform, filter;
 }
 .screen-wrap.hidden {
-  opacity: 0; pointer-events: none;
-  transform: translateY(16px) scale(0.97);
-  filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
   visibility: hidden;
-  transition-delay: 0s, 0s, 0s;
 }
-.screen-wrap:not(.hidden) { visibility: visible; }
+.screen-wrap:not(.hidden) {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Kill italic globally — applies to <em>, <i>, and anything with inline fontStyle italic */
+em, i {
+  font-style: normal !important;
+}
+body * {
+  font-style: normal !important;
+}
 
 [data-press], button, [role="button"] {
   transition: transform .12s cubic-bezier(.2,.8,.2,1), opacity .12s ease;
@@ -211,45 +213,106 @@ html, body { height: 100%; }
   --depth-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.2);
 }
 .nav-bar {
-  background: var(--glass-ultra-thin);
-  backdrop-filter: var(--blur-chrome);
-  -webkit-backdrop-filter: var(--blur-chrome);
-  border: 1px solid var(--border-subtle);
-  box-shadow: var(--specular-top), var(--specular-bottom), var(--depth-shadow);
+  background: rgba(20, 18, 16, 0.55);
+  backdrop-filter: url(#frosted);
+  -webkit-backdrop-filter: url(#frosted);
+  border: 2px solid transparent;
+  box-shadow:
+    0 0 0 1px rgba(255, 240, 220, 0.45),
+    0 8px 32px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,240,220,0.18);
 }
+.liquid-glass {
+  background: rgba(255, 240, 220, 0.06);
+  backdrop-filter: url(#frosted);
+  -webkit-backdrop-filter: url(#frosted);
+  border: 2px solid transparent;
+  box-shadow:
+    0 0 0 1px rgba(255, 240, 220, 0.40),
+    0 4px 24px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,240,220,0.15),
+    inset 0 -1px 0 rgba(0,0,0,0.2);
+}
+/* Default content box — liquid glass with warm tint */
 .lg-card {
-  background: var(--glass-normal);
-  backdrop-filter: var(--blur-normal);
-  -webkit-backdrop-filter: var(--blur-normal);
-  border: 1px solid var(--border-normal);
-  box-shadow: var(--specular-top), var(--specular-bottom), var(--depth-shadow);
+  background: rgba(255, 240, 220, 0.06);
+  backdrop-filter: url(#frosted);
+  -webkit-backdrop-filter: url(#frosted);
+  border: 2px solid transparent;
+  box-shadow:
+    0 0 0 1px rgba(255, 240, 220, 0.32),
+    0 4px 24px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,240,220,0.12),
+    inset 0 -1px 0 rgba(0,0,0,0.2);
 }
+
+/* Small compact box */
 .lg-chip {
-  background: var(--glass-thin);
-  backdrop-filter: var(--blur-thin);
-  -webkit-backdrop-filter: var(--blur-thin);
-  border: 1px solid var(--border-subtle);
-  box-shadow: var(--specular-top);
+  background: rgba(255, 240, 220, 0.05);
+  backdrop-filter: url(#frosted);
+  -webkit-backdrop-filter: url(#frosted);
+  border: 2px solid transparent;
+  box-shadow:
+    0 0 0 1px rgba(255, 240, 220, 0.28),
+    0 2px 12px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,240,220,0.10);
 }
+
+/* Pill / chip / tag */
 .lg-pill {
-  background: var(--glass-thin);
-  backdrop-filter: var(--blur-thin);
-  -webkit-backdrop-filter: var(--blur-thin);
-  border: 1px solid var(--border-subtle);
+  background: rgba(255, 240, 220, 0.07);
+  backdrop-filter: url(#frosted);
+  -webkit-backdrop-filter: url(#frosted);
+  border: 2px solid transparent;
+  box-shadow:
+    0 0 0 1px rgba(255, 240, 220, 0.30),
+    inset 0 1px 0 rgba(255,240,220,0.10);
 }
-.lg-pill.active {
-  background: rgba(255,255,255,0.15);
-  border: 1px solid var(--border-strong);
-  box-shadow: var(--specular-top);
+
+/* Selected / highlighted state — sage glow */
+.lg-pill.active,
+.lg-active {
+  background: rgba(155, 184, 159, 0.10);
+  border: 2px solid transparent;
+  box-shadow:
+    0 0 0 1.5px rgba(155, 184, 159, 0.5),
+    0 0 20px rgba(155, 184, 159, 0.15),
+    0 4px 24px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,240,220,0.10);
 }
+
+/* Bottom-sheet modal */
 .lg-sheet {
-  background: var(--glass-thick);
-  backdrop-filter: var(--blur-thick);
-  -webkit-backdrop-filter: var(--blur-thick);
-  border-top: 1px solid var(--border-normal);
-  border-left: 1px solid var(--border-subtle);
-  border-right: 1px solid var(--border-subtle);
-  box-shadow: var(--specular-top), 0 -8px 40px rgba(0,0,0,0.4);
+  background: rgba(20, 18, 16, 0.62);
+  backdrop-filter: url(#frosted);
+  -webkit-backdrop-filter: url(#frosted);
+  border-top: 1px solid rgba(255, 240, 220, 0.35);
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+}
+
+/* Input field — search bars, text inputs */
+.lg-input {
+  background: rgba(255, 240, 220, 0.04);
+  border: 1px solid rgba(255, 240, 220, 0.08);
+  border-radius: 12px;
+  transition: border-color .2s ease;
+}
+.lg-input:focus-within {
+  border-color: rgba(200, 149, 108, 0.4);
+}
+
+/* Spotlight — warm amber light falling from above onto a frosted surface.
+   Combine with any other surface class (.lg-card, .lg-active, .lg-sheet). */
+.lg-spotlight { position: relative; }
+.lg-spotlight::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 60%;
+  background:
+    radial-gradient(ellipse 70% 100% at 50% -12%, rgba(255,170,90,0.50) 0%, rgba(255,140,70,0.20) 32%, transparent 68%),
+    radial-gradient(ellipse 30% 40% at 50% 0%, rgba(255,210,150,0.30) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 5;
+  mix-blend-mode: screen;
 }
 .lg-theme-card {
   background: var(--glass-normal);
@@ -275,11 +338,12 @@ html, body { height: 100%; }
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15);
 }
 .lg-pro-card {
-  background: rgba(255,210,100,0.06);
-  backdrop-filter: var(--blur-thick);
-  -webkit-backdrop-filter: var(--blur-thick);
-  border: 1px solid rgba(255,210,100,0.15);
-  box-shadow: inset 0 1px 0 rgba(255,210,100,0.12), var(--depth-shadow);
+  background: rgba(200, 170, 100, 0.06);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid rgba(200, 170, 100, 0.15);
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(200,170,100,0.1), 0 4px 16px rgba(0,0,0,0.3);
 }
 .lg-badge {
   background: var(--glass-ultra-thin);

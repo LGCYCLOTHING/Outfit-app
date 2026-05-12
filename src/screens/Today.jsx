@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   useTheme, bgColor, fgColor,
-  ArchiveBurger, StatusBar, GlowCard, Glass, TabBar, PhotoPlaceholder, stockPhoto,
+  ArchiveBurger, StatusBar, GlowCard, Glass, TabBar, PhotoPlaceholder, fitGradient,
 } from '../lib/shared.jsx';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
 
@@ -42,14 +42,12 @@ export default function ScreenToday() {
           }}>
             MON · APR 27 · WEEK 17
           </div>
-          <div className="archive-pressable" style={{
+          <div className="archive-pressable liquid-glass" style={{
             width: 36, height: 36, borderRadius: 18,
             overflow: 'hidden', position: 'relative',
-            border: '1px solid rgba(255,255,255,0.14)',
             cursor: 'pointer',
-            background: `linear-gradient(135deg, ${accentHot} 0%, ${accentDeep} 100%)`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#fff', fontSize: 14, letterSpacing: -0.2,
+            color: '#F5F0E8', fontSize: 14, letterSpacing: -0.2,
             fontStyle: 'italic', fontFamily: "Helvetica", fontWeight: "900"
           }} onClick={() => window.__archiveGo && window.__archiveGo('you')}>
           </div>
@@ -59,14 +57,14 @@ export default function ScreenToday() {
           <div style={{
             fontFamily: '"DM Sans", sans-serif',
             fontWeight: 400,
-            fontSize: 48, lineHeight: 1.0, color: '#fff', letterSpacing: -1.2
+            fontSize: 48, lineHeight: 1.0, color: '#F5F0E8', letterSpacing: -1.2
           }}>
             Good morning,
           </div>
           <div style={{
             fontFamily: '"DM Sans", sans-serif',
             fontWeight: 700,
-            fontSize: 48, lineHeight: 1.0, color: '#fff', letterSpacing: -1.4,
+            fontSize: 48, lineHeight: 1.0, color: '#F5F0E8', letterSpacing: -1.4,
             marginTop: 4
           }}>
             Today's fit.
@@ -82,16 +80,14 @@ export default function ScreenToday() {
             { label: 'Studio · Dinner' },
             { label: '+2 plans' }
           ].map((tag, i) =>
-            <span key={i} style={{
+            <span key={i} className={tag.primary ? '' : 'liquid-glass'} style={{
               fontSize: 13, fontWeight: 500, letterSpacing: -0.2,
               padding: '6px 12px', borderRadius: 100,
               color: tag.primary ? '#1a0d2e' : 'rgba(255,255,255,0.92)',
               background: tag.primary ?
-                `linear-gradient(135deg, ${accent} 0%, ${accentHot} 100%)` :
-                'rgba(255,255,255,0.06)',
+                `linear-gradient(135deg, ${accent} 0%, ${accentHot} 100%)` : undefined,
               boxShadow: tag.primary ?
-                `0 4px 14px -4px rgba(${accentRgba},0.55)` :
-                'inset 0 0 0 1px rgba(255,255,255,0.08)'
+                `0 4px 14px -4px rgba(${accentRgba},0.55)` : undefined
             }}>{tag.label}</span>
           )}
         </div>
@@ -100,7 +96,7 @@ export default function ScreenToday() {
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14, paddingRight: 4 }}>
             <span style={{
               fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic',
-              fontSize: 26, color: '#fff', fontWeight: 400, letterSpacing: -0.5
+              fontSize: 26, color: '#F5F0E8', fontWeight: 400, letterSpacing: -0.5
             }}>
               This week
             </span>
@@ -153,11 +149,10 @@ export default function ScreenToday() {
                     '1px solid rgba(255,255,255,0.07)'
                 }}>
                   {!d.empty &&
-                    <img src={stockPhoto(d.photoIdx)}
-                      style={{
-                        position: 'absolute', inset: 0,
-                        width: '100%', height: '100%', objectFit: 'cover'
-                      }} alt="" />
+                    <div style={{
+                      position: 'absolute', inset: 0,
+                      background: fitGradient(d.photoIdx)
+                    }} />
                   }
                   {d.isToday &&
                     <div style={{
@@ -258,7 +253,7 @@ export default function ScreenToday() {
           </div>
         </div>
 
-        <GlowCard glow="br" active={true}>
+        <div className="lg-active lg-spotlight" style={{ borderRadius: 24, overflow: 'hidden', position: 'relative' }}>
           <div onClick={() => window.__archiveGo && window.__archiveGo('detail')} style={{ position: 'relative', padding: 18, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', cursor: 'pointer' }}>
             <div style={{ borderRadius: 18, overflow: 'hidden', position: 'relative' }}>
               <PhotoPlaceholder ratio="4/5" radius={18} photoId={3} />
@@ -281,11 +276,9 @@ export default function ScreenToday() {
                 fontSize: 14, color: accent, fontWeight: 500,
                 boxShadow: `inset 0 0 0 0.5px rgba(${accentRgba},0.35)`
               }}>Fit 023 · Recycled</div>
-              <div onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('share'); }} style={{
+              <div className="liquid-glass" onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('share'); }} style={{
                 position: 'absolute', top: 12, right: 12,
                 width: 32, height: 32, borderRadius: 16,
-                background: 'rgba(10,8,6,0.55)', backdropFilter: 'blur(10px)',
-                boxShadow: `inset 0 0 0 0.5px rgba(${accentRgba},0.35)`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 cursor: 'pointer'
               }}>
@@ -303,13 +296,11 @@ export default function ScreenToday() {
                   Last worn Mar 14 · matches 61° clear
                 </div>
               </div>
-              <button onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('rating'); }} style={{
+              <button className="liquid-glass" onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('rating'); }} style={{
                 border: 'none', cursor: 'pointer',
                 width: 48, height: 48, borderRadius: 24,
-                background: `linear-gradient(135deg, ${accent} 0%, ${accentHot} 100%)`,
-                boxShadow: `0 0 24px ${accent}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#0a0a0a'
+                color: '#F5F0E8'
               }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M13 6l6 6-6 6" />
@@ -317,34 +308,37 @@ export default function ScreenToday() {
               </button>
             </div>
           </div>
-        </GlowCard>
+        </div>
 
-        <div style={{ marginTop: 20, display: 'flex', gap: 10 }}>
-          <Glass radius={18} style={{ flex: 1.4, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{
-              width: 36, height: 36, borderRadius: 18,
-              background: `radial-gradient(circle at 30% 30%, ${accentHot}, ${accentDeep})`,
-              boxShadow: `0 0 16px rgba(${accentRgba},0.5)`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center'
-            }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#0a0a0a">
+        <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {[
+            { value: '47', label: 'DAY STREAK', icon: (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 2c1 4-3 6-3 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-2 3 0-3-1-5-3-8z" />
               </svg>
+            )},
+            { value: '312', label: 'FITS LOGGED', icon: (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="3" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="M21 15l-5-5L5 21" />
+              </svg>
+            )},
+          ].map((stat, i) => (
+            <div key={i} className="lg-card" style={{
+              borderRadius: 20, padding: 18, aspectRatio: '1.15',
+              display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                {stat.icon}
+                <div style={{ display: 'grid', gridTemplateColumns: '3px 3px', gridTemplateRows: '3px 3px', gap: 3 }}>
+                  {[0,1,2,3].map(k => <div key={k} style={{ width: 3, height: 3, borderRadius: 1.5, background: 'rgba(245,240,232,0.3)' }} />)}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: 44, fontWeight: 700, letterSpacing: -1.5, lineHeight: 1, color: '#F5F0E8' }}>{stat.value}</div>
+                <div style={{ fontSize: 10, color: 'rgba(245,240,232,0.4)', marginTop: 6, letterSpacing: 1.2, fontWeight: 500 }}>{stat.label}</div>
+              </div>
             </div>
-            <div>
-              <div style={{ fontSize: 30, fontWeight: 500, letterSpacing: -0.4, lineHeight: 1 }}>47</div>
-              <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.75)', marginTop: 5, letterSpacing: 0.2, fontWeight: 500 }}>day streak</div>
-            </div>
-          </Glass>
-          <Glass radius={18} style={{ flex: 1, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="3" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="M21 15l-5-5L5 21" />
-            </svg>
-            <div>
-              <div style={{ fontSize: 30, fontWeight: 500, letterSpacing: -0.4, lineHeight: 1 }}>312</div>
-              <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.75)', marginTop: 5, letterSpacing: 0.2, fontWeight: 500 }}>fits logged</div>
-            </div>
-          </Glass>
+          ))}
         </div>
 
         <div style={{ marginTop: 28, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 }}>
@@ -359,7 +353,7 @@ export default function ScreenToday() {
               <PhotoPlaceholder ratio="3/4" radius={12} photoId={idx + 5} />
               <div style={{
                 position: 'absolute', bottom: 7, left: 9,
-                fontSize: 14, color: '#fff',
+                fontSize: 14, color: '#F5F0E8',
                 fontWeight: 500, letterSpacing: -0.1,
                 textShadow: '0 1px 4px rgba(0,0,0,0.6)'
               }}>{['Yesterday', 'Sat', 'Fri', 'Thu', 'Wed', 'Tue'][idx]}</div>
@@ -446,7 +440,7 @@ export default function ScreenToday() {
             <Glass key={i} radius={16} style={{ padding: 14 }}>
               <div style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.6)', letterSpacing: -0.2, textTransform: 'uppercase', marginBottom: 8 }}>{g.label}</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, marginBottom: 8 }}>
-                <span className="h-display" style={{ fontSize: 28, lineHeight: 1, color: '#fff', letterSpacing: -0.6 }}>{g.value}</span>
+                <span className="h-display" style={{ fontSize: 28, lineHeight: 1, color: '#F5F0E8', letterSpacing: -0.6 }}>{g.value}</span>
                 <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>{g.total}</span>
               </div>
               <div style={{ height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
@@ -466,7 +460,7 @@ export default function ScreenToday() {
           </span>
         </div>
         <Glass radius={20} style={{ padding: 20, marginBottom: 8 }}>
-          <div className="h-display" style={{ fontSize: 26, lineHeight: 1.15, color: '#fff', marginBottom: 12, letterSpacing: -0.4 }}>
+          <div className="h-display" style={{ fontSize: 26, lineHeight: 1.15, color: '#F5F0E8', marginBottom: 12, letterSpacing: -0.4 }}>
             Style something you <em>haven't worn</em> in 30 days.
           </div>
           <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>

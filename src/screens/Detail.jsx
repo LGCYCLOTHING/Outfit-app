@@ -51,11 +51,9 @@ export default function ScreenDetail() {
         <div style={{ padding: '0 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
           <div onClick={() => window.__archiveGo && window.__archiveGo('archive')} style={{
             width: 38, height: 38, borderRadius: 19,
-            background: 'rgba(26,20,16,0.06)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: 'inset 0 0 0 0.5px rgba(26,20,16,0.12)',
             cursor: 'pointer',
-          }}>
+          }} className="liquid-glass">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a1410" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 6l-6 6 6 6"/>
             </svg>
@@ -68,11 +66,9 @@ export default function ScreenDetail() {
           </div>
           <div style={{
             width: 38, height: 38, borderRadius: 19,
-            background: 'rgba(26,20,16,0.06)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: 'inset 0 0 0 0.5px rgba(26,20,16,0.12)',
             cursor: 'pointer',
-          }}>
+          }} className="liquid-glass">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a1410" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="1"/>
               <circle cx="19" cy="12" r="1"/>

@@ -136,9 +136,8 @@ export default function ScreenStory() {
             fontFamily: '"DM Sans", sans-serif', letterSpacing: -0.40,
           }}>FIT #{String(fit.id).padStart(3, '0')} · {fit.date}</div>
         </div>
-        <div onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('today'); }} style={{
+        <div className="liquid-glass" onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('today'); }} style={{
           width: 32, height: 32, borderRadius: 16,
-          background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(20px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           cursor: 'pointer', pointerEvents: 'auto',
         }}>

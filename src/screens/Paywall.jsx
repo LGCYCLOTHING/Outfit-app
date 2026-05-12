@@ -62,11 +62,9 @@ export default function ScreenPaywall() {
       <StatusBar />
 
       <div onClick={() => window.__archiveGo && window.__archiveGo('you')} style={{ position: 'absolute', top: 22, right: 22, zIndex: 30, cursor: 'pointer' }}>
-        <div style={{
+        <div className="liquid-glass" style={{
           width: 32, height: 32, borderRadius: 16,
-          background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(20px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.1)',
         }}>
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.8" strokeLinecap="round">
             <path d="M2 2l8 8M10 2l-8 8"/>
