@@ -163,19 +163,25 @@ export default function ScreenToday() {
                     <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: '#F5F0E8' }} />
                     <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: '#F5F0E8' }} />
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                    <span style={{
-                      fontSize: 36, color: '#F5F0E8',
-                      letterSpacing: '-0.05em', lineHeight: 1,
-                    }}>
-                      {dateNum}
-                    </span>
-                    <span style={{
-                      fontSize: 18, color: '#D4C8B8',
-                      letterSpacing: '-0.02em',
-                    }}>
-                      {dayName}
-                    </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F5F0E8" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="4"/>
+                      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+                    </svg>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                      <span style={{
+                        fontSize: 32, color: '#F5F0E8',
+                        letterSpacing: '-0.05em', lineHeight: 1,
+                      }}>
+                        61°
+                      </span>
+                      <span style={{
+                        fontSize: 16, color: '#D4C8B8',
+                        letterSpacing: '-0.02em',
+                      }}>
+                        Clear
+                      </span>
+                    </div>
                   </div>
                 </div>
 
