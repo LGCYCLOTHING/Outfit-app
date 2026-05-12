@@ -6,7 +6,7 @@ export default function ScreenAuth({ onContinue, onBack }) {
       width: '100%', height: '100%', position: 'relative', overflow: 'hidden',
       background: '#0A0807',
       fontFamily: 'Inter, -apple-system, system-ui, sans-serif',
-      color: '#F5F0E8',
+      color: 'var(--text-primary)',
     }}>
       {/* Subtle top glow */}
       <div style={{
@@ -44,13 +44,13 @@ export default function ScreenAuth({ onContinue, onBack }) {
           SIGN IN
         </div>
         <div style={{
-          fontSize: 40, fontWeight: 700, color: '#F5F0E8',
+          fontSize: 40, fontWeight: 700, color: 'var(--text-primary)',
           letterSpacing: '-0.045em', lineHeight: 1.0, marginBottom: 12,
         }}>
           Welcome back
         </div>
         <div style={{
-          fontSize: 15, color: 'rgba(245,240,232,0.6)',
+          fontSize: 15, color: 'var(--text-secondary)',
           lineHeight: 1.5, letterSpacing: '-0.01em',
         }}>
           Sign in to access your archive.
@@ -88,7 +88,7 @@ export default function ScreenAuth({ onContinue, onBack }) {
           className="archive-pressable liquid-glass"
           style={{
             height: 54, borderRadius: 27,
-            color: '#F5F0E8',
+            color: 'var(--text-primary)',
             fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em',
             border: 'none', cursor: 'pointer', fontFamily: 'inherit',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
@@ -109,7 +109,7 @@ export default function ScreenAuth({ onContinue, onBack }) {
           style={{
             height: 54, borderRadius: 27,
             background: 'transparent',
-            color: 'rgba(245,240,232,0.7)',
+            color: 'var(--text-secondary)',
             fontSize: 14, fontWeight: 500, letterSpacing: '-0.01em',
             border: '1px solid rgba(245,240,232,0.18)',
             cursor: 'pointer', fontFamily: 'inherit',
@@ -120,7 +120,7 @@ export default function ScreenAuth({ onContinue, onBack }) {
         {/* Create account link */}
         <div style={{
           textAlign: 'center', marginTop: 12,
-          fontSize: 13, color: 'rgba(245,240,232,0.5)',
+          fontSize: 13, color: 'var(--text-muted)',
           letterSpacing: '-0.01em',
         }}>
           New here?{' '}
@@ -128,7 +128,7 @@ export default function ScreenAuth({ onContinue, onBack }) {
             onClick={onContinue}
             className="archive-pressable"
             style={{
-              color: '#F5F0E8', fontWeight: 600,
+              color: 'var(--text-primary)', fontWeight: 600,
               cursor: 'pointer', textDecoration: 'underline',
               textUnderlineOffset: 3,
             }}>

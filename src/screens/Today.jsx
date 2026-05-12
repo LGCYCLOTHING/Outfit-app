@@ -77,7 +77,7 @@ function StreakRing({ streak, weekProgress, accent, onClick }) {
         <div style={{
           position: 'absolute', inset: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 14, fontWeight: 700, color: '#F5F0E8',
+          fontSize: 14, fontWeight: 700, color: 'var(--text-primary)',
           letterSpacing: '-0.02em',
         }}>
           {streak === 0 ? (
@@ -89,7 +89,7 @@ function StreakRing({ streak, weekProgress, accent, onClick }) {
       </div>
       <div style={{
         fontSize: 8, fontWeight: 500, letterSpacing: 1.4,
-        color: '#5C5248', textTransform: 'uppercase',
+        color: 'var(--text-muted)', textTransform: 'uppercase',
       }}>
         Day streak
       </div>
@@ -169,13 +169,13 @@ export default function ScreenToday() {
                     <WeatherIcon type={weather.icon} size={22} color="#F5F0E8" />
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
                       <span style={{
-                        fontSize: 32, color: '#F5F0E8',
+                        fontSize: 32, color: 'var(--text-primary)',
                         letterSpacing: '-0.05em', lineHeight: 1,
                       }}>
                         {weather.temp}°
                       </span>
                       <span style={{
-                        fontSize: 16, color: '#D4C8B8',
+                        fontSize: 16, color: 'var(--text-secondary)',
                         letterSpacing: '-0.02em',
                       }}>
                         {weather.condition}
@@ -213,7 +213,7 @@ export default function ScreenToday() {
                   </div>
                   <div style={{
                     fontSize: 9, letterSpacing: 1.6,
-                    color: '#C8B5A0', textTransform: 'uppercase',
+                    color: 'var(--text-secondary)', textTransform: 'uppercase',
                   }}>
                     Day streak
                   </div>
@@ -302,7 +302,7 @@ export default function ScreenToday() {
                   </svg>
                 </div>
                 <div>
-                  <div style={{ fontSize: 14, color: '#F5F0E8', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                  <div style={{ fontSize: 14, color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
                     Log today's fit
                   </div>
                   <div style={{ fontSize: 10.5, color: `rgba(${accentRgba},0.85)`, marginTop: 2, letterSpacing: 0.6, textTransform: 'uppercase' }}>
@@ -343,12 +343,12 @@ export default function ScreenToday() {
             </div>
             <div>
               <div style={{
-                fontSize: 14, color: '#F5F0E8', letterSpacing: '-0.02em', lineHeight: 1.2,
+                fontSize: 14, color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: 1.2,
               }}>
                 This week's stories
               </div>
               <div style={{
-                fontSize: 11, color: '#A89880', marginTop: 3, letterSpacing: 0.4,
+                fontSize: 11, color: 'var(--text-secondary)', marginTop: 3, letterSpacing: 0.4,
                 textTransform: 'uppercase',
               }}>
                 6 fits · tap to view
@@ -367,18 +367,18 @@ export default function ScreenToday() {
           }}>
             <div style={{
               fontFamily: 'Inter, sans-serif', fontWeight: 300,
-              fontSize: 14, color: 'rgba(255,255,255,0.78)', letterSpacing: 0.1
+              fontSize: 14, color: 'var(--text-primary)', letterSpacing: 0.1
             }}>Your archive starts here.</div>
             <div style={{
               fontFamily: 'Inter, sans-serif', fontWeight: 300,
-              fontSize: 12, color: 'rgba(255,255,255,0.4)', letterSpacing: 0.1
+              fontSize: 12, color: 'var(--text-muted)', letterSpacing: 0.1
             }}>Log your first fit to get started.</div>
             <button onClick={() => window.__archiveGo && window.__archiveGo('rating')} style={{
               marginTop: 8,
               padding: '9px 18px', borderRadius: 100,
               background: 'rgba(255,255,255,0.04)',
               border: '1px solid rgba(255,255,255,0.18)',
-              color: 'rgba(255,255,255,0.92)',
+              color: 'var(--text-primary)',
               fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 400,
               letterSpacing: 0.1, cursor: 'pointer',
               backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)'
@@ -394,7 +394,7 @@ export default function ScreenToday() {
             <div style={{
               width: 7, height: 7, borderRadius: 3.5, background: accent,
             }} />
-            <span style={{ fontSize: 16, color: 'rgba(255,255,255,0.85)', fontWeight: 500, letterSpacing: -0.1 }}>
+            <span style={{ fontSize: 16, color: 'var(--text-primary)', fontWeight: 500, letterSpacing: -0.1 }}>
               Today's pick
             </span>
           </div>
@@ -404,7 +404,7 @@ export default function ScreenToday() {
               boxShadow: `inset 0 0 0 0.5px rgba(${accentRgba},0.35)` }}>
               {t.name}
             </span>
-            <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.92)', fontFamily: '"DM Sans", sans-serif', fontWeight: 500 }}>94%</span>
+            <span style={{ fontSize: 15, color: 'var(--text-primary)', fontFamily: '"DM Sans", sans-serif', fontWeight: 500 }}>94%</span>
           </div>
         </div>
 
@@ -420,7 +420,7 @@ export default function ScreenToday() {
                 }}>
                   <div style={{
                     fontFamily: 'Inter, sans-serif', fontWeight: 300,
-                    fontSize: 12, color: 'rgba(255,255,255,0.4)', letterSpacing: 0.2
+                    fontSize: 12, color: 'var(--text-muted)', letterSpacing: 0.2
                   }}>Log today's fit →</div>
                 </div>
               }
@@ -447,7 +447,7 @@ export default function ScreenToday() {
                 <div style={{ fontSize: 22, fontWeight: 500, lineHeight: 1.2, marginBottom: 6, letterSpacing: -0.2 }}>
                   Rust suede + cream knit
                 </div>
-                <div style={{ fontSize: 16, color: 'rgba(255,255,255,0.75)', lineHeight: 1.4 }}>
+                <div style={{ fontSize: 16, color: 'var(--text-primary)', lineHeight: 1.4 }}>
                   Last worn Mar 14 · matches 61° clear
                 </div>
               </div>
@@ -455,7 +455,7 @@ export default function ScreenToday() {
                 border: 'none', cursor: 'pointer',
                 width: 48, height: 48, borderRadius: 24,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#F5F0E8'
+                color: 'var(--text-primary)'
               }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M13 6l6 6-6 6" />
@@ -489,15 +489,15 @@ export default function ScreenToday() {
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: 44, fontWeight: 700, letterSpacing: -1.5, lineHeight: 1, color: '#F5F0E8' }}>{stat.value}</div>
-                <div style={{ fontSize: 10, color: 'rgba(245,240,232,0.4)', marginTop: 6, letterSpacing: 1.2, fontWeight: 500 }}>{stat.label}</div>
+                <div style={{ fontSize: 44, fontWeight: 700, letterSpacing: -1.5, lineHeight: 1, color: 'var(--text-primary)' }}>{stat.value}</div>
+                <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 6, letterSpacing: 1.2, fontWeight: 500 }}>{stat.label}</div>
               </div>
             </div>
           ))}
         </div>
 
         <div style={{ marginTop: 28, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 }}>
-          <span style={{ fontSize: 16, color: 'rgba(255,255,255,0.85)', fontWeight: 500, letterSpacing: -0.1 }}>
+          <span style={{ fontSize: 16, color: 'var(--text-primary)', fontWeight: 500, letterSpacing: -0.1 }}>
             Recent
           </span>
           <span onClick={() => window.__archiveGo && window.__archiveGo('archive')} style={{ fontSize: 15, color: accent, fontWeight: 500, cursor: 'pointer' }}>See all</span>
@@ -511,7 +511,7 @@ export default function ScreenToday() {
                 <PhotoPlaceholder ratio="3/4" radius={12} photoId={idx + 5} photoKey={ymd(d)} />
                 <div style={{
                   position: 'absolute', bottom: 7, left: 9,
-                  fontSize: 14, color: '#F5F0E8',
+                  fontSize: 14, color: 'var(--text-primary)',
                   fontWeight: 500, letterSpacing: -0.1,
                   textShadow: '0 1px 4px rgba(0,0,0,0.6)'
                 }}>{['Yesterday', 'Sat', 'Fri', 'Thu', 'Wed', 'Tue'][idx]}</div>
@@ -522,14 +522,14 @@ export default function ScreenToday() {
 
         <div style={{ marginTop: 32, display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
           <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
-          <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.95)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
+          <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
             WARDROBE PULSE
           </span>
         </div>
         <Glass radius={20} style={{ padding: 18 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 }}>
             <span style={{ fontSize: 18, fontWeight: 500, letterSpacing: -0.3 }}>Most worn this month</span>
-            <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>Apr</span>
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 500 }}>Apr</span>
           </div>
           {[
             { name: 'Cream knit', count: 12, pct: 100 },
@@ -538,8 +538,8 @@ export default function ScreenToday() {
           ].map((item, i) =>
             <div key={i} style={{ marginBottom: i === 2 ? 0 : 12 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.88)', fontWeight: 500 }}>{item.name}</span>
-                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>{item.count}×</span>
+                <span style={{ fontSize: 14, color: 'var(--text-primary)', fontWeight: 500 }}>{item.name}</span>
+                <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 500 }}>{item.count}×</span>
               </div>
               <div style={{ height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
                 <div style={{
@@ -553,7 +553,7 @@ export default function ScreenToday() {
 
         <div style={{ marginTop: 24, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
-          <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.95)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
+          <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
             STYLE INSIGHT
           </span>
         </div>
@@ -573,7 +573,7 @@ export default function ScreenToday() {
                 <div className="h-display" style={{ fontSize: 22, lineHeight: 1.15, marginBottom: 6, letterSpacing: -0.4 }}>
                   You wear <em>warm tones</em> 3× more on weekends.
                 </div>
-                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5, fontWeight: 500 }}>
+                <div style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5, fontWeight: 500 }}>
                   Try a navy or sage piece this Saturday for contrast.
                 </div>
               </div>
@@ -583,7 +583,7 @@ export default function ScreenToday() {
 
         <div style={{ marginTop: 24, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
-          <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.95)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
+          <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
             GOALS · APRIL
           </span>
         </div>
@@ -595,10 +595,10 @@ export default function ScreenToday() {
             { label: 'Closet rotated', value: '67', total: '%', pct: 67 }
           ].map((g, i) =>
             <Glass key={i} radius={16} style={{ padding: 14 }}>
-              <div style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.6)', letterSpacing: -0.2, textTransform: 'uppercase', marginBottom: 8 }}>{g.label}</div>
+              <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-secondary)', letterSpacing: -0.2, textTransform: 'uppercase', marginBottom: 8 }}>{g.label}</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, marginBottom: 8 }}>
-                <span className="h-display" style={{ fontSize: 28, lineHeight: 1, color: '#F5F0E8', letterSpacing: -0.6 }}>{g.value}</span>
-                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>{g.total}</span>
+                <span className="h-display" style={{ fontSize: 28, lineHeight: 1, color: 'var(--text-primary)', letterSpacing: -0.6 }}>{g.value}</span>
+                <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>{g.total}</span>
               </div>
               <div style={{ height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
                 <div style={{
@@ -612,12 +612,12 @@ export default function ScreenToday() {
 
         <div style={{ marginTop: 24, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
-          <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.95)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
+          <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
             DAILY PROMPT
           </span>
         </div>
         <Glass radius={20} style={{ padding: 20, marginBottom: 8 }}>
-          <div className="h-display" style={{ fontSize: 26, lineHeight: 1.15, color: '#F5F0E8', marginBottom: 12, letterSpacing: -0.4 }}>
+          <div className="h-display" style={{ fontSize: 26, lineHeight: 1.15, color: 'var(--text-primary)', marginBottom: 12, letterSpacing: -0.4 }}>
             Style something you <em>haven't worn</em> in 30 days.
           </div>
           <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
@@ -631,7 +631,7 @@ export default function ScreenToday() {
               border: '1px solid rgba(255,255,255,0.12)', cursor: 'pointer',
               padding: '12px 16px', borderRadius: 12,
               background: 'rgba(255,255,255,0.04)',
-              color: 'rgba(255,255,255,0.85)', fontSize: 14, fontWeight: 500, letterSpacing: -0.2
+              color: 'var(--text-primary)', fontSize: 14, fontWeight: 500, letterSpacing: -0.2
             }}>Skip</button>
           </div>
         </Glass>

@@ -100,7 +100,7 @@ export default function ScreenPaywall() {
             remixed.
           </div>
         </div>
-        <div style={{ textAlign: 'center', fontSize: 15, color: 'rgba(255,255,255,0.92)', marginTop: 10, marginBottom: 24, lineHeight: 1.5 }}>
+        <div style={{ textAlign: 'center', fontSize: 15, color: 'var(--text-primary)', marginTop: 10, marginBottom: 24, lineHeight: 1.5 }}>
           AI-powered styling on your own wardrobe.
         </div>
 
@@ -118,7 +118,7 @@ export default function ScreenPaywall() {
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 16, fontWeight: 500, marginBottom: 2 }}>{f.title}</div>
-                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.92)', lineHeight: 1.3 }}>{f.sub}</div>
+                <div style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.3 }}>{f.sub}</div>
               </div>
             </div>
           ))}
@@ -156,7 +156,7 @@ export default function ScreenPaywall() {
                 <div style={{ fontSize: 19, fontWeight: 500, letterSpacing: -0.3, color: isActive ? '#fff' : 'rgba(255,255,255,0.85)' }}>
                   {p.price}
                 </div>
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.92)', marginTop: 2 }}>
+                <div style={{ fontSize: 12, color: 'var(--text-primary)', marginTop: 2 }}>
                   {p.sub}
                 </div>
               </div>
@@ -184,7 +184,7 @@ export default function ScreenPaywall() {
           </svg>
         </button>
 
-        <div style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.92)', marginTop: 14, lineHeight: 1.5 }}>
+        <div style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-primary)', marginTop: 14, lineHeight: 1.5 }}>
           Free for 7 days, then {yearly ? '$39.99/year' : '$6.99/month'}.<br/>
           Cancel anytime · Restore purchase
         </div>
@@ -198,7 +198,7 @@ export default function ScreenPaywall() {
           className="archive-pressable"
           style={{
             textAlign: 'center', marginTop: 18, padding: '8px 0',
-            fontSize: 14, color: 'rgba(245,240,232,0.55)',
+            fontSize: 14, color: 'var(--text-muted)',
             fontWeight: 500, cursor: 'pointer', letterSpacing: '-0.01em',
           }}
         >

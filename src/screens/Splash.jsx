@@ -36,13 +36,13 @@ export default function ScreenSplash({ onContinue }) {
         </div>
         <div style={{
           fontFamily: '"Inter", sans-serif',
-          fontSize: 52, fontWeight: 700, color: '#F5F0E8',
+          fontSize: 52, fontWeight: 700, color: 'var(--text-primary)',
           lineHeight: 1.0, letterSpacing: '-0.045em', marginBottom: 18,
         }}>
           Your daily<br/>fit story.
         </div>
         <div style={{
-          fontSize: 15, color: 'rgba(245,240,232,0.65)',
+          fontSize: 15, color: 'var(--text-secondary)',
           lineHeight: 1.5, letterSpacing: '-0.01em', maxWidth: 280,
         }}>
           One photo a day. Every fit, remembered.
@@ -74,7 +74,7 @@ export default function ScreenSplash({ onContinue }) {
         bottom: 'calc(20px + var(--archive-safe-bottom, 0px))',
         left: 0, right: 0,
         textAlign: 'center',
-        fontSize: 11, color: 'rgba(245,240,232,0.45)',
+        fontSize: 11, color: 'var(--text-muted)',
         letterSpacing: '-0.01em',
         pointerEvents: 'none',
       }}>

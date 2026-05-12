@@ -105,7 +105,7 @@ export default function ScreenRating() {
           boxSizing: 'border-box',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.92)', letterSpacing: -0.40, fontFamily: '"DM Sans", sans-serif' }}>
+            <div style={{ fontSize: 13, color: 'var(--text-primary)', letterSpacing: -0.40, fontFamily: '"DM Sans", sans-serif' }}>
               FIT 024 · LOGGED 09:14
             </div>
             <div className="liquid-glass" onClick={() => window.__archiveGo && window.__archiveGo('today')} style={{
@@ -158,7 +158,7 @@ export default function ScreenRating() {
             <div style={{ fontSize: 22, fontWeight: 300, letterSpacing: -0.4, lineHeight: 1.2 }}>
               How did it feel?
             </div>
-            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>
+            <div style={{ fontSize: 14, color: 'var(--text-primary)', marginTop: 4 }}>
               Rate honestly — the AI listens.
             </div>
           </div>
@@ -193,7 +193,7 @@ export default function ScreenRating() {
           </div>
 
           <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.92)', letterSpacing: -0.38, fontFamily: '"DM Sans", sans-serif', marginBottom: 8 }}>
+            <div style={{ fontSize: 12, color: 'var(--text-primary)', letterSpacing: -0.38, fontFamily: '"DM Sans", sans-serif', marginBottom: 8 }}>
               MOOD
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
@@ -216,7 +216,7 @@ export default function ScreenRating() {
           </div>
 
           <div style={{ marginBottom: 22 }}>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.92)', letterSpacing: -0.38, fontFamily: '"DM Sans", sans-serif', marginBottom: 8 }}>
+            <div style={{ fontSize: 12, color: 'var(--text-primary)', letterSpacing: -0.38, fontFamily: '"DM Sans", sans-serif', marginBottom: 8 }}>
               CONTEXT
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
@@ -239,7 +239,7 @@ export default function ScreenRating() {
           </div>
 
           <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ flex: 1, fontSize: 13, color: 'rgba(255,255,255,0.92)', lineHeight: 1.4 }}>
+            <div style={{ flex: 1, fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.4 }}>
               Feeds Mix &amp; Today picks.<br/>Never shown to others.
             </div>
             <button onClick={saveFit} style={{

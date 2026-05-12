@@ -135,14 +135,14 @@ export default function ScreenArchive() {
           <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 30 }}>
               <ArchiveBurger />
-              <div style={{ fontSize: 15, color: 'rgba(245,240,232,0.5)', fontWeight: 400 }}>0 fits</div>
+              <div style={{ fontSize: 15, color: 'var(--text-muted)', fontWeight: 400 }}>0 fits</div>
             </div>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, marginTop: -40 }}>
-              <div className="h-display" style={{ fontSize: 44, color: '#F5F0E8' }}>The <em>archive</em></div>
-              <div style={{ fontSize: 14, color: 'rgba(245,240,232,0.5)' }}>312 fits start with 1.</div>
+              <div className="h-display" style={{ fontSize: 44, color: 'var(--text-primary)' }}>The <em>archive</em></div>
+              <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>312 fits start with 1.</div>
               <button onClick={() => window.__archiveGo && window.__archiveGo('rating')} className="liquid-glass" style={{
                 marginTop: 12, padding: '11px 22px', borderRadius: 100,
-                color: '#F5F0E8', fontFamily: 'inherit', fontSize: 14, fontWeight: 500, cursor: 'pointer',
+                color: 'var(--text-primary)', fontFamily: 'inherit', fontSize: 14, fontWeight: 500, cursor: 'pointer',
               }}>+ Log fit</button>
             </div>
           </div>
@@ -154,11 +154,11 @@ export default function ScreenArchive() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
               <ArchiveBurger />
-              <div style={{ fontSize: 11, color: 'rgba(245,240,232,0.5)', fontWeight: 500, letterSpacing: 0.8 }}>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: 0.8 }}>
                 312 fits · 18 months
               </div>
             </div>
-            <div className="h-display" style={{ fontSize: 48, color: '#F5F0E8', lineHeight: 1 }}>
+            <div className="h-display" style={{ fontSize: 48, color: 'var(--text-primary)', lineHeight: 1 }}>
               The <em>archive</em>
             </div>
           </div>
@@ -206,7 +206,7 @@ export default function ScreenArchive() {
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
               style={{
-                flex: 1, fontSize: 15, color: '#F5F0E8',
+                flex: 1, fontSize: 15, color: 'var(--text-primary)',
                 background: 'transparent', border: 'none', outline: 'none',
                 fontFamily: 'inherit',
               }}
@@ -246,13 +246,13 @@ export default function ScreenArchive() {
 
         {/* NEW Sort row */}
         <div style={{ padding: '0 24px', marginBottom: 22, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ fontSize: 10, color: 'rgba(245,240,232,0.4)', letterSpacing: 1.2, fontWeight: 500 }}>
+          <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: 1.2, fontWeight: 500 }}>
             SORTED BY
           </div>
           <div onClick={cycleSort} className="lg-pill archive-pressable" style={{
             padding: '6px 12px 6px 14px', borderRadius: 100, cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: 8,
-            fontSize: 12, color: '#F5F0E8', fontWeight: 500, letterSpacing: 0.3,
+            fontSize: 12, color: 'var(--text-primary)', fontWeight: 500, letterSpacing: 0.3,
           }}>
             {sortMode}
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.55)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -277,16 +277,16 @@ export default function ScreenArchive() {
             }} />
 
             <div style={{ position: 'relative', padding: '22px 22px 20px', zIndex: 1 }}>
-              <div style={{ fontSize: 10, letterSpacing: 1.6, color: 'rgba(245,240,232,0.55)', fontWeight: 500, marginBottom: 14 }}>
+              <div style={{ fontSize: 10, letterSpacing: 1.6, color: 'var(--text-muted)', fontWeight: 500, marginBottom: 14 }}>
                 FEATURED FIT
               </div>
-              <div className="h-display" style={{ fontSize: 30, color: '#F5F0E8', lineHeight: 1, marginBottom: 10 }}>
+              <div className="h-display" style={{ fontSize: 30, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 10 }}>
                 Soft Structure
               </div>
-              <div style={{ fontSize: 14, color: 'rgba(245,240,232,0.7)', lineHeight: 1.4, maxWidth: 200, marginBottom: 28 }}>
+              <div style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.4, maxWidth: 200, marginBottom: 28 }}>
                 Layered neutrals with<br/>textured contrast.
               </div>
-              <div style={{ fontSize: 10, letterSpacing: 1.4, color: 'rgba(245,240,232,0.5)', fontWeight: 500 }}>
+              <div style={{ fontSize: 10, letterSpacing: 1.4, color: 'var(--text-muted)', fontWeight: 500 }}>
                 APR 26, 2026
               </div>
             </div>
@@ -321,7 +321,7 @@ export default function ScreenArchive() {
                   LIKED
                 </span>
               </div>
-              <span style={{ fontSize: 11, color: 'rgba(245,240,232,0.45)', fontWeight: 500, letterSpacing: 1 }}>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: 1 }}>
                 {String(likedFits.length).padStart(2, '0')}
               </span>
             </div>
@@ -345,7 +345,7 @@ export default function ScreenArchive() {
                   </div>
                   <div style={{
                     position: 'absolute', bottom: 8, left: 10,
-                    fontSize: 10, color: 'rgba(245,240,232,0.85)', letterSpacing: 0.8, fontWeight: 500,
+                    fontSize: 10, color: 'var(--text-primary)', letterSpacing: 0.8, fontWeight: 500,
                   }}>
                     #{f.n}
                   </div>
@@ -358,7 +358,7 @@ export default function ScreenArchive() {
         {/* Empty filter state */}
         {filteredMonths.length === 0 && (
           <div style={{ padding: '40px 24px', textAlign: 'center' }}>
-            <div style={{ fontSize: 13, color: 'rgba(245,240,232,0.5)', letterSpacing: 0.4 }}>
+            <div style={{ fontSize: 13, color: 'var(--text-muted)', letterSpacing: 0.4 }}>
               No fits match "{activeTag}". Try a different filter.
             </div>
           </div>
@@ -371,10 +371,10 @@ export default function ScreenArchive() {
               padding: '0 24px', marginBottom: 14,
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
-              <span style={{ fontSize: 11, color: 'rgba(245,240,232,0.5)', fontWeight: 500, letterSpacing: 1.5 }}>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: 1.5 }}>
                 {m.label}
               </span>
-              <span style={{ fontSize: 11, color: 'rgba(245,240,232,0.5)', fontWeight: 500, letterSpacing: 1 }}>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: 1 }}>
                 {m.count}
               </span>
             </div>
@@ -393,7 +393,7 @@ export default function ScreenArchive() {
                       opacity: 0.3, mixBlendMode: 'overlay', pointerEvents: 'none',
                     }} />
 
-                    <div style={{ position: 'absolute', top: 12, left: 14, fontSize: 13, color: '#F5F0E8', fontWeight: 500 }}>
+                    <div style={{ position: 'absolute', top: 12, left: 14, fontSize: 13, color: 'var(--text-primary)', fontWeight: 500 }}>
                       #{f.n}
                     </div>
 
@@ -407,7 +407,7 @@ export default function ScreenArchive() {
 
                     <div style={{
                       position: 'absolute', bottom: 12, left: 14,
-                      fontSize: 11, color: 'rgba(245,240,232,0.85)', letterSpacing: 1, fontWeight: 500,
+                      fontSize: 11, color: 'var(--text-primary)', letterSpacing: 1, fontWeight: 500,
                     }}>
                       {f.d}
                     </div>
@@ -442,10 +442,10 @@ export default function ScreenArchive() {
             overflow: 'hidden',
           }}>
             <div style={{ width: 38, height: 4, borderRadius: 2, background: 'rgba(245,240,232,0.2)', margin: '0 auto 18px' }} />
-            <div style={{ fontSize: 10, letterSpacing: 1.5, color: 'rgba(245,240,232,0.45)', fontWeight: 500, marginBottom: 4 }}>
+            <div style={{ fontSize: 10, letterSpacing: 1.5, color: 'var(--text-muted)', fontWeight: 500, marginBottom: 4 }}>
               FIT #{String(menuFor).padStart(3, '0')}
             </div>
-            <div className="h-display" style={{ fontSize: 22, color: '#F5F0E8', marginBottom: 18 }}>
+            <div className="h-display" style={{ fontSize: 22, color: 'var(--text-primary)', marginBottom: 18 }}>
               Quick actions
             </div>
             {[

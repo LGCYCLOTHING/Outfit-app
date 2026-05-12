@@ -63,13 +63,13 @@ export default function ScreenYou() {
           }} />
           <div>
             <div className="h-display" style={{ fontSize: 26 }}>Your <em>archive</em></div>
-            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.92)', marginTop: 4, letterSpacing: -0.35, fontFamily: '"DM Sans", sans-serif' }}>312 FITS · 47 DAY STREAK</div>
+            <div style={{ fontSize: 14, color: 'var(--text-primary)', marginTop: 4, letterSpacing: -0.35, fontFamily: '"DM Sans", sans-serif' }}>312 FITS · 47 DAY STREAK</div>
           </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
           <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
-          <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.95)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
+          <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
             DISPLAY MODE
           </span>
         </div>
@@ -100,7 +100,7 @@ export default function ScreenYou() {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
           <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
-          <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.95)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
+          <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
             APPEARANCE · THEME
           </span>
         </div>
@@ -164,7 +164,7 @@ export default function ScreenYou() {
                   position: 'absolute', bottom: 18, left: 0, right: 0,
                   textAlign: 'center',
                   fontSize: 11, letterSpacing: 1.6, fontWeight: 600,
-                  color: '#F5F0E8',
+                  color: 'var(--text-primary)',
                   textShadow: '0 1px 6px rgba(0,0,0,0.55)',
                 }}>
                   {s.name.toUpperCase()}
@@ -178,7 +178,7 @@ export default function ScreenYou() {
           <svg width="11" height="13" viewBox="0 0 12 14" fill={accent}>
             <path d="M6 0a4 4 0 0 0-4 4v2H1v8h10V6h-1V4a4 4 0 0 0-4-4zm0 2a2 2 0 0 1 2 2v2H4V4a2 2 0 0 1 2-2z"/>
           </svg>
-          <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.95)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
+          <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
             PRO · LOCKED
           </span>
         </div>
@@ -213,7 +213,7 @@ export default function ScreenYou() {
                     fontSize: 9, color: '#0a0a0a', fontWeight: 500, letterSpacing: -0.13,
                   }}>PRO</div>
                 </div>
-                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.92)', lineHeight: 1.4 }}>
+                <div style={{ fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.4 }}>
                   App color updates automatically from your outfit photo.
                 </div>
               </div>
@@ -225,7 +225,7 @@ export default function ScreenYou() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, marginTop: 26 }}>
-          <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.95)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
+          <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
             ACCOUNT
           </span>
         </div>
@@ -288,10 +288,10 @@ export default function ScreenYou() {
                 {row.icon}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 15, fontWeight: 600, color: '#F5F0E8', letterSpacing: -0.2, lineHeight: 1.2 }}>
+                <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: -0.2, lineHeight: 1.2 }}>
                   {row.label}
                 </div>
-                <div style={{ fontSize: 12, color: 'rgba(245,240,232,0.55)', marginTop: 3, lineHeight: 1.2 }}>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3, lineHeight: 1.2 }}>
                   {row.sub}
                 </div>
               </div>

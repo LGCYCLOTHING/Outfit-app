@@ -67,7 +67,7 @@ export default function ScreenCalendar() {
           <div onClick={() => setYear(y => y - 1)} className="archive-pressable" style={{
             display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
           }}>
-            <span style={{ fontSize: 26, color: '#F5F0E8', fontWeight: 500, letterSpacing: -0.4 }}>
+            <span style={{ fontSize: 26, color: 'var(--text-primary)', fontWeight: 500, letterSpacing: -0.4 }}>
               {year}
             </span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.75)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -134,7 +134,7 @@ export default function ScreenCalendar() {
                   fontFamily: '"DM Sans", -apple-system, sans-serif',
                   fontSize: 'clamp(72px, 18vw, 130px)',
                   fontWeight: 800,
-                  color: 'rgba(245,240,232,0.94)',
+                  color: 'var(--text-primary)',
                   letterSpacing: -4,
                   lineHeight: 0.85,
                   textShadow: '0 6px 28px rgba(0,0,0,0.45)',
@@ -155,7 +155,7 @@ export default function ScreenCalendar() {
                   fontFamily: '"DM Sans", -apple-system, sans-serif',
                   fontSize: 'clamp(72px, 18vw, 130px)',
                   fontWeight: 800,
-                  color: 'rgba(245,240,232,0.6)',
+                  color: 'var(--text-secondary)',
                   letterSpacing: -4,
                   lineHeight: 0.85,
                   whiteSpace: 'nowrap',
@@ -168,7 +168,7 @@ export default function ScreenCalendar() {
               <div className="liquid-glass" style={{
                 position: 'absolute', top: 12, left: 12,
                 padding: '5px 12px', borderRadius: 100,
-                fontSize: 11, color: '#F5F0E8', fontWeight: 500, letterSpacing: 0.2,
+                fontSize: 11, color: 'var(--text-primary)', fontWeight: 500, letterSpacing: 0.2,
                 zIndex: 3,
               }}>
                 {m.count} fits
@@ -193,7 +193,7 @@ export default function ScreenCalendar() {
           <svg width="14" height="14" viewBox="0 0 24 24" fill={t.light} stroke="none">
             <path d="M12 2c1 4-3 6-3 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-2 3 0-3-1-5-3-8z"/>
           </svg>
-          <span style={{ fontSize: 12, color: 'rgba(245,240,232,0.6)', letterSpacing: 1, fontWeight: 500 }}>
+          <span style={{ fontSize: 12, color: 'var(--text-secondary)', letterSpacing: 1, fontWeight: 500 }}>
             18 day streak · {year}
           </span>
         </div>

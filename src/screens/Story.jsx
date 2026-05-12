@@ -132,7 +132,7 @@ export default function ScreenStory() {
       }}>
         <div style={{ pointerEvents: 'auto' }}>
           <div style={{
-            fontSize: 12, color: 'rgba(255,255,255,0.7)',
+            fontSize: 12, color: 'var(--text-secondary)',
             fontFamily: '"DM Sans", sans-serif', letterSpacing: -0.40,
           }}>FIT #{String(fit.id).padStart(3, '0')} · {fit.date}</div>
         </div>
@@ -158,7 +158,7 @@ export default function ScreenStory() {
         pointerEvents: 'none',
       }}>
         <div style={{
-          textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.92)',
+          textAlign: 'center', fontSize: 12, color: 'var(--text-primary)',
           fontFamily: '"DM Sans", sans-serif', letterSpacing: -0.45, marginBottom: 6,
         }}>{fit.mood.toUpperCase()} · {fit.weather.toUpperCase()}</div>
         <div className="h-display" style={{ fontSize: 30, textAlign: 'center', lineHeight: 1.05 }}>

@@ -68,7 +68,7 @@ function SettingsRow({ icon, title, subtitle, right, onClick, disabled, dangerTe
         </div>
         {subtitle && (
           <div style={{
-            fontSize: 12, color: '#5C5248', marginTop: 3, lineHeight: 1.3,
+            fontSize: 12, color: 'var(--text-muted)', marginTop: 3, lineHeight: 1.3,
             letterSpacing: '-0.01em',
           }}>
             {subtitle}
@@ -239,7 +239,7 @@ export default function ScreenSettings() {
             </svg>
           </div>
           <div style={{
-            fontSize: 28, color: '#F5F0E8',
+            fontSize: 28, color: 'var(--text-primary)',
             letterSpacing: '-0.05em', lineHeight: 1,
           }}>
             Settings
@@ -316,10 +316,10 @@ export default function ScreenSettings() {
             animation: 'archive-slide-up .25s cubic-bezier(.2,.8,.2,1)',
           }}>
             <div style={{ width: 38, height: 4, borderRadius: 2, background: 'rgba(245,240,232,0.2)', margin: '0 auto 18px' }} />
-            <div style={{ fontSize: 22, color: '#F5F0E8', letterSpacing: '-0.04em', marginBottom: 8 }}>
+            <div style={{ fontSize: 22, color: 'var(--text-primary)', letterSpacing: '-0.04em', marginBottom: 8 }}>
               Reset all data?
             </div>
-            <div style={{ fontSize: 14, color: 'rgba(245,240,232,0.6)', lineHeight: 1.4, marginBottom: 22 }}>
+            <div style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.4, marginBottom: 22 }}>
               This will permanently delete every fit, streak, and preference. This cannot be undone.
             </div>
             <button onClick={handleReset} style={{
@@ -331,7 +331,7 @@ export default function ScreenSettings() {
             </button>
             <button onClick={() => setConfirmReset(false)} style={{
               width: '100%', height: 50, borderRadius: 25, border: 'none', cursor: 'pointer',
-              background: 'transparent', color: 'rgba(245,240,232,0.6)',
+              background: 'transparent', color: 'var(--text-secondary)',
               fontSize: 15, fontFamily: 'inherit',
             }}>
               Cancel

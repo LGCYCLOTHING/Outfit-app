@@ -121,14 +121,14 @@ export default function ScreenOnboarding({ onComplete }) {
               </div>
               <div style={{
                 fontFamily: '"Inter", sans-serif',
-                fontSize: 44, fontWeight: 700, color: '#F5F0E8',
+                fontSize: 44, fontWeight: 700, color: 'var(--text-primary)',
                 lineHeight: 1.02, letterSpacing: '-0.04em',
                 whiteSpace: 'pre-line', marginBottom: 18,
               }}>
                 {s.title}
               </div>
               <div style={{
-                fontSize: 15, color: 'rgba(245,240,232,0.72)',
+                fontSize: 15, color: 'var(--text-secondary)',
                 lineHeight: 1.5, letterSpacing: '-0.01em',
                 whiteSpace: 'pre-line', maxWidth: 320,
               }}>
@@ -147,7 +147,7 @@ export default function ScreenOnboarding({ onComplete }) {
           position: 'absolute',
           top: 'calc(22px + var(--archive-safe-top, 54px))',
           right: 26,
-          fontSize: 13, color: 'rgba(245,240,232,0.65)', fontWeight: 500,
+          fontSize: 13, color: 'var(--text-secondary)', fontWeight: 500,
           cursor: 'pointer', zIndex: 10, padding: '6px 4px',
         }}
       >
@@ -199,7 +199,7 @@ export default function ScreenOnboarding({ onComplete }) {
         bottom: 'calc(20px + var(--archive-safe-bottom, 0px))',
         left: 0, right: 0,
         textAlign: 'center',
-        fontSize: 11, color: 'rgba(245,240,232,0.45)',
+        fontSize: 11, color: 'var(--text-muted)',
         letterSpacing: '-0.01em',
         zIndex: 10, pointerEvents: 'none',
       }}>

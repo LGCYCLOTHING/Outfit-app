@@ -137,7 +137,7 @@ export default function ScreenShare() {
               <path d="M6 6l12 12M18 6L6 18"/>
             </svg>
           </div>
-          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.92)', letterSpacing: -0.40, fontFamily: '"DM Sans", sans-serif' }}>
+          <div style={{ fontSize: 13, color: 'var(--text-primary)', letterSpacing: -0.40, fontFamily: '"DM Sans", sans-serif' }}>
             SHARE CARD
           </div>
           <div style={{ width: 36 }} />
@@ -148,7 +148,7 @@ export default function ScreenShare() {
         </div>
 
         <div style={{ marginBottom: 22 }}>
-          <div style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.95)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif', marginBottom: 12 }}>
+          <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif', marginBottom: 12 }}>
             STYLE
           </div>
           <div style={{ display: 'flex', gap: 12 }}>
@@ -219,7 +219,7 @@ export default function ScreenShare() {
           Share fit
         </button>
 
-        <div style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.92)', marginTop: 12 }}>
+        <div style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-primary)', marginTop: 12 }}>
           Saves to camera roll · share to anywhere
         </div>
       </div>

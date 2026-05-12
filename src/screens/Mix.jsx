@@ -59,7 +59,7 @@ export default function ScreenMix() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 6 }}>
           <ArchiveBurger />
           <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
-          <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.95)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
+          <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
             AI MIX · UPDATED 2h AGO
           </span>
         </div>
@@ -67,7 +67,7 @@ export default function ScreenMix() {
           Combos you<br/>
           <em>haven't tried.</em>
         </div>
-        <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.92)', lineHeight: 1.45, marginBottom: 22 }}>
+        <div style={{ fontSize: 15, color: 'var(--text-primary)', lineHeight: 1.45, marginBottom: 22 }}>
           Pulled from 312 logged fits · refreshed daily
         </div>
 
@@ -81,7 +81,7 @@ export default function ScreenMix() {
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.92)', fontFamily: '"DM Sans", sans-serif', letterSpacing: -0.30 }}>
+                  <span style={{ fontSize: 12, color: 'var(--text-primary)', fontFamily: '"DM Sans", sans-serif', letterSpacing: -0.30 }}>
                     COMBO · {String(idx + 1).padStart(2, '0')}
                   </span>
                   {!c.locked && (
@@ -144,14 +144,14 @@ export default function ScreenMix() {
                 {c.title}
               </div>
               <div style={{
-                fontSize: 14, color: 'rgba(255,255,255,0.92)', lineHeight: 1.5,
+                fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.5,
                 marginBottom: 12, paddingLeft: 10,
                 borderLeft: `2px solid ${c.locked ? `rgba(${accentRgba},0.3)` : accent}`,
               }}>
                 {c.reason}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.92)', fontFamily: '"DM Sans", sans-serif', letterSpacing: -0.15 }}>
+                <span style={{ fontSize: 13, color: 'var(--text-primary)', fontFamily: '"DM Sans", sans-serif', letterSpacing: -0.15 }}>
                   {c.pieces}
                 </span>
                 <span onClick={() => window.__archiveGo && window.__archiveGo(c.locked ? 'paywall' : 'rating')} style={{

@@ -123,11 +123,11 @@ export function FitPhoto({ id = 1, label, date, ratio = '3/4', radius = 18, show
         <div style={{
           position: 'absolute', top: 10, left: 12, display: 'flex', flexDirection: 'column', gap: 1,
           fontFamily: '"DM Sans", sans-serif',
-          fontSize: 9.5, color: 'rgba(255,255,255,0.92)', letterSpacing: -0.40,
+          fontSize: 9.5, color: 'var(--text-primary)', letterSpacing: -0.40,
           textShadow: '0 1px 2px rgba(0,0,0,0.6)',
         }}>
           <span>FIT</span>
-          <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12, letterSpacing: -0.30 }}>
+          <span style={{ color: 'var(--text-primary)', fontSize: 12, letterSpacing: -0.30 }}>
             #{String(id).padStart(3, '0')}
           </span>
         </div>
@@ -136,7 +136,7 @@ export function FitPhoto({ id = 1, label, date, ratio = '3/4', radius = 18, show
         <div style={{
           position: 'absolute', bottom: 8, left: 12,
           fontFamily: '"DM Sans", sans-serif',
-          fontSize: 9, color: 'rgba(255,255,255,0.7)', letterSpacing: -0.20,
+          fontSize: 9, color: 'var(--text-secondary)', letterSpacing: -0.20,
           textShadow: '0 1px 2px rgba(0,0,0,0.6)',
         }}>{date}</div>
       )}
@@ -144,7 +144,7 @@ export function FitPhoto({ id = 1, label, date, ratio = '3/4', radius = 18, show
         <div style={{
           position: 'absolute', bottom: 10, right: 12,
           fontFamily: 'DM Sans, system-ui, sans-serif',
-          fontSize: 12, color: 'rgba(255,255,255,0.85)', fontWeight: 500,
+          fontSize: 12, color: 'var(--text-primary)', fontWeight: 500,
           textShadow: '0 1px 2px rgba(0,0,0,0.7)',
         }}>{label}</div>
       )}
@@ -279,7 +279,7 @@ export function PhotoPlaceholder({ ratio = '3/4', radius = 18, onAdd, photoId, p
           }}>+</div>
         </div>
         <div style={{
-          fontSize: 13, color: 'rgba(255,255,255,0.92)',
+          fontSize: 13, color: 'var(--text-primary)',
           fontFamily: '"DM Sans", sans-serif', letterSpacing: -0.35,
         }}>ADD PHOTO</div>
       </div>
@@ -719,7 +719,7 @@ export function StatusBar() {
       {/* Time — left side, vertically centered with the island */}
       <div style={{
         position: 'absolute', top: 18, left: 28,
-        fontSize: 15, fontWeight: 600, color: '#F5F0E8',
+        fontSize: 15, fontWeight: 600, color: 'var(--text-primary)',
         letterSpacing: '-0.02em', fontFamily: '"Inter", -apple-system, sans-serif',
       }}>
         9:41
@@ -729,7 +729,7 @@ export function StatusBar() {
       <div style={{
         position: 'absolute', top: 19, right: 24,
         display: 'flex', alignItems: 'center', gap: 6,
-        color: '#F5F0E8',
+        color: 'var(--text-primary)',
       }}>
         {/* Signal bars */}
         <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor">

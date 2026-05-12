@@ -91,7 +91,7 @@ function FloatingNav({ current, go }) {
         <div style={{
           fontFamily: '"DM Sans", sans-serif',
           fontSize: 9, fontWeight: 500, letterSpacing: 2.5,
-          color: 'rgba(255,255,255,0.45)',
+          color: 'var(--text-muted)',
           textTransform: 'uppercase',
           marginBottom: 12,
         }}>
@@ -138,7 +138,7 @@ function FloatingNav({ current, go }) {
         <div style={{
           fontFamily: '"DM Sans", sans-serif',
           fontSize: 9, fontWeight: 500, letterSpacing: 2.5,
-          color: 'rgba(255,255,255,0.45)',
+          color: 'var(--text-muted)',
           textTransform: 'uppercase',
           marginBottom: 10,
         }}>
@@ -161,7 +161,7 @@ function FloatingNav({ current, go }) {
                 fontFamily: '"DM Sans", -apple-system, system-ui, sans-serif',
                 fontSize: 15, fontWeight: 600,
                 lineHeight: 1.1, letterSpacing: -0.2,
-                color: 'rgba(255,255,255,0.85)',
+                color: 'var(--text-primary)',
                 cursor: 'pointer',
               }}>
               {it.label}
@@ -180,7 +180,7 @@ function FloatingNav({ current, go }) {
 
         <div style={{
           fontFamily: '"DM Sans", sans-serif',
-          fontSize: 9, color: 'rgba(255,255,255,0.4)',
+          fontSize: 9, color: 'var(--text-muted)',
           letterSpacing: 0.3, lineHeight: 1.5,
         }}>
           AĒVUM · Daily outfit tracker<br/>
@@ -209,11 +209,13 @@ export default function App() {
   React.useEffect(() => {
     const h = () => {
       document.body.classList.toggle('archive-light', !!window.__archiveLight);
+      document.body.dataset.theme = window.__archiveTheme || 'dusk';
       force();
     };
     window.addEventListener('archive:themechange', h);
     window.addEventListener('archive:lightchange', h);
     document.body.classList.toggle('archive-light', !!window.__archiveLight);
+    document.body.dataset.theme = window.__archiveTheme || 'dusk';
     return () => {
       window.removeEventListener('archive:themechange', h);
       window.removeEventListener('archive:lightchange', h);

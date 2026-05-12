@@ -118,15 +118,15 @@ export default function ScreenPieces() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
             <ArchiveBurger />
-            <div style={{ fontSize: 11, color: 'rgba(245,240,232,0.5)', fontWeight: 500, letterSpacing: 0.8 }}>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: 0.8 }}>
               YOUR WARDROBE CATALOG
             </div>
           </div>
 
-          <div className="h-display" style={{ fontSize: 48, color: '#F5F0E8', lineHeight: 1, marginBottom: 14 }}>
+          <div className="h-display" style={{ fontSize: 48, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 14 }}>
             <em>Pieces</em>
           </div>
-          <div style={{ fontSize: 14, color: 'rgba(245,240,232,0.7)', lineHeight: 1.5, marginBottom: 32, maxWidth: 280 }}>
+          <div style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 32, maxWidth: 280 }}>
             Catalog every garment you own — track wear, color, and category.
           </div>
 
@@ -143,10 +143,10 @@ export default function ScreenPieces() {
               background: `linear-gradient(135deg, ${accent} 0%, ${accentHot} 100%)`,
               color: '#0a0a0a', marginBottom: 14,
             }}>PRO FEATURE</div>
-            <div className="h-display" style={{ fontSize: 26, color: '#F5F0E8', lineHeight: 1.15, marginBottom: 10 }}>
+            <div className="h-display" style={{ fontSize: 26, color: 'var(--text-primary)', lineHeight: 1.15, marginBottom: 10 }}>
               Build your wardrobe library.
             </div>
-            <div style={{ fontSize: 14, color: 'rgba(245,240,232,0.65)', lineHeight: 1.5, marginBottom: 18 }}>
+            <div style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 18 }}>
               Unlock unlimited pieces, smart matching, and wear analytics with Archive Pro.
             </div>
             <button
@@ -184,8 +184,8 @@ export default function ScreenPieces() {
                   </svg>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14, color: '#F5F0E8', letterSpacing: '-0.02em' }}>{row.t}</div>
-                  <div style={{ fontSize: 12, color: 'rgba(245,240,232,0.55)', marginTop: 2 }}>{row.s}</div>
+                  <div style={{ fontSize: 14, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>{row.t}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{row.s}</div>
                 </div>
               </div>
             ))}
@@ -196,7 +196,7 @@ export default function ScreenPieces() {
             className="archive-pressable"
             style={{
               marginTop: 18, alignSelf: 'center', cursor: 'pointer',
-              fontSize: 12, color: 'rgba(245,240,232,0.4)', letterSpacing: 0.4,
+              fontSize: 12, color: 'var(--text-muted)', letterSpacing: 0.4,
             }}>
             Preview as Pro
           </div>
@@ -233,11 +233,11 @@ export default function ScreenPieces() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
               <ArchiveBurger />
-              <div style={{ fontSize: 11, color: 'rgba(245,240,232,0.5)', fontWeight: 500, letterSpacing: 0.8 }}>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: 0.8 }}>
                 {pieces.length} piece{pieces.length === 1 ? '' : 's'}
               </div>
             </div>
-            <div className="h-display" style={{ fontSize: 48, color: '#F5F0E8', lineHeight: 1 }}>
+            <div className="h-display" style={{ fontSize: 48, color: 'var(--text-primary)', lineHeight: 1 }}>
               Your <em>pieces</em>
             </div>
           </div>
@@ -251,7 +251,7 @@ export default function ScreenPieces() {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F5F0E8" strokeWidth="2" strokeLinecap="round">
               <path d="M12 5v14M5 12h14"/>
             </svg>
-            <span style={{ fontSize: 13, color: '#F5F0E8', fontWeight: 500 }}>Add</span>
+            <span style={{ fontSize: 13, color: 'var(--text-primary)', fontWeight: 500 }}>Add</span>
           </div>
         </div>
 
@@ -268,10 +268,10 @@ export default function ScreenPieces() {
                 <path d="M4 7l4-3h8l4 3-3 4-2-1v11H7V10L5 11 4 7z"/>
               </svg>
             </div>
-            <div className="h-display" style={{ fontSize: 28, color: '#F5F0E8', marginTop: 8 }}>
+            <div className="h-display" style={{ fontSize: 28, color: 'var(--text-primary)', marginTop: 8 }}>
               Add your first <em>piece</em>
             </div>
-            <div style={{ fontSize: 13, color: 'rgba(245,240,232,0.55)', textAlign: 'center', maxWidth: 260, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'center', maxWidth: 260, lineHeight: 1.5 }}>
               Catalog garments to see them paired with your fits.
             </div>
             <button
@@ -292,11 +292,11 @@ export default function ScreenPieces() {
               <div style={{ padding: '0 24px', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <CategoryIcon cat={g.cat} size={14} color={accent} />
-                  <span style={{ fontSize: 11, color: 'rgba(245,240,232,0.55)', fontWeight: 500, letterSpacing: 1.5 }}>
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: 1.5 }}>
                     {g.cat.toUpperCase()}
                   </span>
                 </div>
-                <span style={{ fontSize: 11, color: 'rgba(245,240,232,0.45)', fontWeight: 500, letterSpacing: 1 }}>
+                <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: 1 }}>
                   {String(g.items.length).padStart(2, '0')}
                 </span>
               </div>
@@ -326,14 +326,14 @@ export default function ScreenPieces() {
                       position: 'absolute', bottom: 10, left: 12, right: 12,
                     }}>
                       <div style={{
-                        fontSize: 13, color: '#F5F0E8', fontWeight: 500,
+                        fontSize: 13, color: 'var(--text-primary)', fontWeight: 500,
                         letterSpacing: '-0.02em', lineHeight: 1.2,
                         textShadow: '0 1px 4px rgba(0,0,0,0.6)',
                         whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                       }}>{p.name}</div>
                       {p.color && (
                         <div style={{
-                          fontSize: 10, color: 'rgba(245,240,232,0.7)', marginTop: 2, letterSpacing: 0.4,
+                          fontSize: 10, color: 'var(--text-secondary)', marginTop: 2, letterSpacing: 0.4,
                           textTransform: 'uppercase',
                         }}>{p.color}</div>
                       )}
@@ -373,7 +373,7 @@ export default function ScreenPieces() {
             maxHeight: '88%', overflow: 'auto',
           }}>
             <div style={{ width: 38, height: 4, borderRadius: 2, background: 'rgba(245,240,232,0.2)', margin: '0 auto 16px' }} />
-            <div className="h-display" style={{ fontSize: 24, color: '#F5F0E8', marginBottom: 18 }}>
+            <div className="h-display" style={{ fontSize: 24, color: 'var(--text-primary)', marginBottom: 18 }}>
               Add piece
             </div>
 
@@ -404,7 +404,7 @@ export default function ScreenPieces() {
                       <path d="M3 7h3l2-2.5h8L18 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
                       <circle cx="12" cy="13" r="3.5"/>
                     </svg>
-                    <span style={{ fontSize: 12, color: 'rgba(245,240,232,0.55)', letterSpacing: 0.4 }}>Tap to add photo</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)', letterSpacing: 0.4 }}>Tap to add photo</span>
                   </div>
                 )}
               </div>
@@ -412,7 +412,7 @@ export default function ScreenPieces() {
 
             {/* Name */}
             <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 10, color: 'rgba(245,240,232,0.5)', letterSpacing: 1.2, marginBottom: 6, fontWeight: 500 }}>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: 1.2, marginBottom: 6, fontWeight: 500 }}>
                 NAME
               </div>
               <input
@@ -423,7 +423,7 @@ export default function ScreenPieces() {
                   width: '100%', padding: '12px 14px', borderRadius: 12,
                   background: 'rgba(255, 240, 220, 0.04)',
                   border: '1px solid rgba(255, 240, 220, 0.10)',
-                  color: '#F5F0E8', fontSize: 14,
+                  color: 'var(--text-primary)', fontSize: 14,
                   fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box',
                 }}
               />
@@ -431,7 +431,7 @@ export default function ScreenPieces() {
 
             {/* Color */}
             <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 10, color: 'rgba(245,240,232,0.5)', letterSpacing: 1.2, marginBottom: 6, fontWeight: 500 }}>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: 1.2, marginBottom: 6, fontWeight: 500 }}>
                 COLOR
               </div>
               <input
@@ -442,7 +442,7 @@ export default function ScreenPieces() {
                   width: '100%', padding: '12px 14px', borderRadius: 12,
                   background: 'rgba(255, 240, 220, 0.04)',
                   border: '1px solid rgba(255, 240, 220, 0.10)',
-                  color: '#F5F0E8', fontSize: 14,
+                  color: 'var(--text-primary)', fontSize: 14,
                   fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box',
                 }}
               />
@@ -450,7 +450,7 @@ export default function ScreenPieces() {
 
             {/* Category */}
             <div style={{ marginBottom: 18 }}>
-              <div style={{ fontSize: 10, color: 'rgba(245,240,232,0.5)', letterSpacing: 1.2, marginBottom: 8, fontWeight: 500 }}>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: 1.2, marginBottom: 8, fontWeight: 500 }}>
                 CATEGORY
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
@@ -477,7 +477,7 @@ export default function ScreenPieces() {
                 flex: 1, border: '1px solid rgba(255,255,255,0.12)', cursor: 'pointer',
                 padding: '13px 16px', borderRadius: 100,
                 background: 'rgba(255,255,255,0.04)',
-                color: 'rgba(255,255,255,0.85)', fontSize: 14, fontWeight: 500,
+                color: 'var(--text-primary)', fontSize: 14, fontWeight: 500,
                 fontFamily: 'inherit',
               }}>Cancel</button>
               <button onClick={savePiece} disabled={!name.trim()} style={{
