@@ -72,7 +72,7 @@ function FloatingNav({ current, go }) {
         padding: 'calc(40px + var(--archive-safe-top, 0px)) 26px calc(20px + var(--archive-safe-bottom, 0px))',
         boxSizing: 'border-box',
         transform: open ? 'translateY(0)' : 'translateY(-100%)',
-        transition: 'transform .45s cubic-bezier(.16,1,.3,1)',
+        transition: 'transform .65s cubic-bezier(.16,1,.3,1)',
         overflow: 'hidden',
       }}>
         <div
