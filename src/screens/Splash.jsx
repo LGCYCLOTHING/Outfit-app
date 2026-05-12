@@ -25,7 +25,7 @@ export default function ScreenSplash({ onContinue }) {
       {/* Centered content */}
       <div style={{
         position: 'absolute', inset: 0,
-        padding: 'calc(140px + var(--archive-safe-top, 0px)) 30px 0',
+        padding: 'calc(140px + var(--archive-safe-top, 54px)) 30px 0',
         display: 'flex', flexDirection: 'column',
       }}>
         <div style={{

@@ -109,7 +109,7 @@ export default function ScreenOnboarding({ onComplete }) {
             {/* Content — bottom-left aligned per Saudi reference */}
             <div style={{
               position: 'absolute', inset: 0,
-              padding: 'calc(60px + var(--archive-safe-top, 0px)) 30px calc(220px + var(--archive-safe-bottom, 0px))',
+              padding: 'calc(60px + var(--archive-safe-top, 54px)) 30px calc(220px + var(--archive-safe-bottom, 0px))',
               display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
               pointerEvents: 'none',
             }}>
@@ -145,7 +145,7 @@ export default function ScreenOnboarding({ onComplete }) {
         className="archive-pressable"
         style={{
           position: 'absolute',
-          top: 'calc(22px + var(--archive-safe-top, 0px))',
+          top: 'calc(22px + var(--archive-safe-top, 54px))',
           right: 26,
           fontSize: 13, color: 'rgba(245,240,232,0.65)', fontWeight: 500,
           cursor: 'pointer', zIndex: 10, padding: '6px 4px',

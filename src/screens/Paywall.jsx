@@ -72,7 +72,7 @@ export default function ScreenPaywall() {
         </div>
       </div>
 
-      <div style={{ position: 'relative', zIndex: 2, padding: 'calc(50px + var(--archive-safe-top, 0px)) 24px calc(30px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'relative', zIndex: 2, padding: 'calc(50px + var(--archive-safe-top, 54px)) 24px calc(30px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 22 }}>
           <div style={{
             width: 88, height: 88, borderRadius: 28,

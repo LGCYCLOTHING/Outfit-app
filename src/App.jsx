@@ -13,8 +13,9 @@ import ScreenStory from './screens/Story.jsx';
 import ScreenSplash from './screens/Splash.jsx';
 import ScreenOnboarding from './screens/Onboarding.jsx';
 import ScreenAuth from './screens/Auth.jsx';
+import ScreenSettings from './screens/Settings.jsx';
 
-const VALID_SCREENS = ['today','archive','mix','you','paywall','rating','detail','calendar','share','story','splash','onboarding','auth'];
+const VALID_SCREENS = ['today','archive','mix','you','paywall','rating','detail','calendar','share','story','splash','onboarding','auth','settings'];
 
 const ONBOARDED_KEY = 'archive_onboarded';
 function isOnboarded() {
@@ -242,6 +243,7 @@ export default function App() {
     splash:     <ScreenSplash onContinue={goOnboarding} />,
     onboarding: <ScreenOnboarding onComplete={goAuth} />,
     auth:       <ScreenAuth onContinue={goPaywall} onBack={goOnboarding} />,
+    settings:   <ScreenSettings />,
     today:    <ScreenToday />,
     archive:  <ScreenArchive />,
     mix:      <ScreenMix />,

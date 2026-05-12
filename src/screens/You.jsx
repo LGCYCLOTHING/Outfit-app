@@ -53,7 +53,7 @@ export default function ScreenYou() {
 
       <StatusBar />
 
-      <div style={{ position: 'relative', zIndex: 2, padding: 'calc(24px + var(--archive-safe-top, 0px)) 24px calc(120px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
+      <div style={{ position: 'relative', zIndex: 2, padding: 'calc(24px + var(--archive-safe-top, 54px)) 24px calc(120px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 26 }}>
           <ArchiveBurger />
           <div style={{
@@ -249,8 +249,20 @@ export default function ScreenYou() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {[
             {
+              label: 'Settings',
+              sub: 'Notifications, data, privacy',
+              onClick: () => window.__archiveGo && window.__archiveGo('settings'),
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5F0E8" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>
+                </svg>
+              ),
+            },
+            {
               label: 'Notifications',
               sub: 'Daily pick at 7:30 am',
+              onClick: () => window.__archiveGo && window.__archiveGo('settings'),
               icon: (
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5F0E8" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
@@ -261,6 +273,7 @@ export default function ScreenYou() {
             {
               label: 'Photo backup',
               sub: 'iCloud · 2.4 GB',
+              onClick: () => window.__archiveGo && window.__archiveGo('settings'),
               icon: (
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5F0E8" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 16.5a4.5 4.5 0 0 0-1.5-8.7 6 6 0 0 0-11.6 1.5A4 4 0 0 0 7 17h13"/>
@@ -270,6 +283,7 @@ export default function ScreenYou() {
             {
               label: 'Export archive',
               sub: 'PDF · 312 fits',
+              onClick: () => window.__archiveGo && window.__archiveGo('settings'),
               icon: (
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5F0E8" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 3v12M7 8l5-5 5 5M5 21h14"/>
@@ -277,7 +291,7 @@ export default function ScreenYou() {
               ),
             },
           ].map((row) => (
-            <div key={row.label} className="lg-pill archive-pressable" style={{
+            <div key={row.label} onClick={row.onClick} className="lg-pill archive-pressable" style={{
               padding: '12px 14px 12px 12px', borderRadius: 100,
               display: 'flex', alignItems: 'center', gap: 14,
               cursor: 'pointer',

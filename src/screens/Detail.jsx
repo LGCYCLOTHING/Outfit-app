@@ -45,7 +45,7 @@ export default function ScreenDetail() {
 
       <div style={{
         position: 'relative', zIndex: 2,
-        padding: 'calc(20px + var(--archive-safe-top, 0px)) 0 calc(120px + var(--archive-safe-bottom, 0px))',
+        padding: 'calc(20px + var(--archive-safe-top, 54px)) 0 calc(120px + var(--archive-safe-bottom, 0px))',
         height: '100%', overflow: 'auto', boxSizing: 'border-box',
       }}>
         <div style={{ padding: '0 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>

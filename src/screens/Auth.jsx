@@ -22,7 +22,7 @@ export default function ScreenAuth({ onContinue, onBack }) {
         className="archive-pressable liquid-glass"
         style={{
           position: 'absolute',
-          top: 'calc(20px + var(--archive-safe-top, 0px))',
+          top: 'calc(20px + var(--archive-safe-top, 54px))',
           left: 22,
           width: 38, height: 38, borderRadius: 19,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -35,7 +35,7 @@ export default function ScreenAuth({ onContinue, onBack }) {
 
       {/* Heading */}
       <div style={{
-        padding: 'calc(110px + var(--archive-safe-top, 0px)) 28px 0',
+        padding: 'calc(110px + var(--archive-safe-top, 54px)) 28px 0',
       }}>
         <div style={{
           fontSize: 11, letterSpacing: 2.4, color: '#9BB89F',

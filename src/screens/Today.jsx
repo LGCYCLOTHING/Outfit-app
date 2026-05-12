@@ -125,118 +125,152 @@ export default function ScreenToday() {
 
       <StatusBar />
 
-      <div style={{ position: 'relative', zIndex: 2, padding: 'calc(12px + var(--archive-safe-top, 0px)) 22px calc(120px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
+      <div style={{ position: 'relative', zIndex: 2, padding: 'calc(12px + var(--archive-safe-top, 54px)) 22px calc(120px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
         {(() => {
           const streak = computeStreak();
           const weekDays = getThisWeekDays();
           const todayDate = new Date();
-          const dayName = todayDate.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+          const dayName = todayDate.toLocaleDateString('en-US', { weekday: 'long' });
           const dateNum = todayDate.getDate();
           const daysThisWeekLogged = weekDays.filter(d => d.hasFit).length;
           const weekProgress = daysThisWeekLogged / 7;
 
+          // Streak ring sizing
+          const ringSize = 36;
+          const ringStroke = 1.5;
+          const ringR = (ringSize - ringStroke) / 2;
+          const ringC = 2 * Math.PI * ringR;
+          const ringDash = Math.max(0, Math.min(1, weekProgress)) * ringC;
+
           return (
             <React.Fragment>
-              {/* Header row — hamburger left, date center, streak right */}
+              {/* Header — hamburger + "12 Tuesday" clustered LEFT, streak RIGHT */}
               <div style={{
-                display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
-                marginBottom: 18,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                marginTop: 8, marginBottom: 12,
               }}>
+                {/* LEFT GROUP — hamburger menu, then "12 Tuesday" right next to it */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div
+                    onClick={() => window.__archiveToggleNav && window.__archiveToggleNav()}
+                    className="archive-pressable"
+                    style={{
+                      width: 24, height: 22,
+                      display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 6,
+                      cursor: 'pointer',
+                    }}>
+                    <div style={{ width: 22, height: 1, borderRadius: 0.5, background: '#F5F0E8' }} />
+                    <div style={{ width: 22, height: 1, borderRadius: 0.5, background: '#F5F0E8' }} />
+                    <div style={{ width: 22, height: 1, borderRadius: 0.5, background: '#F5F0E8' }} />
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                    <span style={{
+                      fontSize: 36, color: '#F5F0E8',
+                      letterSpacing: '-0.05em', lineHeight: 1,
+                    }}>
+                      {dateNum}
+                    </span>
+                    <span style={{
+                      fontSize: 18, color: '#D4C8B8',
+                      letterSpacing: '-0.02em',
+                    }}>
+                      {dayName}
+                    </span>
+                  </div>
+                </div>
+
+                {/* RIGHT — streak circle (animated flame) + "DAY STREAK" label below */}
                 <div
-                  onClick={() => window.__archiveToggleNav && window.__archiveToggleNav()}
+                  onClick={() => window.__archiveGo && window.__archiveGo('you')}
                   className="archive-pressable"
                   style={{
-                    width: 28, height: 22, marginTop: 8,
-                    display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 5,
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
                     cursor: 'pointer',
                   }}>
-                  <div style={{ width: 22, height: 1.5, borderRadius: 1, background: '#F5F0E8' }} />
-                  <div style={{ width: 22, height: 1.5, borderRadius: 1, background: '#F5F0E8' }} />
-                  <div style={{ width: 22, height: 1.5, borderRadius: 1, background: '#F5F0E8' }} />
-                </div>
-
-                <div style={{
-                  display: 'flex', alignItems: 'baseline', gap: 10,
-                  paddingTop: 4, fontFamily: '"DM Sans", "Inter", sans-serif',
-                }}>
-                  <span style={{
-                    fontSize: 11, fontWeight: 500, letterSpacing: 1.5,
-                    color: '#A89880',
+                  <div style={{ position: 'relative', width: ringSize, height: ringSize }}>
+                    <svg width={ringSize} height={ringSize}
+                      style={{ position: 'absolute', inset: 0, transform: 'rotate(-90deg)' }}>
+                      <circle cx={ringSize/2} cy={ringSize/2} r={ringR} fill="none"
+                        stroke="rgba(245,240,232,0.18)" strokeWidth={ringStroke} />
+                      <circle cx={ringSize/2} cy={ringSize/2} r={ringR} fill="none"
+                        stroke={accent} strokeWidth={ringStroke} strokeLinecap="round"
+                        strokeDasharray={`${ringDash} ${ringC}`} />
+                    </svg>
+                    <div className="archive-flame" style={{
+                      position: 'absolute', inset: 0,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      filter: `drop-shadow(0 0 4px ${accent})`,
+                    }}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill={accent}>
+                        <path d="M12 2c1 4-3 6-3 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-2 3 0-3-1-5-3-8z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div style={{
+                    fontSize: 9, letterSpacing: 1.6,
+                    color: '#C8B5A0', textTransform: 'uppercase',
                   }}>
-                    {dayName}
-                  </span>
-                  <span style={{ color: '#5C5248', fontSize: 14 }}>·</span>
-                  <span style={{
-                    fontSize: 32, fontWeight: 700, color: '#F5F0E8',
-                    letterSpacing: '-0.04em', lineHeight: 1,
-                  }}>
-                    {dateNum}
-                  </span>
+                    Day streak
+                  </div>
                 </div>
-
-                <StreakRing
-                  streak={streak}
-                  weekProgress={weekProgress}
-                  accent={accent}
-                  onClick={() => window.__archiveGo && window.__archiveGo('you')}
-                />
               </div>
 
-              {/* Week strip — 7 day columns, M T W T F S S */}
+              {/* Week strip — shorter glass card, thicker text inside */}
               <div style={{
-                display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)',
-                marginBottom: 16, paddingBottom: 14,
-                borderBottom: '1px solid rgba(255,240,220,0.06)',
+                background: 'rgba(255, 240, 220, 0.04)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 240, 220, 0.07)',
+                borderRadius: 16,
+                padding: '8px 16px 10px',
+                margin: '10px 0 18px',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
               }}>
-                {weekDays.map((d, i) => (
-                  <div key={i} style={{
-                    display: 'flex', flexDirection: 'column',
-                    alignItems: 'center', gap: 6,
-                  }}>
-                    <span style={{
-                      fontSize: 10, fontWeight: 500,
-                      color: '#5C5248', letterSpacing: '0.05em',
+                <div style={{
+                  display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)',
+                }}>
+                  {weekDays.map((d, i) => (
+                    <div key={i} style={{
+                      display: 'flex', flexDirection: 'column',
+                      alignItems: 'center', gap: 5,
                     }}>
-                      {d.letter}
-                    </span>
-                    <div style={{
-                      width: 28, height: 28, borderRadius: 14,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: d.isToday ? accent : 'transparent',
-                    }}>
-                      <span style={{
-                        fontSize: 13, fontWeight: 600,
-                        color: d.isToday ? '#0a0a0a' : '#5C5248',
-                        letterSpacing: '-0.02em',
+                      {/* Tall pill — wraps BOTH letter AND date for current day */}
+                      <div style={{
+                        background: d.isToday ? `rgba(${accentRgba}, 0.22)` : 'transparent',
+                        borderRadius: 14,
+                        padding: '4px 0',
+                        width: 28,
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', gap: 2,
                       }}>
-                        {d.dateNum}
-                      </span>
+                        <span style={{
+                          fontSize: 11,
+                          color: d.isToday ? accent : '#B5A89A',
+                          letterSpacing: '0.05em',
+                        }}>
+                          {d.letter}
+                        </span>
+                        <span style={{
+                          fontSize: 14,
+                          color: d.isToday ? accent : '#D4C8B8',
+                          letterSpacing: '-0.02em',
+                        }}>
+                          {d.dateNum}
+                        </span>
+                      </div>
+                      {/* Logged fit indicator */}
+                      <div style={{
+                        width: 3, height: 3, borderRadius: 1.5,
+                        background: d.hasFit ? accent : 'transparent',
+                      }} />
                     </div>
-                    <div style={{
-                      width: 4, height: 4, borderRadius: 2,
-                      background: d.hasFit ? accent : 'transparent',
-                      marginTop: 2,
-                    }} />
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </React.Fragment>
           );
         })()}
 
-        <div style={{ marginTop: 36, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {[
-            { label: 'Earth tones', primary: true },
-            { label: 'Layered' },
-            { label: 'Studio · Dinner' },
-          ].map((tag, i) =>
-            <span key={i} className={tag.primary ? 'lg-active' : 'lg-pill'} style={{
-              fontSize: 13, fontWeight: 500, letterSpacing: -0.2,
-              padding: '7px 14px', borderRadius: 100,
-              color: tag.primary ? '#9BB89F' : 'rgba(245,240,232,0.62)',
-            }}>{tag.label}</span>
-          )}
-        </div>
 
         <div style={{ marginTop: 36, marginBottom: 4 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18, paddingRight: 4 }}>

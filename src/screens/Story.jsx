@@ -106,7 +106,7 @@ export default function ScreenStory() {
       />
 
       <div style={{
-        position: 'absolute', top: 'calc(14px + var(--archive-safe-top, 0px))', left: 14, right: 14,
+        position: 'absolute', top: 'calc(14px + var(--archive-safe-top, 54px))', left: 14, right: 14,
         display: 'flex', gap: 4, zIndex: 20,
       }}>
         {Array.from({ length: SEGMENTS }).map((_, i) => (
@@ -126,7 +126,7 @@ export default function ScreenStory() {
       </div>
 
       <div style={{
-        position: 'absolute', top: 'calc(30px + var(--archive-safe-top, 0px))', left: 18, right: 18,
+        position: 'absolute', top: 'calc(30px + var(--archive-safe-top, 54px))', left: 18, right: 18,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         zIndex: 20, pointerEvents: 'none',
       }}>

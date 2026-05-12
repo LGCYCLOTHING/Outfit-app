@@ -126,7 +126,7 @@ export default function ScreenShare() {
       <LiquidMesh seed={8} intensity={1} />
       <StatusBar />
 
-      <div style={{ position: 'relative', zIndex: 2, padding: 'calc(24px + var(--archive-safe-top, 0px)) 24px calc(40px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
+      <div style={{ position: 'relative', zIndex: 2, padding: 'calc(24px + var(--archive-safe-top, 54px)) 24px calc(40px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
           <div className="liquid-glass" onClick={() => window.__archiveGo && window.__archiveGo('today')} style={{
             width: 36, height: 36, borderRadius: 18,
