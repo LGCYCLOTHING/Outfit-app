@@ -195,7 +195,6 @@ export default function ScreenShare() {
                   display: 'flex', alignItems: 'center', gap: 4,
                   padding: '2px 7px', borderRadius: 6,
                   background: `linear-gradient(135deg, ${accent} 0%, ${accentHot} 100%)`,
-                  boxShadow: `0 0 10px rgba(${accentRgba},0.5)`,
                 }}>
                   <svg width="9" height="9" viewBox="0 0 24 24" fill="#0a0a0a" stroke="none">
                     <path d="M12 2l3 6 6 1-4 4 1 6-6-3-6 3 1-6-4-4 6-1z"/>

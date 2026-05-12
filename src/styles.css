@@ -7,13 +7,27 @@ html, body { margin: 0; padding: 0; background: #0a0910; height: 100%; overflow:
 body {
   background: #000;
 }
+/* Flex container holding both device shells side-by-side */
+.shell-container {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  gap: 28px;
+}
+.shell-container.single .device-shell--secondary {
+  display: none;
+}
+
 .device-shell {
-  position: fixed;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  /* iPhone 15 Pro / 16 Pro logical dimensions: 393×852, scaled down to fit */
-  width: min(393px, 92vw, calc(95vh / 2.168));
+  position: relative;
+  flex-shrink: 0;
+  /* When both visible, each takes half the viewport. When alone, full width. */
+  width: min(393px, calc((100vw - 80px) / 2), calc(92vh / 2.168));
   aspect-ratio: 393 / 852;
+}
+.shell-container.single .device-shell {
+  width: min(393px, 92vw, calc(95vh / 2.168));
+}
+.device-shell {
   background: #1A1A1A;
   border-radius: 54px;
   border: 1px solid rgba(255,255,255,0.15);
@@ -34,13 +48,35 @@ body {
   border-radius: 54px;
   background: #000;
   overflow: hidden;
-  /* Fake safe-area so the design clears the top/bottom curves of the screen */
-  --sa-top: 28px;
-  --sa-bottom: 20px;
+  /* Status-bar safe area — every screen's content pushes below this 54px region */
+  --sa-top: 54px !important;
+  --sa-bottom: 20px !important;
 }
 .device-island { display: none; }
 /* Side buttons hidden in this minimal mockup style */
 .device-side { display: none; }
+
+/* Clean mode — inside the secondary preview iframe.
+   Skip the bezel entirely so we don't nest a phone inside a phone. */
+body.archive-clean .shell-container {
+  position: fixed; inset: 0; display: block;
+}
+body.archive-clean .device-shell {
+  position: fixed !important; inset: 0 !important;
+  width: 100% !important; height: 100% !important;
+  max-width: none !important;
+  aspect-ratio: auto !important;
+  border-radius: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+body.archive-clean #stage {
+  border-radius: 0 !important;
+  --sa-top: env(safe-area-inset-top, 0px);
+  --sa-bottom: env(safe-area-inset-bottom, 0px);
+}
 
 /* On a real touch-only phone, go fullscreen (no bezel) */
 @media (hover: none) and (pointer: coarse) and (max-width: 500px) {
@@ -63,38 +99,106 @@ body {
 }
 
 body {
-  font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'SF Pro', system-ui, sans-serif;
-  font-feature-settings: 'ss01' on, 'cv11' on;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro', system-ui, sans-serif;
+  font-feature-settings: 'cv11' on, 'ss01' on, 'ss03' on;
+  letter-spacing: -0.012em;
   color: #fff;
   -webkit-tap-highlight-color: transparent;
   -webkit-user-select: none;
   user-select: none;
   overscroll-behavior: none;
 }
-/* Force Geist everywhere (overrides inline fontFamily set in JSX). */
+/* Force Inter everywhere with tight tracking (overrides inline fontFamily set in JSX). */
 body, body *,
 input, button, textarea, select {
-  font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'SF Pro', system-ui, sans-serif !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif !important;
+  letter-spacing: -0.012em;
 }
-body.archive-light { background: #f5f0e8; color: #0a0a0a; }
-body.archive-light .archive-screen { color: #0a0a0a; }
-body.archive-light .archive-screen::before {
-  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 1;
-  background: rgba(245, 240, 232, 0.94);
-  mix-blend-mode: lighten;
+/* Larger text gets progressively tighter tracking */
+h1, h2, h3, .h-display,
+[style*="font-size: 2"],
+[style*="font-size: 3"],
+[style*="font-size: 4"],
+[style*="font-size: 5"] {
+  letter-spacing: -0.035em;
 }
-body.archive-light .archive-screen > * { color: inherit; }
+/* ──────────────────────────────────────────────
+   LIGHT MODE — full overrides
+   Inline white text (#F5F0E8, rgba(245,240,232,*)) becomes warm dark.
+   Glass surfaces flip from cream tint to warm-dark tint.
+   Exceptions marked with data-dark-surface keep light text.
+   ────────────────────────────────────────────── */
+body.archive-light { background: #f5f0e8; }
+
+/* Force dark warm text on every element inside the screen */
+body.archive-light .archive-screen,
+body.archive-light .archive-screen *:not(svg):not(path):not(circle):not(rect):not(ellipse):not(line) {
+  color: #1a1612 !important;
+}
+body.archive-light .archive-screen svg {
+  stroke: #1a1612;
+}
+
+/* EXCEPT: anything marked [data-dark-surface] (theme swatches, hero gradient cards, dark wells) keeps light text */
+body.archive-light [data-dark-surface],
+body.archive-light [data-dark-surface] *:not(svg) {
+  color: #F5F0E8 !important;
+}
+body.archive-light [data-dark-surface] svg {
+  stroke: #F5F0E8;
+}
+
+/* Glass cards flip: warm cream → warm DARK tint over cream bg */
+body.archive-light .lg-card,
+body.archive-light .lg-chip,
+body.archive-light .lg-pill,
+body.archive-light .liquid-glass {
+  background: rgba(26, 22, 18, 0.04) !important;
+  box-shadow:
+    0 0 0 1px rgba(26, 22, 18, 0.16),
+    0 4px 24px rgba(0,0,0,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.5) !important;
+}
+body.archive-light .lg-active,
+body.archive-light .lg-pill.active {
+  background: rgba(122, 155, 126, 0.16) !important;
+  box-shadow:
+    0 0 0 1.5px rgba(122, 155, 126, 0.55),
+    inset 0 1px 0 rgba(255,255,255,0.4) !important;
+}
+
+/* Tab bar: cream-glass surface with dark text in light mode */
+body.archive-light .nav-bar {
+  background: rgba(255, 240, 220, 0.55) !important;
+  box-shadow:
+    0 0 0 1px rgba(26, 22, 18, 0.18),
+    0 8px 32px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.6) !important;
+}
+body.archive-light .nav-bar div,
+body.archive-light .nav-bar span {
+  color: #1a1612 !important;
+}
+body.archive-light .nav-bar svg {
+  stroke: #1a1612;
+}
+
+/* Sheet (modals) in light mode — warm cream */
+body.archive-light .lg-sheet {
+  background: rgba(255, 240, 220, 0.92) !important;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.12) !important;
+}
 .h-display {
-  font-family: 'Geist', -apple-system, system-ui, sans-serif !important;
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  line-height: 0.95;
+  font-family: 'Inter', -apple-system, system-ui, sans-serif !important;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 0.94;
 }
 .h-display em, .h-display i {
-  font-family: 'Geist', -apple-system, system-ui, sans-serif !important;
-  font-weight: 400;
+  font-family: 'Inter', -apple-system, system-ui, sans-serif !important;
+  font-weight: 500;
   font-style: normal;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.045em;
 }
 * { box-sizing: border-box; }
 #root { position: relative; width: 100%; height: 100%; }
@@ -213,81 +317,130 @@ body * {
   --depth-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.2);
 }
 .nav-bar {
-  background: rgba(20, 18, 16, 0.55);
-  backdrop-filter: url(#frosted);
-  -webkit-backdrop-filter: url(#frosted);
+  background: rgba(20, 18, 16, 0.45);
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
   border: 2px solid transparent;
   box-shadow:
-    0 0 0 1px rgba(255, 240, 220, 0.45),
-    0 8px 32px rgba(0,0,0,0.4),
-    inset 0 1px 0 rgba(255,240,220,0.18);
+    /* TOP edge — bright crisp shine */
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.70),
+    inset 0 4px 10px rgba(255, 255, 255, 0.14),
+    /* BOTTOM edge — slightly less bright shine */
+    inset 0 -1.5px 0 rgba(255, 255, 255, 0.38),
+    inset 0 -4px 12px rgba(0, 0, 0, 0.28),
+    /* very faint side dim — keeps the edge visible without a hard outline */
+    inset 1px 0 0 rgba(0, 0, 0, 0.06),
+    inset -1px 0 0 rgba(0, 0, 0, 0.06),
+    /* drop shadow under the glass */
+    0 12px 36px rgba(0, 0, 0, 0.45),
+    0 4px 10px rgba(0, 0, 0, 0.3);
 }
 .liquid-glass {
-  background: rgba(255, 240, 220, 0.06);
-  backdrop-filter: url(#frosted);
-  -webkit-backdrop-filter: url(#frosted);
+  background: rgba(255, 240, 220, 0.08);
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
   border: 2px solid transparent;
   box-shadow:
-    0 0 0 1px rgba(255, 240, 220, 0.40),
-    0 4px 24px rgba(0,0,0,0.4),
-    inset 0 1px 0 rgba(255,240,220,0.15),
-    inset 0 -1px 0 rgba(0,0,0,0.2);
+    /* TOP edge — bright crisp shine */
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.75),
+    inset 0 4px 11px rgba(255, 255, 255, 0.16),
+    /* BOTTOM edge — softer matching shine */
+    inset 0 -1.5px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -4px 12px rgba(0, 0, 0, 0.30),
+    /* faint side dimming */
+    inset 1px 0 0 rgba(0, 0, 0, 0.06),
+    inset -1px 0 0 rgba(0, 0, 0, 0.06),
+    /* drop shadow */
+    0 12px 32px rgba(0, 0, 0, 0.5),
+    0 4px 10px rgba(0, 0, 0, 0.35);
 }
-/* Default content box — liquid glass with warm tint */
+/* Default content box — top/bottom shine, no side outline */
 .lg-card {
-  background: rgba(255, 240, 220, 0.06);
-  backdrop-filter: url(#frosted);
-  -webkit-backdrop-filter: url(#frosted);
+  background: rgba(255, 240, 220, 0.07);
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
   border: 2px solid transparent;
   box-shadow:
-    0 0 0 1px rgba(255, 240, 220, 0.32),
-    0 4px 24px rgba(0,0,0,0.4),
-    inset 0 1px 0 rgba(255,240,220,0.12),
-    inset 0 -1px 0 rgba(0,0,0,0.2);
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.65),
+    inset 0 4px 14px rgba(255, 255, 255, 0.12),
+    inset 0 -1.5px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -4px 14px rgba(0, 0, 0, 0.28),
+    inset 1px 0 0 rgba(0, 0, 0, 0.05),
+    inset -1px 0 0 rgba(0, 0, 0, 0.05),
+    0 12px 30px rgba(0,0,0,0.5),
+    0 4px 10px rgba(0,0,0,0.32);
 }
 
 /* Small compact box */
 .lg-chip {
-  background: rgba(255, 240, 220, 0.05);
-  backdrop-filter: url(#frosted);
-  -webkit-backdrop-filter: url(#frosted);
+  background: rgba(255, 240, 220, 0.06);
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
   border: 2px solid transparent;
   box-shadow:
-    0 0 0 1px rgba(255, 240, 220, 0.28),
-    0 2px 12px rgba(0,0,0,0.3),
-    inset 0 1px 0 rgba(255,240,220,0.10);
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.60),
+    inset 0 3px 8px rgba(255, 255, 255, 0.10),
+    inset 0 -1.5px 0 rgba(255, 255, 255, 0.30),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.22),
+    inset 1px 0 0 rgba(0, 0, 0, 0.04),
+    inset -1px 0 0 rgba(0, 0, 0, 0.04),
+    0 6px 18px rgba(0,0,0,0.35),
+    0 2px 6px rgba(0,0,0,0.25);
 }
 
 /* Pill / chip / tag */
 .lg-pill {
-  background: rgba(255, 240, 220, 0.07);
-  backdrop-filter: url(#frosted);
-  -webkit-backdrop-filter: url(#frosted);
+  background: rgba(255, 240, 220, 0.09);
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
   border: 2px solid transparent;
   box-shadow:
-    0 0 0 1px rgba(255, 240, 220, 0.30),
-    inset 0 1px 0 rgba(255,240,220,0.10);
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.72),
+    inset 0 4px 10px rgba(255, 255, 255, 0.12),
+    inset 0 -1.5px 0 rgba(255, 255, 255, 0.40),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.26),
+    inset 1px 0 0 rgba(0, 0, 0, 0.05),
+    inset -1px 0 0 rgba(0, 0, 0, 0.05),
+    0 6px 16px rgba(0,0,0,0.3);
 }
 
-/* Selected / highlighted state — sage glow */
+/* Selected / highlighted state — sage outline (no outer glow) */
 .lg-pill.active,
 .lg-active {
   background: rgba(155, 184, 159, 0.10);
   border: 2px solid transparent;
   box-shadow:
     0 0 0 1.5px rgba(155, 184, 159, 0.5),
-    0 0 20px rgba(155, 184, 159, 0.15),
     0 4px 24px rgba(0,0,0,0.4),
     inset 0 1px 0 rgba(255,240,220,0.10);
 }
 
 /* Bottom-sheet modal */
 .lg-sheet {
-  background: rgba(20, 18, 16, 0.62);
-  backdrop-filter: url(#frosted);
-  -webkit-backdrop-filter: url(#frosted);
+  background: rgba(20, 18, 16, 0.78);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
   border-top: 1px solid rgba(255, 240, 220, 0.35);
   box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+}
+
+/* Gradient outline ring — pair with --grad-border CSS var per element.
+   Uses mask-composite trick to clip a gradient down to just the border ring. */
+.lg-border-gradient { position: relative; }
+.lg-border-gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.6px;
+  background: var(--grad-border, linear-gradient(135deg, #C8B6FF, #4A3A8C));
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+  z-index: 4;
 }
 
 /* Input field — search bars, text inputs */

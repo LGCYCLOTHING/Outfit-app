@@ -58,7 +58,7 @@ export default function ScreenMix() {
       <div style={{ position: 'relative', zIndex: 2, padding: 'calc(24px + var(--archive-safe-top, 0px)) 24px calc(120px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 6 }}>
           <ArchiveBurger />
-          <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent, boxShadow: `0 0 10px ${accent}` }} />
+          <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
           <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.95)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
             AI MIX · UPDATED 2h AGO
           </span>
@@ -99,7 +99,6 @@ export default function ScreenMix() {
                     padding: '3px 9px', borderRadius: 100,
                     background: `linear-gradient(135deg, ${accent} 0%, ${accentHot} 100%)`,
                     fontSize: 12, color: '#0a0a0a', fontWeight: 500, letterSpacing: -0.13,
-                    boxShadow: `0 0 12px rgba(${accentRgba},0.5)`,
                   }}>
                     <svg width="9" height="11" viewBox="0 0 12 14" fill="#0a0a0a">
                       <path d="M6 0a4 4 0 0 0-4 4v2H1v8h10V6h-1V4a4 4 0 0 0-4-4zm0 2a2 2 0 0 1 2 2v2H4V4a2 2 0 0 1 2-2z"/>
@@ -130,7 +129,7 @@ export default function ScreenMix() {
                       width: 52, height: 52, borderRadius: 26,
                       background: 'rgba(20,16,14,0.7)',
                       backdropFilter: 'blur(10px)',
-                      boxShadow: `inset 0 0 0 0.5px rgba(${accentRgba},0.4), 0 0 24px rgba(${accentRgba},0.3)`,
+                      boxShadow: `inset 0 0 0 0.5px rgba(${accentRgba},0.4)`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
                       <svg width="20" height="22" viewBox="0 0 12 14" fill={accent}>

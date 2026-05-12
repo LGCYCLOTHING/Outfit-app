@@ -18,7 +18,7 @@ export function fgColor() {
 
 export const THEMES = {
   ivory:  { id:'ivory',  name:'Ivory',  sub:'warm cream',     light:'#C8A97E', hot:'#A88D63', deep:'#2A2018', softRgba:'200,169,126', darkBg:'/themes/bg-2.png' },
-  slate:  { id:'slate',  name:'Slate',  sub:'cool blue-grey', light:'#8BA7B8', hot:'#6E89A0', deep:'#1A2830', softRgba:'139,167,184', darkBg:'/themes/bg-1.png' },
+  slate:  { id:'slate',  name:'Slate',  sub:'jade mint',      light:'#3DDFB4', hot:'#1FB58E', deep:'#08221C', softRgba:'61,223,180',  darkBg:'/themes/bg-1.png' },
   forest: { id:'forest', name:'Forest', sub:'deep olive',     light:'#4A7C59', hot:'#386649', deep:'#0F1F14', softRgba:'74,124,89',   darkBg:'/themes/bg-3.png' },
   smoke:  { id:'smoke',  name:'Smoke',  sub:'silver chrome',  light:'#8C8880', hot:'#6E6A62', deep:'#181614', softRgba:'140,136,128', darkBg:'/themes/bg-4.png' },
   dusk:   { id:'dusk',   name:'Dusk',   sub:'muted twilight', light:'#7C6E9E', hot:'#5F5380', deep:'#14101E', softRgba:'124,110,158', darkBg:'/themes/bg-5.png' },
@@ -30,19 +30,21 @@ export function useTheme() {
   return THEMES[(typeof window !== 'undefined' && window.__archiveTheme) || DEFAULT_THEME];
 }
 
+// Neutral subtle dark gradients — empty-state look. Slight variation between
+// slots keeps visual rhythm but no garish color.
 const FIT_PALETTES = [
-  'radial-gradient(120% 80% at 30% 20%, #d8b48a 0%, #8a6238 35%, #2a1a10 75%, #0c0807 100%)',
-  'radial-gradient(110% 90% at 70% 30%, #5c4836 0%, #2e2218 45%, #100b08 80%)',
-  'radial-gradient(130% 90% at 40% 70%, #c0683a 0%, #6b3216 40%, #1c0d07 80%)',
-  'radial-gradient(110% 80% at 60% 25%, #aaa599 0%, #4f4940 45%, #15110d 85%)',
-  'radial-gradient(130% 100% at 80% 80%, #b9722e 0%, #3a1d0c 30%, #0a0605 70%)',
-  'radial-gradient(120% 90% at 30% 30%, #e9d4a8 0%, #8d6f44 40%, #261a0e 85%)',
-  'radial-gradient(110% 90% at 50% 40%, #8a8050 0%, #3e3820 50%, #100c08 85%)',
-  'radial-gradient(120% 90% at 60% 60%, #a8462a 0%, #5b1f12 45%, #1b0805 80%)',
-  'radial-gradient(120% 90% at 40% 30%, #6a6c84 0%, #2c2a3a 45%, #0d0c14 80%)',
-  'radial-gradient(110% 90% at 50% 50%, #d6995c 0%, #7a4422 40%, #1f100a 80%)',
-  'radial-gradient(120% 90% at 70% 30%, #6e4a30 0%, #2b1a10 45%, #0a0604 80%)',
-  'radial-gradient(110% 80% at 40% 30%, #b88a78 0%, #5a352a 45%, #170a08 80%)',
+  'linear-gradient(180deg, #1c1a1a 0%, #100e0e 100%)',
+  'linear-gradient(180deg, #1a1b1d 0%, #0e0f11 100%)',
+  'linear-gradient(180deg, #1d1b1a 0%, #110f0e 100%)',
+  'linear-gradient(180deg, #1a1a1c 0%, #0e0e10 100%)',
+  'linear-gradient(180deg, #1c1c1c 0%, #101010 100%)',
+  'linear-gradient(180deg, #1b1a1c 0%, #0f0e10 100%)',
+  'linear-gradient(180deg, #1a1c1c 0%, #0e1010 100%)',
+  'linear-gradient(180deg, #1c1b1a 0%, #100f0e 100%)',
+  'linear-gradient(180deg, #1a1b1c 0%, #0e0f10 100%)',
+  'linear-gradient(180deg, #1c1a1b 0%, #100e0f 100%)',
+  'linear-gradient(180deg, #1b1b1d 0%, #0f0f11 100%)',
+  'linear-gradient(180deg, #1a1a1a 0%, #0e0e0e 100%)',
 ];
 
 export function fitGradient(id) {
@@ -50,7 +52,27 @@ export function fitGradient(id) {
   return FIT_PALETTES[n % FIT_PALETTES.length];
 }
 
-// (Removed: stock Unsplash people photos. PhotoPlaceholder now renders warm gradient blocks instead.)
+// Gradient OUTLINE palettes — paired with each fit via deterministic hash.
+// Used as the colorful ring around dark placeholder cards.
+const FIT_BORDERS = [
+  'linear-gradient(135deg, #C8B6FF 0%, #8A7BD8 50%, #4A3A8C 100%)',  // lavender
+  'linear-gradient(135deg, #7FE5D4 0%, #4DB8A0 50%, #1A4D40 100%)',  // teal
+  'linear-gradient(135deg, #FFB89A 0%, #E07A4A 50%, #7A2E15 100%)',  // coral
+  'linear-gradient(135deg, #B0DBFF 0%, #6BA3E0 50%, #1E4A80 100%)',  // sky
+  'linear-gradient(135deg, #FFC1E0 0%, #E07AB0 50%, #803050 100%)',  // pink
+  'linear-gradient(135deg, #B5F0D0 0%, #6BC890 50%, #1A5230 100%)',  // mint
+  'linear-gradient(135deg, #FFE0A0 0%, #E0B060 50%, #80551F 100%)',  // amber
+  'linear-gradient(135deg, #A0B0FF 0%, #6080E0 50%, #1A2A80 100%)',  // indigo
+  'linear-gradient(135deg, #FFC0B5 0%, #E08070 50%, #803020 100%)',  // rose
+  'linear-gradient(135deg, #C8E0A8 0%, #889F66 50%, #2A4015 100%)',  // sage
+  'linear-gradient(135deg, #B0C0D8 0%, #708095 50%, #2A3548 100%)',  // slate-blue
+  'linear-gradient(135deg, #FFB0E0 0%, #C060A0 50%, #50205A 100%)',  // magenta
+];
+
+export function fitBorder(id) {
+  const n = typeof id === 'number' ? id : (String(id).split('').reduce((a, c) => a + c.charCodeAt(0), 0));
+  return FIT_BORDERS[Math.abs(n) % FIT_BORDERS.length];
+}
 
 export function FitPhoto({ id = 1, label, date, ratio = '3/4', radius = 18, showNumber = true, placeholder = false, onAdd, style = {} }) {
   if (placeholder) {
@@ -226,26 +248,40 @@ export function PhotoPlaceholder({ ratio = '3/4', radius = 18, onAdd, photoId, e
       </div>
     );
   }
-  // Warm gradient block — no people photos
+  // Neutral dark card with a unique gradient outline ring + centered placeholder icon
   return (
-    <div style={{
+    <div className="lg-border-gradient" style={{
       position: 'relative', width: '100%', aspectRatio: ratio,
       borderRadius: radius, overflow: 'hidden',
       background: fitGradient(pid),
-      boxShadow: 'inset 0 0 0 0.5px rgba(255,240,220,0.06), inset 0 -40px 60px rgba(0,0,0,0.35)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      '--grad-border': fitBorder(pid),
       ...style,
     }}>
-      {/* fine film-grain texture */}
+      {/* Centered placeholder icon — picks up the border color */}
+      <svg
+        style={{ width: '26%', height: 'auto', opacity: 0.22, pointerEvents: 'none' }}
+        viewBox="0 0 24 24" fill="none"
+        stroke="rgba(245,240,232,0.95)" strokeWidth="1.2"
+        strokeLinecap="round" strokeLinejoin="round"
+      >
+        <rect x="3" y="5" width="18" height="14" rx="2"/>
+        <circle cx="8.5" cy="10" r="1.4"/>
+        <path d="M21 15l-5-5-9 9"/>
+      </svg>
+
+      {/* Soft inner glow tinted by the gradient color (top + bottom edges) */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: `linear-gradient(to bottom, ${'transparent'} 0%, transparent 100%)`,
+        boxShadow: 'inset 0 0 30px rgba(0,0,0,0.4)',
+        pointerEvents: 'none',
+      }} />
+      {/* Fine film-grain texture */}
       <div style={{
         position: 'absolute', inset: 0,
         backgroundImage: 'url("data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence baseFrequency=%220.9%22 numOctaves=%222%22 stitchTiles=%22stitch%22/><feColorMatrix values=%220 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>")',
-        mixBlendMode: 'overlay', opacity: 0.3, pointerEvents: 'none',
-      }} />
-      {/* warm bottom vignette per spec */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        background: 'linear-gradient(to top, rgba(12,10,8,0.7) 0%, transparent 45%)',
-        pointerEvents: 'none',
+        mixBlendMode: 'overlay', opacity: 0.25, pointerEvents: 'none',
       }} />
     </div>
   );
@@ -372,6 +408,73 @@ export function TabBar({ active = 'today', theme }) {
   );
 }
 
+// iOS-style status bar — 54px tall, with time, Dynamic Island, and signal/wifi/battery icons.
+// Rendered at the top of every screen.
 export function StatusBar() {
-  return null;
+  return (
+    <div style={{
+      position: 'absolute', top: 0, left: 0, right: 0,
+      height: 54,
+      zIndex: 100,
+      pointerEvents: 'none',
+      fontFamily: '"Inter", -apple-system, system-ui, sans-serif',
+    }}>
+      {/* Dynamic Island — centered black pill */}
+      <div style={{
+        position: 'absolute', left: '50%', top: 11,
+        transform: 'translateX(-50%)',
+        width: 126, height: 37,
+        background: '#000000',
+        borderRadius: 20,
+      }} />
+
+      {/* Time — left side, vertically centered with the island */}
+      <div style={{
+        position: 'absolute', top: 18, left: 28,
+        fontSize: 15, fontWeight: 600, color: '#F5F0E8',
+        letterSpacing: '-0.02em', fontFamily: '"Inter", -apple-system, sans-serif',
+      }}>
+        9:41
+      </div>
+
+      {/* Right cluster — signal + wifi + battery */}
+      <div style={{
+        position: 'absolute', top: 19, right: 24,
+        display: 'flex', alignItems: 'center', gap: 6,
+        color: '#F5F0E8',
+      }}>
+        {/* Signal bars */}
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor">
+          <rect x="0"    y="7"   width="3" height="4"   rx="0.6"/>
+          <rect x="4.5"  y="5"   width="3" height="6"   rx="0.6"/>
+          <rect x="9"    y="2.5" width="3" height="8.5" rx="0.6"/>
+          <rect x="13.5" y="0"   width="3" height="11"  rx="0.6"/>
+        </svg>
+
+        {/* Wifi */}
+        <svg width="15" height="11" viewBox="0 0 15 11" fill="currentColor">
+          <path d="M7.5 0C5 0 2.6 0.9 0.7 2.5l1.4 1.7c1.5-1.2 3.4-1.9 5.4-1.9s3.9 0.7 5.4 1.9l1.4-1.7C12.4 0.9 10 0 7.5 0zm0 3.5C5.9 3.5 4.4 4 3.2 4.9l1.4 1.6c0.8-0.6 1.8-1 2.9-1s2.1 0.4 2.9 1l1.4-1.6C10.6 4 9.1 3.5 7.5 3.5zm0 3.3c-0.9 0-1.7 0.3-2.4 0.8L7.5 10l2.4-2.4C9.2 7.1 8.4 6.8 7.5 6.8z"/>
+        </svg>
+
+        {/* Battery */}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{
+            width: 24, height: 11, borderRadius: 3,
+            border: '1px solid rgba(245,240,232,0.45)',
+            padding: 1.5, boxSizing: 'border-box',
+            position: 'relative',
+          }}>
+            <div style={{
+              width: '78%', height: '100%', borderRadius: 1.5,
+              background: '#F5F0E8',
+            }} />
+          </div>
+          <div style={{
+            width: 1.5, height: 4, borderRadius: '0 1px 1px 0',
+            background: 'rgba(245,240,232,0.45)', marginLeft: 1,
+          }} />
+        </div>
+      </div>
+    </div>
+  );
 }

@@ -109,7 +109,7 @@ export default function ScreenRating() {
                 <div key={n} onClick={() => setStars(n)} style={{
                   cursor: 'pointer', width: 38, height: 38,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  filter: active ? `drop-shadow(0 0 8px ${accent})` : 'none',
+                  filter: 'none',
                 }}>
                   <svg width="32" height="32" viewBox="0 0 24 24"
                        fill={active ? accent : 'transparent'}

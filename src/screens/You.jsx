@@ -20,7 +20,7 @@ export default function ScreenYou() {
     ember:  { hi: '#FFE0B0', mid1: '#FFAE63', mid2: '#FF6B35', deep: '#C2391F' },
     dusk:   { hi: '#E8C9FF', mid1: '#B093E6', mid2: '#7A52D6', deep: '#3D2380' },
     forest: { hi: '#D6EFC2', mid1: '#9BC78C', mid2: '#5C9762', deep: '#1F4225' },
-    slate:  { hi: '#D4E4ED', mid1: '#94B8CE', mid2: '#5285AE', deep: '#1F3D60' },
+    slate:  { hi: '#B4F4DC', mid1: '#5BDDB2', mid2: '#1FB58E', deep: '#08221C' },
     smoke:  { hi: '#EAE5DC', mid1: '#B5AFA4', mid2: '#807870', deep: '#3D3833' },
     ivory:  { hi: '#FFEED1', mid1: '#F0CC92', mid2: '#B98D52', deep: '#5A4628' },
   };
@@ -59,7 +59,7 @@ export default function ScreenYou() {
           <div style={{
             width: 64, height: 64, borderRadius: 32,
             background: `radial-gradient(circle at 30% 30%, ${accent} 0%, ${accentHot} 50%, ${accentDeep} 100%)`,
-            boxShadow: `inset 0 0 0 0.5px rgba(${accentRgba},0.4), 0 0 24px rgba(${accentRgba},0.4)`,
+            boxShadow: `inset 0 0 0 0.5px rgba(${accentRgba},0.4)`,
           }} />
           <div>
             <div className="h-display" style={{ fontSize: 26 }}>Your <em>archive</em></div>
@@ -68,7 +68,7 @@ export default function ScreenYou() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-          <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent, boxShadow: `0 0 10px ${accent}` }} />
+          <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
           <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.95)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
             DISPLAY MODE
           </span>
@@ -99,7 +99,7 @@ export default function ScreenYou() {
         </Glass>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-          <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent, boxShadow: `0 0 10px ${accent}` }} />
+          <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
           <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.95)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
             APPEARANCE · THEME
           </span>
@@ -120,7 +120,7 @@ export default function ScreenYou() {
                   background: '#0F0D0B',
                   border: isActive ? `1.5px solid ${s.light}` : '1px solid rgba(245,240,232,0.08)',
                   boxShadow: isActive
-                    ? `0 0 28px rgba(${s.softRgba}, 0.32), 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(245,240,232,0.08)`
+                    ? `0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(245,240,232,0.08)`
                     : '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(245,240,232,0.06), inset 0 -1px 0 rgba(0,0,0,0.2)',
                   cursor: 'pointer',
                   transition: 'border-color .25s ease, box-shadow .25s ease',
@@ -164,7 +164,7 @@ export default function ScreenYou() {
                     position: 'absolute', top: 14, left: 14,
                     width: 7, height: 7, borderRadius: 4,
                     background: '#F5F0E8',
-                    boxShadow: `0 0 10px ${s.light}, inset 0 0 0 1px ${s.light}`,
+                    boxShadow: `inset 0 0 0 1px ${s.light}`,
                   }} />
                 )}
 
@@ -207,7 +207,7 @@ export default function ScreenYou() {
                 position: 'relative', width: 52, height: 52, borderRadius: 26, flexShrink: 0,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 background: 'conic-gradient(from 0deg, #f5e6c8, #7aa6c4, #6e9a4d, #a8aab2, #9472cf, #ff8a3d, #f5e6c8)',
-                boxShadow: `0 0 18px rgba(${accentRgba},0.5), inset 0 0 0 1.5px rgba(255,255,255,0.15)`,
+                boxShadow: `inset 0 0 0 1.5px rgba(255,255,255,0.15)`,
               }}>
                 <div style={{
                   width: 38, height: 38, borderRadius: 19,
@@ -228,7 +228,6 @@ export default function ScreenYou() {
                     padding: '2px 7px', borderRadius: 100,
                     background: `linear-gradient(135deg, ${accent} 0%, ${accentHot} 100%)`,
                     fontSize: 9, color: '#0a0a0a', fontWeight: 500, letterSpacing: -0.13,
-                    boxShadow: `0 0 10px rgba(${accentRgba},0.5)`,
                   }}>PRO</div>
                 </div>
                 <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.92)', lineHeight: 1.4 }}>

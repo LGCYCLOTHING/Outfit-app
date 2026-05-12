@@ -10,8 +10,19 @@ import ScreenDetail from './screens/Detail.jsx';
 import ScreenCalendar from './screens/Calendar.jsx';
 import ScreenShare from './screens/Share.jsx';
 import ScreenStory from './screens/Story.jsx';
+import ScreenSplash from './screens/Splash.jsx';
+import ScreenOnboarding from './screens/Onboarding.jsx';
+import ScreenAuth from './screens/Auth.jsx';
 
-const VALID_SCREENS = ['today','archive','mix','you','paywall','rating','detail','calendar','share','story'];
+const VALID_SCREENS = ['today','archive','mix','you','paywall','rating','detail','calendar','share','story','splash','onboarding','auth'];
+
+const ONBOARDED_KEY = 'archive_onboarded';
+function isOnboarded() {
+  try { return !!localStorage.getItem(ONBOARDED_KEY); } catch (e) { return false; }
+}
+function markOnboarded() {
+  try { localStorage.setItem(ONBOARDED_KEY, '1'); } catch (e) {}
+}
 
 function AppWordmark() {
   return <div className="archive-wordmark">ARCHIVE</div>;
@@ -188,7 +199,12 @@ export default function App() {
     try {
       const h = (location.hash || '').replace(/^#/, '');
       if (VALID_SCREENS.includes(h)) return h;
+      // Skip onboarding if URL has ?clean=1 (used by the secondary preview iPhone)
+      const params = new URLSearchParams(location.search);
+      if (params.get('clean') === '1') return 'today';
     } catch (e) {}
+    // First-time user → splash → onboarding carousel → auth → paywall → today
+    if (!isOnboarded()) return 'splash';
     return 'today';
   });
   const [, force] = React.useReducer(x => x + 1, 0);
@@ -210,7 +226,22 @@ export default function App() {
   const go = React.useCallback((id) => setScreen(id), []);
   React.useEffect(() => { window.__archiveGo = go; }, [go]);
 
+  // Multi-step onboarding flow: splash → onboarding → auth → paywall → today (empty)
+  const goOnboarding = React.useCallback(() => setScreen('onboarding'), []);
+  const goAuth = React.useCallback(() => setScreen('auth'), []);
+  const goPaywall = React.useCallback(() => setScreen('paywall'), []);
+  const finishOnboarding = React.useCallback(() => {
+    markOnboarded();
+    // Show the first-install empty state on the Today screen for new users
+    if (typeof window !== 'undefined') window.__archiveEmpty = true;
+    setScreen('today');
+  }, []);
+  React.useEffect(() => { window.__archiveFinishOnboarding = finishOnboarding; }, [finishOnboarding]);
+
   const screens = {
+    splash:     <ScreenSplash onContinue={goOnboarding} />,
+    onboarding: <ScreenOnboarding onComplete={goAuth} />,
+    auth:       <ScreenAuth onContinue={goPaywall} onBack={goOnboarding} />,
     today:    <ScreenToday />,
     archive:  <ScreenArchive />,
     mix:      <ScreenMix />,

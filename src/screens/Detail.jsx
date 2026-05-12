@@ -277,7 +277,7 @@ export default function ScreenDetail() {
               background: b.accent ? `linear-gradient(135deg, ${accent}, ${accentHot})` : 'transparent',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
-              boxShadow: b.accent ? `0 0 14px rgba(${accentRgba},0.5)` : 'none',
+              boxShadow: 'none',
             }}>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
               stroke={b.accent ? '#1a1410' : 'rgba(255,255,255,0.85)'}

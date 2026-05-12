@@ -199,7 +199,7 @@ export default function ScreenArchive() {
                   fontSize: 14, fontWeight: 500, cursor: 'pointer',
                   background: active ? SAGE_BG : undefined,
                   border: active ? `1.5px solid ${SAGE_BORDER}` : undefined,
-                  boxShadow: active ? `0 0 20px ${SAGE_GLOW}, inset 0 1px 0 rgba(255,240,220,0.08)` : undefined,
+                  boxShadow: active ? `inset 0 1px 0 rgba(255,240,220,0.08)` : undefined,
                   color: active ? SAGE : 'rgba(245,240,232,0.6)',
                   transition: 'all .18s ease',
                 }}>{tag}</div>

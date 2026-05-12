@@ -77,7 +77,7 @@ export default function ScreenPaywall() {
           <div style={{
             width: 88, height: 88, borderRadius: 28,
             background: `linear-gradient(135deg, ${accent} 0%, ${accentHot} 50%, ${accentDeep} 100%)`,
-            boxShadow: `0 0 40px rgba(${accentRgba},0.6), inset 0 1px 0 rgba(255,255,255,0.4)`,
+            boxShadow: `inset 0 1px 0 rgba(255,255,255,0.4)`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             position: 'relative',
           }}>
@@ -166,7 +166,11 @@ export default function ScreenPaywall() {
 
         <div style={{ flex: 1 }} />
 
-        <button onClick={() => window.__archiveGo && window.__archiveGo('you')} style={{
+        <button onClick={() => {
+          // Finish onboarding if in flow, otherwise return to You
+          if (window.__archiveFinishOnboarding) window.__archiveFinishOnboarding();
+          else if (window.__archiveGo) window.__archiveGo('you');
+        }} style={{
           width: '100%', height: 56, borderRadius: 28, border: 'none', cursor: 'pointer',
           background: `linear-gradient(135deg, ${accent} 0%, ${accentHot} 100%)`,
           boxShadow: `inset 0 1px 0 rgba(255,255,255,0.4)`,
@@ -183,6 +187,22 @@ export default function ScreenPaywall() {
         <div style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.92)', marginTop: 14, lineHeight: 1.5 }}>
           Free for 7 days, then {yearly ? '$39.99/year' : '$6.99/month'}.<br/>
           Cancel anytime · Restore purchase
+        </div>
+
+        {/* Maybe later — visible skip for the onboarding flow */}
+        <div
+          onClick={() => {
+            if (window.__archiveFinishOnboarding) window.__archiveFinishOnboarding();
+            else if (window.__archiveGo) window.__archiveGo('today');
+          }}
+          className="archive-pressable"
+          style={{
+            textAlign: 'center', marginTop: 18, padding: '8px 0',
+            fontSize: 14, color: 'rgba(245,240,232,0.55)',
+            fontWeight: 500, cursor: 'pointer', letterSpacing: '-0.01em',
+          }}
+        >
+          Maybe later
         </div>
       </div>
     </div>
