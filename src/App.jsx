@@ -69,39 +69,39 @@ function FloatingNav({ current, go }) {
         zIndex: 100,
         borderBottomLeftRadius: 24,
         borderBottomRightRadius: 24,
-        padding: 'calc(60px + var(--archive-safe-top, 0px)) 28px calc(32px + var(--archive-safe-bottom, 0px))',
+        padding: 'calc(40px + var(--archive-safe-top, 0px)) 26px calc(20px + var(--archive-safe-bottom, 0px))',
         boxSizing: 'border-box',
         transform: open ? 'translateY(0)' : 'translateY(-100%)',
         transition: 'transform .28s ease-out',
-        overflow: 'auto',
+        overflow: 'hidden',
       }}>
         <div
           className="archive-pressable"
           onClick={() => setOpen(false)}
           style={{
             position: 'absolute',
-            top: 'calc(20px + var(--archive-safe-top, 0px))',
+            top: 'calc(16px + var(--archive-safe-top, 0px))',
             right: 22,
-            width: 28, height: 28,
+            width: 26, height: 26,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer',
           }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="1" strokeLinecap="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="1" strokeLinecap="round">
             <path d="M5 5l14 14M19 5L5 19"/>
           </svg>
         </div>
 
         <div style={{
           fontFamily: '"DM Sans", sans-serif',
-          fontSize: 10, fontWeight: 500, letterSpacing: 3,
+          fontSize: 9, fontWeight: 500, letterSpacing: 2.5,
           color: 'rgba(255,255,255,0.45)',
           textTransform: 'uppercase',
-          marginBottom: 22,
+          marginBottom: 12,
         }}>
           Navigate
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18, marginBottom: 28 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 9, marginBottom: 16 }}>
           {[
             { id: 'today',    label: 'Today' },
             { id: 'archive',  label: 'Archive' },
@@ -119,10 +119,10 @@ function FloatingNav({ current, go }) {
                 onClick={() => { go(it.id); setOpen(false); }}
                 style={{
                   fontFamily: '"DM Sans", -apple-system, system-ui, sans-serif',
-                  fontSize: 36,
+                  fontSize: 22,
                   fontWeight: 700,
                   lineHeight: 1,
-                  letterSpacing: -0.5,
+                  letterSpacing: -0.4,
                   color: active ? accent : 'rgba(255,255,255,0.95)',
                   cursor: 'pointer',
                   opacity: open ? 1 : 0,
@@ -138,20 +138,20 @@ function FloatingNav({ current, go }) {
         <div style={{
           height: 1,
           background: 'rgba(255,255,255,0.08)',
-          marginBottom: 22,
+          marginBottom: 12,
         }} />
 
         <div style={{
           fontFamily: '"DM Sans", sans-serif',
-          fontSize: 10, fontWeight: 500, letterSpacing: 3,
+          fontSize: 9, fontWeight: 500, letterSpacing: 2.5,
           color: 'rgba(255,255,255,0.45)',
           textTransform: 'uppercase',
-          marginBottom: 16,
+          marginBottom: 10,
         }}>
           Account
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 14 }}>
           {[
             { id: 'paywall',  label: 'Go Pro', badge: true },
             { id: 'settings', label: 'Settings' },
@@ -163,10 +163,10 @@ function FloatingNav({ current, go }) {
               className="archive-pressable"
               onClick={() => { go(it.id); setOpen(false); }}
               style={{
-                display: 'flex', alignItems: 'center', gap: 10,
+                display: 'flex', alignItems: 'center', gap: 8,
                 fontFamily: '"DM Sans", -apple-system, system-ui, sans-serif',
-                fontSize: 22, fontWeight: 600,
-                lineHeight: 1.1, letterSpacing: -0.3,
+                fontSize: 15, fontWeight: 600,
+                lineHeight: 1.1, letterSpacing: -0.2,
                 color: 'rgba(255,255,255,0.85)',
                 cursor: 'pointer',
                 opacity: open ? 1 : 0,
@@ -177,8 +177,8 @@ function FloatingNav({ current, go }) {
               {it.badge && (
                 <span style={{
                   fontFamily: '"DM Sans", sans-serif',
-                  fontSize: 9, fontWeight: 500, letterSpacing: 1,
-                  padding: '3px 7px', borderRadius: 4,
+                  fontSize: 8, fontWeight: 500, letterSpacing: 1,
+                  padding: '2px 6px', borderRadius: 3,
                   background: `linear-gradient(135deg, ${accent} 0%, ${tt.hot || accent} 100%)`,
                   color: '#0a0a0a',
                 }}>PRO</span>
@@ -189,8 +189,8 @@ function FloatingNav({ current, go }) {
 
         <div style={{
           fontFamily: '"DM Sans", sans-serif',
-          fontSize: 10.5, color: 'rgba(255,255,255,0.4)',
-          letterSpacing: 0.3, lineHeight: 1.6,
+          fontSize: 9, color: 'rgba(255,255,255,0.4)',
+          letterSpacing: 0.3, lineHeight: 1.5,
           opacity: open ? 1 : 0,
           transition: 'opacity .3s ease .35s',
         }}>
