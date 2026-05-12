@@ -4,7 +4,7 @@ import {
   ArchiveBurger, StatusBar, GlowCard, Glass, TabBar, PhotoPlaceholder, fitGradient, fitBorder,
 } from '../lib/shared.jsx';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
-import { useWeather, WeatherIcon } from '../lib/weather.js';
+import { useWeather, WeatherIcon } from '../lib/weather.jsx';
 
 // ─────────── Streak / week helpers (read from localStorage) ───────────
 function readLoggedDays() {
