@@ -19,8 +19,16 @@ body {
   display: flex; align-items: center; justify-content: center;
   gap: 28px;
 }
-.shell-container.single .device-shell--secondary {
+.shell-container.single .device-shell--secondary,
+.shell-container.hidden-secondary .device-shell--secondary {
   display: none;
+}
+.shell-container.hidden-primary .device-shell--primary {
+  display: none;
+}
+.shell-container.hidden-secondary .device-shell--primary,
+.shell-container.hidden-primary .device-shell--secondary {
+  width: min(393px, 92vw, calc(95vh / 2.168));
 }
 
 .device-shell {
