@@ -201,9 +201,9 @@ export function ArchiveBurger() {
         cursor: 'pointer',
         flexShrink: 0,
       }}>
-      <div style={{ width: 20, height: 2, borderRadius: 1, background: '#FFFFFF' }} />
-      <div style={{ width: 20, height: 2, borderRadius: 1, background: '#FFFFFF' }} />
-      <div style={{ width: 20, height: 2, borderRadius: 1, background: '#FFFFFF' }} />
+      <div style={{ width: 20, height: 2.5, borderRadius: 1.5, background: '#FFFFFF' }} />
+      <div style={{ width: 20, height: 2.5, borderRadius: 1.5, background: '#FFFFFF' }} />
+      <div style={{ width: 20, height: 2.5, borderRadius: 1.5, background: '#FFFFFF' }} />
     </div>
   );
 }

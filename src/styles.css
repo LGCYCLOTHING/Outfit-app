@@ -422,21 +422,9 @@ body * {
     0 8px 32px rgba(0, 0, 0, 0.4),
     0 2px 8px rgba(0, 0, 0, 0.2);
 }
-.liquid-glass::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 10%;
-  width: 80%; height: 1px;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.6) 30%,
-    rgba(255, 255, 255, 0.9) 50%,
-    rgba(255, 255, 255, 0.6) 70%,
-    transparent 100%);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 1;
-}
+/* No specular ::before on .liquid-glass — it's used for small round icon
+   buttons where a horizontal arc doesn't follow the curve and reads as a
+   stray line. Cards/pills/sheet keep theirs because they're flat-topped. */
 
 .lg-card {
   position: relative;
@@ -720,8 +708,8 @@ body * {
   position: absolute;
   left: 1px;
   width: 22px;
-  height: 1.5px;
-  border-radius: 1px;
+  height: 2.5px;
+  border-radius: 1.5px;
   background: #F5F0E8;
   transform-origin: center;
   transition:

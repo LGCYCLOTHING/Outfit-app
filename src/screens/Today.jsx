@@ -159,9 +159,9 @@ export default function ScreenToday() {
                       display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 6,
                       cursor: 'pointer',
                     }}>
-                    <div style={{ width: 22, height: 1, borderRadius: 0.5, background: '#F5F0E8' }} />
-                    <div style={{ width: 22, height: 1, borderRadius: 0.5, background: '#F5F0E8' }} />
-                    <div style={{ width: 22, height: 1, borderRadius: 0.5, background: '#F5F0E8' }} />
+                    <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: '#F5F0E8' }} />
+                    <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: '#F5F0E8' }} />
+                    <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: '#F5F0E8' }} />
                   </div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
                     <span style={{
