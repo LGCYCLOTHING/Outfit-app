@@ -5,28 +5,16 @@ html, body { margin: 0; padding: 0; background: #0a0910; height: 100%; overflow:
   --archive-safe-top: 54px;
   --archive-safe-bottom: 20px;
 
-  /* Default text colors (used until body[data-theme] sets a theme) */
-  --text-primary: #F5F0E8;
-  --text-secondary: #A89880;
-  --text-muted: #6B6560;
+  /* Universal text colors — white on every theme, with a darker glass tint
+     behind cards to guarantee contrast (see .lg-* rules below). */
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.65);
+  --text-muted: rgba(255, 255, 255, 0.35);
 }
-
-/* ──────────────────────────────────────────────
-   Per-theme adaptive text colors
-   Background image varies by theme — some have lighter
-   regions where light text would disappear. Each theme
-   declares its own primary/secondary/muted tones.
-   ────────────────────────────────────────────── */
-body[data-theme="slate"]  { --text-primary: #F5F0E8; --text-secondary: #A89880; --text-muted: #6B6560; }
-body[data-theme="ivory"]  { --text-primary: #F5F0E8; --text-secondary: #C4B5A0; --text-muted: #8C7D6A; }
-body[data-theme="forest"] { --text-primary: #F5F0E8; --text-secondary: #A8C4B8; --text-muted: #6B9080; }
-body[data-theme="smoke"]  { --text-primary: #F5F0E8; --text-secondary: #B0ABA5; --text-muted: #6B6560; }
-body[data-theme="dusk"]   { --text-primary: #F5F0E8; --text-secondary: #C4A8B8; --text-muted: #8C6A7D; }
-body[data-theme="ember"]  { --text-primary: #1A1A1A; --text-secondary: #3D3530; --text-muted: #6B5C50; }
 
 /* Primary heading shadow — keeps display text readable over textured backgrounds */
 .h-display {
-  text-shadow: 0 1px 8px rgba(0,0,0,0.3);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.25);
 }
 
 /* ============================================
@@ -398,9 +386,11 @@ body * {
    ═════════════════════════════════════════════════════════════════ */
 .nav-bar {
   position: relative;
-  background: linear-gradient(135deg,
-    rgba(255, 255, 255, 0.14) 0%,
-    rgba(255, 255, 255, 0.06) 100%);
+  background:
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0.06) 100%),
+    rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(40px) saturate(220%) brightness(1.15);
   -webkit-backdrop-filter: blur(40px) saturate(220%) brightness(1.15);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -430,10 +420,12 @@ body * {
 
 .liquid-glass {
   position: relative;
-  background: linear-gradient(135deg,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0.08) 100%);
+  background:
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      rgba(255, 255, 255, 0.08) 100%),
+    rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(24px) saturate(180%) brightness(1.05);
   -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(1.05);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -451,10 +443,12 @@ body * {
 
 .lg-card {
   position: relative;
-  background: linear-gradient(135deg,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0.08) 100%);
+  background:
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      rgba(255, 255, 255, 0.08) 100%),
+    rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(24px) saturate(180%) brightness(1.05);
   -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(1.05);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -484,10 +478,12 @@ body * {
 
 .lg-chip {
   position: relative;
-  background: linear-gradient(135deg,
-    rgba(255, 255, 255, 0.10) 0%,
-    rgba(255, 255, 255, 0.04) 50%,
-    rgba(255, 255, 255, 0.07) 100%);
+  background:
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.10) 0%,
+      rgba(255, 255, 255, 0.04) 50%,
+      rgba(255, 255, 255, 0.07) 100%),
+    rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(24px) saturate(180%) brightness(1.05);
   -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(1.05);
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -517,10 +513,12 @@ body * {
 
 .lg-pill {
   position: relative;
-  background: linear-gradient(135deg,
-    rgba(255, 255, 255, 0.13) 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0.09) 100%);
+  background:
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.13) 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      rgba(255, 255, 255, 0.09) 100%),
+    rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(24px) saturate(180%) brightness(1.05);
   -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(1.05);
   border: 1px solid rgba(255, 255, 255, 0.16);
@@ -552,9 +550,11 @@ body * {
 .lg-pill.active,
 .lg-active {
   position: relative;
-  background: linear-gradient(135deg,
-    rgba(155, 184, 159, 0.18) 0%,
-    rgba(155, 184, 159, 0.06) 100%);
+  background:
+    linear-gradient(135deg,
+      rgba(155, 184, 159, 0.18) 0%,
+      rgba(155, 184, 159, 0.06) 100%),
+    rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(24px) saturate(180%) brightness(1.05);
   -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(1.05);
   border: 1px solid rgba(155, 184, 159, 0.45);
