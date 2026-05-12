@@ -181,7 +181,7 @@ export default function ScreenToday() {
 
                 {/* RIGHT — streak circle (animated flame) + "DAY STREAK" label below */}
                 <div
-                  onClick={() => window.__archiveGo && window.__archiveGo('you')}
+                  onClick={() => window.__archiveGo && window.__archiveGo('streak')}
                   className="archive-pressable"
                   style={{
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
