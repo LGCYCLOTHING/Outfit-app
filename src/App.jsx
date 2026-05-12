@@ -65,6 +65,7 @@ function FloatingNav({ current, go }) {
       <div className="liquid-glass" style={{
         position: 'absolute',
         top: 0, left: 0, right: 0,
+        height: '65%',
         zIndex: 100,
         borderBottomLeftRadius: 24,
         borderBottomRightRadius: 24,
@@ -72,7 +73,7 @@ function FloatingNav({ current, go }) {
         boxSizing: 'border-box',
         transform: open ? 'translateY(0)' : 'translateY(-100%)',
         transition: 'transform .28s ease-out',
-        overflow: 'hidden',
+        overflow: 'auto',
       }}>
         <div
           className="archive-pressable"
