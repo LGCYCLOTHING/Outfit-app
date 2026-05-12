@@ -80,13 +80,13 @@ function FloatingNav({ current, go }) {
           onClick={() => setOpen(false)}
           style={{
             position: 'absolute',
-            top: 'calc(16px + var(--archive-safe-top, 0px))',
-            right: 22,
-            width: 26, height: 26,
+            top: 'calc(14px + var(--archive-safe-top, 0px))',
+            right: 18,
+            width: 40, height: 40,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer',
           }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="1" strokeLinecap="round">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="1.5" strokeLinecap="round">
             <path d="M5 5l14 14M19 5L5 19"/>
           </svg>
         </div>
