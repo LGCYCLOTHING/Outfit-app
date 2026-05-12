@@ -274,6 +274,49 @@ export default function ScreenToday() {
         })()}
 
 
+        {/* Log today's fit — primary CTA */}
+        {(() => {
+          const todayLogged = new Set(readLoggedDays()).has(ymd(new Date()));
+          if (todayLogged) return null;
+          return (
+            <div
+              onClick={() => window.__archiveGo && window.__archiveGo('rating')}
+              className="archive-pressable"
+              style={{
+                marginTop: 4, marginBottom: 8,
+                padding: '13px 18px', borderRadius: 14,
+                background: `linear-gradient(135deg, rgba(${accentRgba},0.22) 0%, rgba(${accentRgba},0.08) 100%)`,
+                border: `1px solid rgba(${accentRgba},0.35)`,
+                boxShadow: `inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 14px rgba(${accentRgba},0.18)`,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                cursor: 'pointer',
+              }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{
+                  width: 30, height: 30, borderRadius: 15,
+                  background: `linear-gradient(135deg, ${accent} 0%, ${accentHot} 100%)`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" strokeWidth="2.6" strokeLinecap="round">
+                    <path d="M12 5v14M5 12h14"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style={{ fontSize: 14, color: '#F5F0E8', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                    Log today's fit
+                  </div>
+                  <div style={{ fontSize: 10.5, color: `rgba(${accentRgba},0.85)`, marginTop: 2, letterSpacing: 0.6, textTransform: 'uppercase' }}>
+                    Keep the streak alive
+                  </div>
+                </div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 6l6 6-6 6"/>
+              </svg>
+            </div>
+          );
+        })()}
+
         {/* Simplified "This week" — single compact pill that opens story mode */}
         <div
           onClick={() => window.__archiveGo && window.__archiveGo('story')}

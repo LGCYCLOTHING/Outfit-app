@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTheme, StatusBar, FitPhoto } from '../lib/shared.jsx';
+import { useTheme, StatusBar, FitPhoto, getSavedFitPhoto, saveFitPhoto } from '../lib/shared.jsx';
 
 export default function ScreenDetail() {
   const t = useTheme();
@@ -9,6 +9,21 @@ export default function ScreenDetail() {
 
   const [tab, setTab] = React.useState('Pieces');
   const tabs = ['Pieces', 'People', 'Notes'];
+
+  const photoKey = 23;
+  const [photo, setPhoto] = React.useState(() => getSavedFitPhoto(photoKey));
+  const fileRef = React.useRef(null);
+  const onPickFile = (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      saveFitPhoto(photoKey, dataUrl);
+      setPhoto(dataUrl);
+    };
+    reader.readAsDataURL(f);
+  };
 
   const people = [
     { id: 1, name: 'Alex',  initials: 'A', tone: '#7aa6c4' },
@@ -110,7 +125,36 @@ export default function ScreenDetail() {
             boxShadow: '0 30px 60px -15px rgba(60,30,15,0.45), 0 10px 20px -8px rgba(60,30,15,0.3)',
             aspectRatio: '3/4',
           }}>
-            <FitPhoto id={23} radius={4} ratio="3/4" />
+            {photo ? (
+              <div style={{ width: '100%', height: '100%', borderRadius: 4, overflow: 'hidden', background: '#000' }}>
+                <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              </div>
+            ) : (
+              <FitPhoto id={23} radius={4} ratio="3/4" photoKey={photoKey} />
+            )}
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              onChange={onPickFile}
+              style={{ display: 'none' }}
+            />
+            <div
+              onClick={() => fileRef.current && fileRef.current.click()}
+              className="archive-pressable"
+              style={{
+                position: 'absolute', bottom: 10, right: 10,
+                width: 34, height: 34, borderRadius: 17,
+                background: 'rgba(26,20,16,0.55)', backdropFilter: 'blur(12px)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer',
+                boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.18)',
+              }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F5F0E8" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 7h3l2-2.5h8L18 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
+                <circle cx="12" cy="13" r="3.5"/>
+              </svg>
+            </div>
           </div>
           <div style={{
             position: 'absolute', top: '50%', right: 14,

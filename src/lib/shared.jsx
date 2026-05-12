@@ -74,9 +74,32 @@ export function fitBorder(id) {
   return FIT_BORDERS[Math.abs(n) % FIT_BORDERS.length];
 }
 
-export function FitPhoto({ id = 1, label, date, ratio = '3/4', radius = 18, showNumber = true, placeholder = false, onAdd, style = {} }) {
+export function getSavedFitPhoto(key) {
+  if (typeof window === 'undefined' || key == null) return null;
+  try { return localStorage.getItem('archive_fit_photo_' + key); } catch (e) { return null; }
+}
+export function saveFitPhoto(key, dataUrl) {
+  if (typeof window === 'undefined' || key == null) return;
+  try { localStorage.setItem('archive_fit_photo_' + key, dataUrl); } catch (e) {}
+}
+
+export function FitPhoto({ id = 1, label, date, ratio = '3/4', radius = 18, showNumber = true, placeholder = false, onAdd, photoKey, style = {} }) {
   if (placeholder) {
     return <PhotoPlaceholder ratio={ratio} radius={radius} onAdd={onAdd} style={style} />;
+  }
+  const saved = getSavedFitPhoto(photoKey != null ? photoKey : id);
+  if (saved) {
+    return (
+      <div style={{
+        position: 'relative', width: '100%', aspectRatio: ratio,
+        borderRadius: radius, overflow: 'hidden',
+        background: '#000',
+        boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)',
+        ...style,
+      }}>
+        <img src={saved} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+      </div>
+    );
   }
   return (
     <div style={{
@@ -185,8 +208,22 @@ export function ArchiveBurger() {
   );
 }
 
-export function PhotoPlaceholder({ ratio = '3/4', radius = 18, onAdd, photoId, empty = false, style = {} }) {
+export function PhotoPlaceholder({ ratio = '3/4', radius = 18, onAdd, photoId, photoKey, empty = false, style = {} }) {
   const pid = photoId != null ? photoId : Math.floor(Math.random() * 12);
+  const saved = getSavedFitPhoto(photoKey != null ? photoKey : photoId);
+  if (saved) {
+    return (
+      <div style={{
+        position: 'relative', width: '100%', aspectRatio: ratio,
+        borderRadius: radius, overflow: 'hidden',
+        background: '#000',
+        boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)',
+        ...style,
+      }}>
+        <img src={saved} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+      </div>
+    );
+  }
   if (typeof window !== 'undefined' && window.__archiveEmpty) {
     return (
       <div style={{

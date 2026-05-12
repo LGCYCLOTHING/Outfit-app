@@ -15,6 +15,7 @@ import ScreenOnboarding from './screens/Onboarding.jsx';
 import ScreenAuth from './screens/Auth.jsx';
 import ScreenSettings from './screens/Settings.jsx';
 import ScreenStreak from './screens/Streak.jsx';
+import ScreenPieces from './screens/Pieces.jsx';
 
 const VALID_SCREENS = ['today','archive','mix','you','paywall','rating','detail','calendar','share','story','splash','onboarding','auth','settings','pieces','streak'];
 
@@ -246,7 +247,7 @@ export default function App() {
     auth:       <ScreenAuth onContinue={goPaywall} onBack={goOnboarding} />,
     settings:   <ScreenSettings />,
     today:    <ScreenToday />,
-    pieces:   <ScreenDetail />,
+    pieces:   <ScreenPieces />,
     streak:   <ScreenStreak />,
     archive:  <ScreenArchive />,
     mix:      <ScreenMix />,

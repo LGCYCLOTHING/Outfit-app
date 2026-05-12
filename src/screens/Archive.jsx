@@ -32,11 +32,27 @@ function DotsMenu({ color = 'rgba(245,240,232,0.55)' }) {
 
 const SORT_MODES = ['Latest', 'Oldest', 'Most worn', 'Liked first'];
 
+function readLikedFits() {
+  try { return new Set(JSON.parse(localStorage.getItem('archive_liked_fits') || '[]')); }
+  catch (e) { return new Set(); }
+}
+function writeLikedFits(set) {
+  try { localStorage.setItem('archive_liked_fits', JSON.stringify(Array.from(set))); } catch (e) {}
+}
+
 export default function ScreenArchive() {
   const t = useTheme();
 
   const [activeTag, setActiveTag] = React.useState('All');
-  const [favorited, setFavorited] = React.useState(() => new Set([23, 21]));
+  const [favorited, setFavorited] = React.useState(() => {
+    const stored = readLikedFits();
+    if (stored.size === 0) {
+      const seed = new Set([23, 21]);
+      writeLikedFits(seed);
+      return seed;
+    }
+    return stored;
+  });
   const [sortMode, setSortMode] = React.useState('Latest');
   const [searchFocused, setSearchFocused] = React.useState(false);
   const [menuFor, setMenuFor] = React.useState(null);
@@ -46,6 +62,7 @@ export default function ScreenArchive() {
     setFavorited(prev => {
       const n = new Set(prev);
       n.has(id) ? n.delete(id) : n.add(id);
+      writeLikedFits(n);
       return n;
     });
   };
@@ -55,29 +72,49 @@ export default function ScreenArchive() {
     setSortMode(SORT_MODES[(i + 1) % SORT_MODES.length]);
   };
 
+  // Each fit now carries a category + sortable timestamp + wear count
   const months = [
     { label: 'APRIL / 2026', count: '06', fits: [
-      { id: 24, n: '024', d: 'APR 26' },
-      { id: 23, n: '023', d: 'APR 25' },
-      { id: 22, n: '022', d: 'APR 23' },
-      { id: 21, n: '021', d: 'APR 21' },
-      { id: 20, n: '020', d: 'APR 19' },
-      { id: 19, n: '019', d: 'APR 17' },
+      { id: 24, n: '024', d: 'APR 26', ts: 20260426, worn: 1, cat: 'Knit' },
+      { id: 23, n: '023', d: 'APR 25', ts: 20260425, worn: 3, cat: 'Suede' },
+      { id: 22, n: '022', d: 'APR 23', ts: 20260423, worn: 2, cat: 'Outerwear' },
+      { id: 21, n: '021', d: 'APR 21', ts: 20260421, worn: 4, cat: 'Denim' },
+      { id: 20, n: '020', d: 'APR 19', ts: 20260419, worn: 1, cat: 'Vintage' },
+      { id: 19, n: '019', d: 'APR 17', ts: 20260417, worn: 2, cat: 'Knit' },
     ]},
     { label: 'MARCH / 2026', count: '09', fits: [
-      { id: 18, n: '018', d: 'MAR 30' },
-      { id: 17, n: '017', d: 'MAR 28' },
-      { id: 16, n: '016', d: 'MAR 24' },
-      { id: 15, n: '015', d: 'MAR 19' },
-      { id: 14, n: '014', d: 'MAR 14' },
-      { id: 13, n: '013', d: 'MAR 11' },
-      { id: 12, n: '012', d: 'MAR 07' },
-      { id: 11, n: '011', d: 'MAR 02' },
-      { id: 10, n: '010', d: 'MAR 01' },
+      { id: 18, n: '018', d: 'MAR 30', ts: 20260330, worn: 5, cat: 'Outerwear' },
+      { id: 17, n: '017', d: 'MAR 28', ts: 20260328, worn: 2, cat: 'Suede' },
+      { id: 16, n: '016', d: 'MAR 24', ts: 20260324, worn: 1, cat: 'Denim' },
+      { id: 15, n: '015', d: 'MAR 19', ts: 20260319, worn: 3, cat: 'Knit' },
+      { id: 14, n: '014', d: 'MAR 14', ts: 20260314, worn: 6, cat: 'Vintage' },
+      { id: 13, n: '013', d: 'MAR 11', ts: 20260311, worn: 2, cat: 'Outerwear' },
+      { id: 12, n: '012', d: 'MAR 07', ts: 20260307, worn: 1, cat: 'Denim' },
+      { id: 11, n: '011', d: 'MAR 02', ts: 20260302, worn: 4, cat: 'Suede' },
+      { id: 10, n: '010', d: 'MAR 01', ts: 20260301, worn: 2, cat: 'Knit' },
     ]},
   ];
 
   const tags = ['All', 'Knit', 'Outerwear', 'Suede', 'Vintage', 'Denim'];
+
+  // Apply filter + sort to each month's fits before render
+  const sortFits = (fits) => {
+    const arr = [...fits];
+    if (sortMode === 'Latest') arr.sort((a, b) => b.ts - a.ts);
+    else if (sortMode === 'Oldest') arr.sort((a, b) => a.ts - b.ts);
+    else if (sortMode === 'Most worn') arr.sort((a, b) => b.worn - a.worn);
+    else if (sortMode === 'Liked first') arr.sort((a, b) => {
+      const af = favorited.has(a.id) ? 1 : 0;
+      const bf = favorited.has(b.id) ? 1 : 0;
+      if (af !== bf) return bf - af;
+      return b.ts - a.ts;
+    });
+    return arr;
+  };
+  const filteredMonths = months.map(m => {
+    const filtered = m.fits.filter(f => activeTag === 'All' || f.cat === activeTag);
+    return { ...m, fits: sortFits(filtered), count: String(filtered.length).padStart(2, '0') };
+  }).filter(m => m.fits.length > 0);
 
   // Collect all liked fits across months for the LIKED section
   const allFits = months.flatMap(m => m.fits);
@@ -318,8 +355,17 @@ export default function ScreenArchive() {
           </div>
         )}
 
+        {/* Empty filter state */}
+        {filteredMonths.length === 0 && (
+          <div style={{ padding: '40px 24px', textAlign: 'center' }}>
+            <div style={{ fontSize: 13, color: 'rgba(245,240,232,0.5)', letterSpacing: 0.4 }}>
+              No fits match "{activeTag}". Try a different filter.
+            </div>
+          </div>
+        )}
+
         {/* Months */}
-        {months.map((m) => (
+        {filteredMonths.map((m) => (
           <div key={m.label} style={{ marginBottom: 32 }}>
             <div style={{
               padding: '0 24px', marginBottom: 14,

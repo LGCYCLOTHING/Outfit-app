@@ -1,6 +1,13 @@
 import React from 'react';
-import { useTheme, StatusBar, FitPhoto } from '../lib/shared.jsx';
+import { useTheme, StatusBar, FitPhoto, getSavedFitPhoto, saveFitPhoto } from '../lib/shared.jsx';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
+
+function ymd(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
 
 export default function ScreenRating() {
   const t = useTheme();
@@ -11,6 +18,33 @@ export default function ScreenRating() {
   const [stars, setStars] = React.useState(4);
   const [mood, setMood] = React.useState('Confident');
   const [ctx, setCtx] = React.useState('Campus');
+  const todayKey = ymd(new Date());
+  const [photo, setPhoto] = React.useState(() => getSavedFitPhoto(todayKey));
+  const fileRef = React.useRef(null);
+
+  const onPickFile = (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      saveFitPhoto(todayKey, dataUrl);
+      setPhoto(dataUrl);
+    };
+    reader.readAsDataURL(f);
+  };
+
+  const saveFit = () => {
+    try {
+      const logged = JSON.parse(localStorage.getItem('archive_fits_logged') || '[]');
+      if (!logged.includes(todayKey)) {
+        logged.push(todayKey);
+        localStorage.setItem('archive_fits_logged', JSON.stringify(logged));
+      }
+      if (typeof window !== 'undefined') window.__archiveEmpty = false;
+    } catch (e) {}
+    window.__archiveGo && window.__archiveGo('today');
+  };
 
   const ratingLabels = {
     1: 'Rough day',
@@ -90,7 +124,34 @@ export default function ScreenRating() {
             borderRadius: 22, overflow: 'hidden',
             boxShadow: `0 20px 50px -10px rgba(${accentRgba},0.35), 0 30px 60px -20px rgba(0,0,0,0.7)`,
           }}>
-            <FitPhoto id={24} radius={22} ratio="3/4" />
+            {photo ? (
+              <div style={{ width: '100%', aspectRatio: '3/4', borderRadius: 22, overflow: 'hidden', background: '#000' }}>
+                <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              </div>
+            ) : (
+              <FitPhoto id={24} radius={22} ratio="3/4" photoKey={todayKey} />
+            )}
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              onChange={onPickFile}
+              style={{ display: 'none' }}
+            />
+            <div
+              onClick={() => fileRef.current && fileRef.current.click()}
+              className="liquid-glass archive-pressable"
+              style={{
+                position: 'absolute', bottom: 10, right: 10,
+                width: 34, height: 34, borderRadius: 17,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer',
+              }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F5F0E8" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 7h3l2-2.5h8L18 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
+                <circle cx="12" cy="13" r="3.5"/>
+              </svg>
+            </div>
           </div>
 
           <div style={{ textAlign: 'center', marginTop: 18, marginBottom: 14 }}>
@@ -181,7 +242,7 @@ export default function ScreenRating() {
             <div style={{ flex: 1, fontSize: 13, color: 'rgba(255,255,255,0.92)', lineHeight: 1.4 }}>
               Feeds Mix &amp; Today picks.<br/>Never shown to others.
             </div>
-            <button onClick={() => window.__archiveGo && window.__archiveGo('today')} style={{
+            <button onClick={saveFit} style={{
               border: 'none', cursor: 'pointer',
               padding: '13px 22px', borderRadius: 100,
               background: `linear-gradient(135deg, ${accent} 0%, ${accentHot} 100%)`,
