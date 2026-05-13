@@ -17,6 +17,16 @@ html, body { margin: 0; padding: 0; background: #0a0910; height: 100%; overflow:
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.25);
 }
 
+/* AĒVUM wordmark composited on top of icon images — overrides the global
+   "Inter 900 / -0.05em" force so we can use the thin Inter 300 + wide tracking
+   the user spec'd for the icon mark. */
+.aevum-wordmark {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 300 !important;
+  letter-spacing: 0.26em !important;
+  text-transform: uppercase;
+}
+
 /* ============================================
    iPhone phone-mockup bezel — clean, minimal.
    Always on. Goes fullscreen on real touch phones.

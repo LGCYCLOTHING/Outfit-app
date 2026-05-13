@@ -231,6 +231,14 @@ export default function ScreenYou() {
                   alt=""
                   style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                 />
+                {/* AĒVUM wordmark composited on top — Inter 300, 0.26em tracking, white */}
+                <div className="aevum-wordmark" style={{
+                  position: 'absolute', inset: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#fff', fontSize: 7.5, paddingLeft: '0.26em',
+                  textShadow: '0 1px 4px rgba(0,0,0,0.45)',
+                  pointerEvents: 'none',
+                }}>AĒVUM</div>
                 {isPicked && (
                   <div style={{
                     position: 'absolute', top: 5, right: 5,

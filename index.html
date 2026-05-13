@@ -32,15 +32,21 @@
   <img id="archive-bg-ember"  src="/themes/bg-6.png" alt="" />
 </div>
 <!-- External app icon preview — sits on the black workspace OUTSIDE the iPhone bezel.
-     Auto-updates to match the active theme; user override saved in localStorage 'aevum_app_icon'. -->
+     Auto-updates to match the active theme; user override saved in localStorage 'aevum_app_icon'.
+     The "AĒVUM" wordmark is composited on top of the icon (the icon files are background-only). -->
 <div id="external-app-icon" aria-hidden="true"
   style="position:fixed;top:32px;left:32px;z-index:200;
-         display:flex;flex-direction:column;align-items:center;gap:14px;
+         display:flex;flex-direction:column;align-items:center;gap:0;
          pointer-events:none;font-family:'Inter',sans-serif;">
-  <img id="external-app-icon-img" src="/icons/icon-ivory.png" alt=""
-    style="width:128px;height:128px;border-radius:30px;object-fit:cover;display:block;
-           box-shadow:0 20px 50px rgba(0,0,0,0.65),inset 0 1px 0 rgba(255,255,255,0.2);" />
-  <div style="font-size:13px;font-weight:500;letter-spacing:2.2px;color:rgba(255,255,255,0.75);">AĒVUM</div>
+  <div style="position:relative;width:128px;height:128px;">
+    <img id="external-app-icon-img" src="/icons/icon-ivory.png" alt=""
+      style="width:100%;height:100%;border-radius:30px;object-fit:cover;display:block;
+             box-shadow:0 20px 50px rgba(0,0,0,0.65),inset 0 1px 0 rgba(255,255,255,0.2);" />
+    <div class="aevum-wordmark"
+         style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+                color:#fff;font-size:18px;padding-left:0.26em;
+                text-shadow:0 2px 10px rgba(0,0,0,0.45);pointer-events:none;">AĒVUM</div>
+  </div>
 </div>
 
 <!-- Side toggle: hide / show the SECONDARY preview iPhone (left edge) -->
