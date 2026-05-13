@@ -226,70 +226,74 @@ h1, h2,
   letter-spacing: -0.05em !important;
 }
 /* ──────────────────────────────────────────────
-   LIGHT MODE — full overrides
-   Inline white text (#F5F0E8, rgba(245,240,232,*)) becomes warm dark.
-   Glass surfaces flip from cream tint to warm-dark tint.
-   Exceptions marked with data-dark-surface keep light text.
+   LIGHT MODE — white text preserved on lighter frosted glass surfaces.
+   Text stays white in both modes; only the glass tint + a text shadow
+   for legibility differ.
    ────────────────────────────────────────────── */
-body.archive-light { background: #f5f0e8; }
-
-/* Force dark warm text on every element inside the screen */
-body.archive-light .archive-screen,
-body.archive-light .archive-screen *:not(svg):not(path):not(circle):not(rect):not(ellipse):not(line) {
-  color: #1a1612 !important;
-}
-body.archive-light .archive-screen svg {
-  stroke: #1a1612;
+body.archive-light {
+  /* Override the universal text variables — same hue, lighter opacities
+     tuned for legibility on bright backgrounds. */
+  --text-primary:   #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.75);
+  --text-muted:     rgba(255, 255, 255, 0.45);
 }
 
-/* EXCEPT: anything marked [data-dark-surface] (theme swatches, hero gradient cards, dark wells) keeps light text */
-body.archive-light [data-dark-surface],
-body.archive-light [data-dark-surface] *:not(svg) {
-  color: #F5F0E8 !important;
-}
-body.archive-light [data-dark-surface] svg {
-  stroke: #F5F0E8;
+/* Soft drop-shadow on every readable text node so white stays legible
+   over the bright frosted glass + light bg images. */
+body.archive-light .archive-screen *:not(svg):not(path):not(circle):not(rect):not(ellipse):not(line):not(line) {
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
 }
 
-/* Glass cards flip: warm cream → warm DARK tint over cream bg */
+/* Glass cards in light mode — brighter frost so white text contrasts cleanly */
 body.archive-light .lg-card,
 body.archive-light .lg-chip,
 body.archive-light .lg-pill,
 body.archive-light .liquid-glass {
-  background: rgba(26, 22, 18, 0.04) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
   box-shadow:
-    0 0 0 1px rgba(26, 22, 18, 0.16),
-    0 4px 24px rgba(0,0,0,0.06),
-    inset 0 1px 0 rgba(255,255,255,0.5) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.30),
+    0 8px 24px rgba(0, 0, 0, 0.10) !important;
 }
 body.archive-light .lg-active,
 body.archive-light .lg-pill.active {
-  background: rgba(122, 155, 126, 0.16) !important;
+  background:
+    linear-gradient(135deg, rgba(155, 184, 159, 0.30) 0%, rgba(155, 184, 159, 0.12) 100%),
+    rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(155, 184, 159, 0.55) !important;
   box-shadow:
-    0 0 0 1.5px rgba(122, 155, 126, 0.55),
-    inset 0 1px 0 rgba(255,255,255,0.4) !important;
+    0 0 0 1px rgba(155, 184, 159, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.30),
+    0 8px 24px rgba(0, 0, 0, 0.10) !important;
 }
 
-/* Tab bar: cream-glass surface with dark text in light mode */
+/* Tab bar — brighter frost, white icons */
 body.archive-light .nav-bar {
-  background: rgba(255, 240, 220, 0.55) !important;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 100%),
+    rgba(255, 255, 255, 0.10) !important;
+  backdrop-filter: blur(40px) saturate(220%) brightness(1.15) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(220%) brightness(1.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
   box-shadow:
-    0 0 0 1px rgba(26, 22, 18, 0.18),
-    0 8px 32px rgba(0,0,0,0.08),
-    inset 0 1px 0 rgba(255,255,255,0.6) !important;
-}
-body.archive-light .nav-bar div,
-body.archive-light .nav-bar span {
-  color: #1a1612 !important;
-}
-body.archive-light .nav-bar svg {
-  stroke: #1a1612;
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 20px 60px rgba(0, 0, 0, 0.06) !important;
 }
 
-/* Sheet (modals) in light mode — warm cream */
+/* Sheet (modals) in light mode — frosted white, still white text */
 body.archive-light .lg-sheet {
-  background: rgba(255, 240, 220, 0.92) !important;
-  box-shadow: 0 -8px 40px rgba(0,0,0,0.12) !important;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.10) 100%),
+    rgba(255, 255, 255, 0.20) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.12) !important;
 }
 .h-display {
   font-family: 'Inter', -apple-system, system-ui, sans-serif !important;
