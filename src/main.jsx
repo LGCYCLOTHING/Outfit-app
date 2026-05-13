@@ -3,17 +3,26 @@ import ReactDOM from 'react-dom/client';
 import './styles.css';
 import App from './App.jsx';
 
-// External icon (rendered outside the bezel by index.html) — sync to active theme/override
+// External icon (rendered outside the bezel by index.html) — sync to active
+// theme/override. Also rewrites every <link rel="apple-touch-icon"> + the
+// PWA favicon to the corresponding -mark.png so that the NEXT "Add to Home
+// Screen" captures whichever icon the user currently has selected.
 function updateExternalAppIcon() {
   if (typeof window === 'undefined') return;
-  const img = document.getElementById('external-app-icon-img');
-  if (!img) return;
   let id = 'ivory';
   try {
     const override = localStorage.getItem('aevum_app_icon');
     id = override || window.__archiveTheme || 'ivory';
   } catch (e) { id = window.__archiveTheme || 'ivory'; }
-  img.src = `/icons/icon-${id}.png`;
+
+  // In-app desktop preview badge (uses the no-text variant; wordmark is HTML)
+  const img = document.getElementById('external-app-icon-img');
+  if (img) img.src = `/icons/icon-${id}.png`;
+
+  // Home-screen icon links — use the -mark.png variant with text baked in
+  const markSrc = `/icons/icon-${id}-mark.png`;
+  document.querySelectorAll('link[rel="apple-touch-icon"], link[rel="icon"]')
+    .forEach(link => { link.href = markSrc; });
 }
 if (typeof window !== 'undefined') {
   window.addEventListener('archive:themechange', updateExternalAppIcon);
