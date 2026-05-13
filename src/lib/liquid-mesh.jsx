@@ -41,109 +41,117 @@ function bgFor(themeId) {
   return `${cfg.secondary}, ${cfg.main}, ${cfg.base}`;
 }
 
-export default function LiquidMesh({ seed = 0, intensity = 1 }) {
-  const initial = (typeof window !== 'undefined' && window.__archiveTheme) || 'dusk';
-  const [current, setCurrent] = React.useState(initial);
-  const [previous, setPrevious] = React.useState(null);
-  const isLight = typeof window !== 'undefined' && !!window.__archiveLight;
+// Build a "background variant" key from theme id + light flag.
+// e.g. "dusk:dark", "ivory:light". Used so the crossfade fires for either
+// a theme switch or a dark↔light flip.
+function variantKey(themeId, light) {
+  return `${themeId}:${light ? 'light' : 'dark'}`;
+}
+function parseVariant(key) {
+  const [themeId, mode] = key.split(':');
+  return { themeId, light: mode === 'light' };
+}
 
-  // Listen for theme changes — crossfade by stacking previous + current with opacity transitions
+export default function LiquidMesh({ seed = 0, intensity = 1 }) {
+  const initialTheme = (typeof window !== 'undefined' && window.__archiveTheme) || 'dusk';
+  const initialLight = typeof window !== 'undefined' && !!window.__archiveLight;
+  const [current, setCurrent] = React.useState(variantKey(initialTheme, initialLight));
+  const [previous, setPrevious] = React.useState(null);
+
+  // One handler covers both: theme change AND dark/light flip.
+  // Builds the next variant key, crossfades if it differs from the current.
   React.useEffect(() => {
     const handler = () => {
-      const next = (typeof window !== 'undefined' && window.__archiveTheme) || 'dusk';
+      const theme = (typeof window !== 'undefined' && window.__archiveTheme) || 'dusk';
+      const light = typeof window !== 'undefined' && !!window.__archiveLight;
+      const next = variantKey(theme, light);
       setCurrent(prev => {
         if (next === prev) return prev;
         setPrevious(prev);
-        // Drop previous after the crossfade completes
         setTimeout(() => setPrevious(null), 440);
         return next;
       });
     };
     window.addEventListener('archive:themechange', handler);
-    return () => window.removeEventListener('archive:themechange', handler);
+    window.addEventListener('archive:lightchange', handler);
+    return () => {
+      window.removeEventListener('archive:themechange', handler);
+      window.removeEventListener('archive:lightchange', handler);
+    };
   }, []);
 
-  // Keyframes for crossfade
   const keyframes = `
     @keyframes archive-bg-fade-in  { from { opacity: 0; } to { opacity: 1; } }
     @keyframes archive-bg-fade-out { from { opacity: 1; } to { opacity: 0; } }
   `;
 
-  // Each theme layer = gradient fallback + bg image on top.
-  // The whole layer fades in/out so gradient + image transition together.
-  const ThemeLayer = ({ themeId, anim }) => (
-    <div style={{ position: 'absolute', inset: 0, animation: anim || 'none' }}>
-      <div style={{
-        position: 'absolute', inset: 0,
-        background: bgFor(themeId),
-      }} />
-      <div style={{
-        position: 'absolute', inset: 0,
-        backgroundImage: `url('/backgrounds/bg-${themeId}.png')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-      }} />
-    </div>
-  );
-
-  // ─────────── LIGHT MODE ───────────
-  if (isLight) {
+  // A single layer = gradient fallback + bg image on top, scoped to one variant.
+  // The whole stack fades in/out so gradient + image transition together.
+  const ThemeLayer = ({ variant, anim }) => {
+    const { themeId, light } = parseVariant(variant);
+    const imageSrc = light
+      ? `/backgrounds/bg-${themeId}-light.png`
+      : `/backgrounds/bg-${themeId}.png`;
     return (
-      <div data-liquid-mesh="true" style={{
-        position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none',
-        background: '#F5F0E8',
-      }}>
-        <ThemeLayer themeId={current} />
+      <div style={{ position: 'absolute', inset: 0, animation: anim || 'none' }}>
         <div style={{
           position: 'absolute', inset: 0,
-          backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.4 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")`,
-          backgroundSize: '220px 220px',
-          opacity: 0.04,
-          mixBlendMode: 'multiply',
+          background: light ? '#F5F0E8' : bgFor(themeId),
+        }} />
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `url('${imageSrc}')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
         }} />
       </div>
     );
-  }
+  };
 
-  // ─────────── DARK MODE — gradient + bg image, with crossfade ───────────
+  const { light: currentLight } = parseVariant(current);
+
   return (
     <div data-liquid-mesh="true" style={{
       position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none',
-      background: '#020204',
+      background: currentLight ? '#F5F0E8' : '#020204',
     }}>
       <style>{keyframes}</style>
 
-      {/* Previous theme — fades out over 400ms */}
+      {/* Previous variant — fades out over 400ms */}
       {previous && (
         <ThemeLayer
           key={`prev-${previous}`}
-          themeId={previous}
+          variant={previous}
           anim="archive-bg-fade-out 400ms ease forwards"
         />
       )}
 
-      {/* Current theme — fades in over 400ms (or static if no previous) */}
+      {/* Current variant — fades in over 400ms when there's a previous to swap from */}
       <ThemeLayer
         key={`curr-${current}`}
-        themeId={current}
+        variant={current}
         anim={previous ? 'archive-bg-fade-in 400ms ease forwards' : null}
       />
 
-      {/* Top vignette so status-bar reads clearly */}
-      <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0, height: '7%',
-        background: 'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 100%)',
-        pointerEvents: 'none',
-      }} />
+      {/* Top vignette so status-bar reads clearly (dark mode only) */}
+      {!currentLight && (
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0, height: '7%',
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 100%)',
+          pointerEvents: 'none',
+        }} />
+      )}
 
       {/* Film grain */}
       <div style={{
         position: 'absolute', inset: 0,
-        backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")`,
+        backgroundImage: currentLight
+          ? `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.4 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")`
+          : `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")`,
         backgroundSize: '220px 220px',
-        opacity: 0.05,
-        mixBlendMode: 'overlay',
+        opacity: currentLight ? 0.04 : 0.05,
+        mixBlendMode: currentLight ? 'multiply' : 'overlay',
         pointerEvents: 'none',
       }} />
     </div>
