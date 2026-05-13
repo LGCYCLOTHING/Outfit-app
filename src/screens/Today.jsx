@@ -184,39 +184,28 @@ export default function ScreenToday() {
                   </div>
                 </div>
 
-                {/* RIGHT — streak circle (animated flame) + "DAY STREAK" label below */}
+                {/* RIGHT — animated flame + streak number */}
                 <div
                   onClick={() => window.__archiveGo && window.__archiveGo('streak')}
                   className="archive-pressable"
                   style={{
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
+                    display: 'flex', alignItems: 'center', gap: 6,
                     cursor: 'pointer',
                   }}>
-                  <div style={{ position: 'relative', width: ringSize, height: ringSize }}>
-                    <svg width={ringSize} height={ringSize}
-                      style={{ position: 'absolute', inset: 0, transform: 'rotate(-90deg)' }}>
-                      <circle cx={ringSize/2} cy={ringSize/2} r={ringR} fill="none"
-                        stroke="rgba(245,240,232,0.18)" strokeWidth={ringStroke} />
-                      <circle cx={ringSize/2} cy={ringSize/2} r={ringR} fill="none"
-                        stroke={accent} strokeWidth={ringStroke} strokeLinecap="round"
-                        strokeDasharray={`${ringDash} ${ringC}`} />
-                    </svg>
-                    <div className="archive-flame" style={{
-                      position: 'absolute', inset: 0,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      filter: `drop-shadow(0 0 4px ${accent})`,
-                    }}>
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill={accent}>
-                        <path d="M12 2c1 4-3 6-3 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-2 3 0-3-1-5-3-8z"/>
-                      </svg>
-                    </div>
-                  </div>
-                  <div style={{
-                    fontSize: 9, letterSpacing: 1.6,
-                    color: 'var(--text-secondary)', textTransform: 'uppercase',
+                  <div className="archive-flame" style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))',
                   }}>
-                    Day streak
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="#FFFFFF">
+                      <path d="M12 2c1 4-3 6-3 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-2 3 0-3-1-5-3-8z"/>
+                    </svg>
                   </div>
+                  <span style={{
+                    fontSize: 28, color: '#FFFFFF',
+                    letterSpacing: '-0.05em', lineHeight: 1,
+                  }}>
+                    {streak}
+                  </span>
                 </div>
               </div>
 
