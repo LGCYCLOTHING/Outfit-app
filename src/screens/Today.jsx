@@ -470,7 +470,7 @@ export default function ScreenToday() {
               width: 7, height: 7, borderRadius: 3.5, background: accent,
             }} />
             <span style={{ fontSize: 16, color: 'var(--text-primary)', fontWeight: 500, letterSpacing: -0.1 }}>
-              Today's pick
+              Today's fit
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -483,62 +483,148 @@ export default function ScreenToday() {
           </div>
         </div>
 
-        <div className="lg-active lg-spotlight" style={{ borderRadius: 24, overflow: 'hidden', position: 'relative' }}>
-          <div onClick={() => window.__archiveGo && window.__archiveGo('detail')} style={{ position: 'relative', padding: 18, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', cursor: 'pointer' }}>
-            <div style={{ borderRadius: 18, overflow: 'hidden', position: 'relative' }}>
-              <PhotoPlaceholder ratio="4/5" radius={18} photoId={3} photoKey={ymd(new Date())} />
-              {typeof window !== 'undefined' && window.__archiveEmpty &&
-                <div style={{
-                  position: 'absolute', inset: 0,
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12,
-                  pointerEvents: 'none'
+        {(() => {
+          const picks = [
+            { id: 3,  num: '023', tag: 'Recycled',  title: 'Rust suede + cream knit',     sub: 'Last worn Mar 14 · matches 61° clear', pct: '94%' },
+            { id: 7,  num: '019', tag: 'AI Pick',   title: 'Charcoal layered',            sub: 'Built from 4 pieces you own',          pct: '89%' },
+            { id: 11, num: '014', tag: 'Comfort',   title: 'Olive denim + tee',           sub: 'Light, breathable for 60s+ weather',   pct: '86%' },
+          ];
+          // Mouse-drag-to-scroll for desktop (touch swipe works natively)
+          const onPicksDown = (e) => {
+            const el = e.currentTarget;
+            const startX = e.clientX;
+            const startScroll = el.scrollLeft;
+            const onMove = (m) => { el.scrollLeft = startScroll - (m.clientX - startX); };
+            const onUp = () => {
+              window.removeEventListener('pointermove', onMove);
+              window.removeEventListener('pointerup', onUp);
+            };
+            window.addEventListener('pointermove', onMove);
+            window.addEventListener('pointerup', onUp);
+          };
+          return (
+            <>
+            <div className="picks-row"
+              onPointerDown={onPicksDown}
+              style={{
+              display: 'flex',
+              gap: 12,
+              overflowX: 'auto',
+              overflowY: 'hidden',
+              scrollSnapType: 'x mandatory',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+              margin: '0 -28px',
+              padding: '0 28px 6px',
+              cursor: 'grab',
+            }}>
+              <style>{`.picks-row::-webkit-scrollbar{display:none}`}</style>
+              {picks.map((p, i) => (
+                <div key={p.id}
+                  className={i === 0 ? 'lg-active lg-spotlight' : 'lg-card'}
+                  style={{
+                    flex: '0 0 88%',
+                    scrollSnapAlign: 'start',
+                    borderRadius: 24, overflow: 'hidden', position: 'relative',
+                  }}>
+                  <div onClick={() => window.__archiveGo && window.__archiveGo('detail')}
+                    style={{ position: 'relative', padding: 18, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', cursor: 'pointer' }}>
+                    <div style={{ borderRadius: 18, overflow: 'hidden', position: 'relative' }}>
+                      <PhotoPlaceholder ratio="4/5" radius={18} photoId={p.id} photoKey={i === 0 ? ymd(new Date()) : undefined} />
+                      <div style={{
+                        position: 'absolute', top: 12, left: 12,
+                        padding: '6px 11px', borderRadius: 100,
+                        background: 'rgba(10,8,6,0.55)', backdropFilter: 'blur(10px)',
+                        fontSize: 13, color: accent, fontWeight: 500,
+                        boxShadow: `inset 0 0 0 0.5px rgba(${accentRgba},0.35)`,
+                      }}>Fit {p.num} · {p.tag}</div>
+                      <div style={{
+                        position: 'absolute', top: 12, right: 12,
+                        padding: '6px 10px', borderRadius: 100,
+                        background: 'rgba(10,8,6,0.55)', backdropFilter: 'blur(10px)',
+                        fontSize: 12, color: '#fff', fontWeight: 600,
+                      }}>{p.pct}</div>
+                      <div className="liquid-glass" onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('share'); }} style={{
+                        position: 'absolute', bottom: 12, right: 12,
+                        width: 32, height: 32, borderRadius: 16,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer'
+                      }}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v14" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div style={{ marginTop: 16, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 20, fontWeight: 500, lineHeight: 1.2, marginBottom: 6, letterSpacing: -0.2 }}>
+                          {p.title}
+                        </div>
+                        <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                          {p.sub}
+                        </div>
+                      </div>
+                      <button className="liquid-glass" onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('rating'); }} style={{
+                        border: 'none', cursor: 'pointer',
+                        width: 44, height: 44, borderRadius: 22, flexShrink: 0,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: 'var(--text-primary)'
+                      }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M5 12h14M13 6l6 6-6 6" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {/* + Add fit — trailing card, opens Rating to log a new one */}
+              <div
+                onClick={() => window.__archiveGo && window.__archiveGo('rating')}
+                className="lg-card archive-pressable"
+                style={{
+                  flex: '0 0 60%',
+                  scrollSnapAlign: 'start',
+                  borderRadius: 24,
+                  overflow: 'hidden',
+                  border: '1px dashed rgba(255,255,255,0.25)',
+                  display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer',
+                  minHeight: 360,
                 }}>
-                  <div style={{
-                    fontFamily: 'Inter, sans-serif', fontWeight: 300,
-                    fontSize: 12, color: 'var(--text-muted)', letterSpacing: 0.2
-                  }}>Log today's fit →</div>
+                <div style={{
+                  width: 56, height: 56, borderRadius: 28,
+                  background: `linear-gradient(135deg, ${accent} 0%, ${accentHot} 100%)`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: `0 8px 22px -4px rgba(${accentRgba},0.55)`,
+                  marginBottom: 14,
+                }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" strokeWidth="2.8" strokeLinecap="round">
+                    <path d="M12 5v14M5 12h14"/>
+                  </svg>
                 </div>
-              }
-              <div style={{
-                position: 'absolute', top: 12, left: 12,
-                padding: '6px 11px', borderRadius: 100,
-                background: 'rgba(10,8,6,0.55)', backdropFilter: 'blur(10px)',
-                fontSize: 14, color: accent, fontWeight: 500,
-                boxShadow: `inset 0 0 0 0.5px rgba(${accentRgba},0.35)`
-              }}>Fit 023 · Recycled</div>
-              <div className="liquid-glass" onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('share'); }} style={{
-                position: 'absolute', top: 12, right: 12,
-                width: 32, height: 32, borderRadius: 16,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer'
-              }}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v14" />
-                </svg>
-              </div>
-            </div>
-            <div style={{ marginTop: 16, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-              <div>
-                <div style={{ fontSize: 22, fontWeight: 500, lineHeight: 1.2, marginBottom: 6, letterSpacing: -0.2 }}>
-                  Rust suede + cream knit
+                <div style={{ fontSize: 15, color: '#fff', fontWeight: 600, letterSpacing: '-0.01em' }}>
+                  Add a fit
                 </div>
-                <div style={{ fontSize: 16, color: 'var(--text-primary)', lineHeight: 1.4 }}>
-                  Last worn Mar 14 · matches 61° clear
+                <div style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.6)', marginTop: 4, letterSpacing: 0.3 }}>
+                  Log today's outfit
                 </div>
               </div>
-              <button className="liquid-glass" onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('rating'); }} style={{
-                border: 'none', cursor: 'pointer',
-                width: 48, height: 48, borderRadius: 24,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'var(--text-primary)'
-              }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14M13 6l6 6-6 6" />
-                </svg>
-              </button>
             </div>
-          </div>
-        </div>
+            {/* Page indicator dots — picks + the "+" card */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 5, marginTop: 10, marginBottom: 4 }}>
+              {[...picks, 'add'].map((_, i) => (
+                <div key={i} style={{
+                  width: i === 0 ? 16 : 5, height: 5, borderRadius: 3,
+                  background: i === 0 ? accent : 'rgba(255,255,255,0.25)',
+                  transition: 'width .25s ease',
+                }} />
+              ))}
+            </div>
+            </>
+          );
+        })()}
 
         {(() => {
           const allLogged = readLoggedDays();
