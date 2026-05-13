@@ -172,10 +172,12 @@ body.archive-clean #stage {
   /* Hide the desktop chrome — workspace icon + side toggle buttons */
   #external-app-icon,
   #toggle-secondary,
-  #toggle-primary { display: none !important; }
+  #toggle-primary,
+  #show-splash-btn { display: none !important; }
 }
 /* Inside the secondary-preview iframe, also hide it */
-body.archive-clean #external-app-icon { display: none !important; }
+body.archive-clean #external-app-icon,
+body.archive-clean #show-splash-btn { display: none !important; }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro', system-ui, sans-serif;

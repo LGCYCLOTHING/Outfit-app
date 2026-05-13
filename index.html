@@ -49,6 +49,23 @@
   </div>
 </div>
 
+<!-- Dev utility: clear onboarded flag and reload to show the splash screen.
+     Workspace-only (hidden on touch phones + inside the clean preview iframe). -->
+<button id="show-splash-btn" type="button" aria-label="Show splash screen"
+  onclick="try{localStorage.removeItem('aevum_onboarded');}catch(e){};location.reload();"
+  style="position:fixed;left:32px;bottom:32px;z-index:1000;
+         padding:10px 16px;border-radius:100px;border:1px solid rgba(255,255,255,0.18);
+         background:rgba(0,0,0,0.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+         color:#fff;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.5px;
+         cursor:pointer;display:flex;align-items:center;gap:6px;
+         box-shadow:0 8px 24px rgba(0,0,0,0.45);">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1 4v6h6M23 20v-6h-6"/>
+    <path d="M3.5 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.65 4.36A9 9 0 0 0 20.5 15"/>
+  </svg>
+  Show splash
+</button>
+
 <!-- Side toggle: hide / show the SECONDARY preview iPhone (left edge) -->
 <button id="toggle-secondary" type="button" aria-label="Toggle secondary preview"
   style="position:fixed;left:14px;top:50%;transform:translateY(-50%);z-index:1000;
