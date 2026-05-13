@@ -362,9 +362,6 @@ export default function ScreenToday() {
                   <div style={{ fontSize: 14, color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
                     Log today's fit
                   </div>
-                  <div style={{ fontSize: 10.5, color: `rgba(${accentRgba},0.85)`, marginTop: 2, letterSpacing: 0.6, textTransform: 'uppercase' }}>
-                    Keep the streak alive
-                  </div>
                 </div>
               </div>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -531,8 +528,9 @@ export default function ScreenToday() {
               id: 'week',
               value: String(fitsThisWeek),
               label: 'THIS WEEK',
+              nav: 'streak',
               icon: (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 10h18M8 3v4M16 3v4" />
                 </svg>
               ),
@@ -541,15 +539,60 @@ export default function ScreenToday() {
               id: 'fits',
               value: String(allLogged.length || 312),
               label: 'FITS LOGGED',
+              nav: 'archive',
               icon: (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="3" width="18" height="18" rx="3" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="M21 15l-5-5L5 21" />
                 </svg>
               ),
             },
           };
 
+          // Extra static stat cards below the draggable pair
+          const sortedLogged = [...allLogged].sort();
+          let bestStreak = 0, run = 0, prev = null;
+          for (const day of sortedLogged) {
+            const d = new Date(day);
+            if (prev && (d - prev) === 86400000) run++;
+            else run = 1;
+            bestStreak = Math.max(bestStreak, run);
+            prev = d;
+          }
+          let likedCount = 0;
+          try { likedCount = JSON.parse(localStorage.getItem('aevum_liked_fits') || '[]').length; } catch (e) {}
+          let piecesCount = 0;
+          try { piecesCount = JSON.parse(localStorage.getItem('aevum_pieces') || '[]').length; } catch (e) {}
+          const now = new Date();
+          const thisMonthCount = allLogged.filter(d => {
+            const dd = new Date(d);
+            return dd.getFullYear() === now.getFullYear() && dd.getMonth() === now.getMonth();
+          }).length;
+
+          const extraStats = [
+            { label: 'BEST STREAK', value: String(bestStreak || 47), nav: 'streak', icon: (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2c1 4-3 6-3 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-2 3 0-3-1-5-3-8z"/>
+              </svg>
+            )},
+            { label: 'THIS MONTH', value: String(thisMonthCount || 23), nav: 'calendar', icon: (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 11h18M8 3v4M16 3v4M8 15h2M14 15h2"/>
+              </svg>
+            )},
+            { label: 'LIKED', value: String(likedCount || 8), nav: 'archive', icon: (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            )},
+            { label: 'PIECES', value: String(piecesCount || 0), nav: 'pieces', icon: (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 7l4-3h8l4 3-3 4-2-1v11H7V10L5 11 4 7z"/>
+              </svg>
+            )},
+          ];
+
           return (
+            <>
             <div
               ref={statsGridRef}
               style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: STAT_GAP, position: 'relative' }}>
@@ -566,8 +609,10 @@ export default function ScreenToday() {
                   : 0;
                 const shiftX = isDragging ? baseShift + statDragX : baseShift + otherReflow;
                 return (
-                  <div key={id} data-stat-card className="lg-card" style={{
-                    borderRadius: 20, padding: 18, aspectRatio: '1.15',
+                  <div key={id} data-stat-card
+                    onClick={() => { if (!isDragging) window.__archiveGo && window.__archiveGo(stat.nav); }}
+                    className="lg-card archive-pressable" style={{
+                    borderRadius: 18, padding: 14, aspectRatio: '1.45',
                     display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
                     transform: `translateX(${shiftX}px) scale(${isDragging ? 1.04 : 1})`,
                     transition: isDragging
@@ -575,11 +620,12 @@ export default function ScreenToday() {
                       : 'transform .35s cubic-bezier(.2,.8,.2,1)',
                     zIndex: isDragging ? 10 : 1,
                     boxShadow: isDragging ? '0 16px 40px rgba(0,0,0,0.55)' : undefined,
-                    cursor: isDragging ? 'grabbing' : 'default',
+                    cursor: isDragging ? 'grabbing' : 'pointer',
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       {stat.icon}
                       <div
+                        onClick={(e) => e.stopPropagation()}
                         onPointerDown={(e) => onStatGripDown(id, e)}
                         onPointerMove={onStatGripMove}
                         onPointerUp={onStatGripUp}
@@ -594,13 +640,37 @@ export default function ScreenToday() {
                       </div>
                     </div>
                     <div>
-                      <div style={{ fontSize: 44, fontWeight: 700, letterSpacing: -1.5, lineHeight: 1, color: 'var(--text-primary)' }}>{stat.value}</div>
-                      <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 6, letterSpacing: 1.2, fontWeight: 500 }}>{stat.label}</div>
+                      <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: -1.2, lineHeight: 1, color: 'var(--text-primary)' }}>{stat.value}</div>
+                      <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 5, letterSpacing: 1.1, fontWeight: 500 }}>{stat.label}</div>
                     </div>
                   </div>
                 );
               })}
             </div>
+            <div style={{ marginTop: STAT_GAP, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: STAT_GAP }}>
+              {extraStats.map((stat) => (
+                <div key={stat.label}
+                  onClick={() => window.__archiveGo && window.__archiveGo(stat.nav)}
+                  className="lg-card archive-pressable"
+                  style={{
+                    borderRadius: 18, padding: 14, aspectRatio: '1.45',
+                    display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                    cursor: 'pointer',
+                  }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    {stat.icon}
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 6l6 6-6 6"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: -1.2, lineHeight: 1, color: 'var(--text-primary)' }}>{stat.value}</div>
+                    <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 5, letterSpacing: 1.1, fontWeight: 500 }}>{stat.label}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            </>
           );
         })()}
 
