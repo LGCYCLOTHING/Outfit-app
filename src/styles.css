@@ -135,7 +135,8 @@ body.archive-clean #stage {
     inset: 0 !important;
     border-radius: 0;
     --sa-top: env(safe-area-inset-top, 0px);
-    --sa-bottom: env(safe-area-inset-bottom, 0px);
+    /* No bottom safe-area on phone — let content run all the way to the edge */
+    --sa-bottom: 0px !important;
   }
   .device-island, .device-side { display: none; }
   /* Hide the desktop chrome — workspace icon + side toggle buttons */
