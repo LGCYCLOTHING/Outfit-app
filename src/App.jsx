@@ -102,8 +102,8 @@ function FloatingNav({ current, go }) {
         transition: isDragging
           ? 'none'
           : open
-            ? 'transform .55s cubic-bezier(.16,1,.3,1)'
-            : 'transform .85s cubic-bezier(.16,1,.3,1)',
+            ? 'transform .9s cubic-bezier(.16,1,.3,1)'
+            : 'transform 1.2s cubic-bezier(.16,1,.3,1)',
         overflow: 'hidden',
       }}>
         <div style={{
