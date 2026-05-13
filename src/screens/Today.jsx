@@ -105,7 +105,10 @@ export default function ScreenToday() {
   const accentRgba = t.softRgba;
   const weather = useWeather();
 
-  // ── Stat cards — drag handle reorder, persisted to localStorage ──
+  // ── Stat cards — iPhone-style drag-to-reorder with live re-flow ──
+  // DOM order never changes; visual position comes from statOrder + transform.
+  const STAT_DOM_ORDER = ['week', 'fits'];
+  const STAT_GAP = 10;
   const [statOrder, setStatOrder] = React.useState(() => {
     try {
       const saved = localStorage.getItem('aevum_stats_order');
@@ -118,7 +121,27 @@ export default function ScreenToday() {
   });
   const [draggingStatId, setDraggingStatId] = React.useState(null);
   const [statDragX, setStatDragX] = React.useState(0);
+  const [statCardWidth, setStatCardWidth] = React.useState(0);
   const statDragStartRef = React.useRef(0);
+  const statsGridRef = React.useRef(null);
+
+  React.useLayoutEffect(() => {
+    const measure = () => {
+      if (!statsGridRef.current) return;
+      const card = statsGridRef.current.querySelector('[data-stat-card]');
+      if (card) setStatCardWidth(card.offsetWidth);
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    window.addEventListener('archive:resize', measure);
+    return () => {
+      window.removeEventListener('resize', measure);
+      window.removeEventListener('archive:resize', measure);
+    };
+  }, []);
+
+  const STAT_COL_DIST = statCardWidth + STAT_GAP;
+  const STAT_SWAP_THRESHOLD = statCardWidth ? statCardWidth / 2 : 80;
 
   const onStatGripDown = (id, e) => {
     e.stopPropagation();
@@ -133,7 +156,7 @@ export default function ScreenToday() {
   };
   const onStatGripUp = () => {
     if (!draggingStatId) return;
-    if (Math.abs(statDragX) > 70) {
+    if (Math.abs(statDragX) > STAT_SWAP_THRESHOLD) {
       setStatOrder(o => {
         const next = [o[1], o[0]];
         try { localStorage.setItem('aevum_stats_order', JSON.stringify(next)); } catch (e) {}
@@ -527,16 +550,29 @@ export default function ScreenToday() {
           };
 
           return (
-            <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              {statOrder.map((id) => {
+            <div
+              ref={statsGridRef}
+              style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: STAT_GAP, position: 'relative' }}>
+              {STAT_DOM_ORDER.map((id) => {
                 const stat = statsById[id];
+                const logicalPos = statOrder.indexOf(id);
+                const domPos = STAT_DOM_ORDER.indexOf(id);
+                const baseShift = (logicalPos - domPos) * STAT_COL_DIST;
                 const isDragging = draggingStatId === id;
+                const isOther = draggingStatId && draggingStatId !== id;
+                // Other card slides into dragged card's slot as soon as drag crosses the swap threshold
+                const otherReflow = isOther && Math.abs(statDragX) > STAT_SWAP_THRESHOLD
+                  ? (statDragX > 0 ? -STAT_COL_DIST : STAT_COL_DIST)
+                  : 0;
+                const shiftX = isDragging ? baseShift + statDragX : baseShift + otherReflow;
                 return (
-                  <div key={id} className="lg-card" style={{
+                  <div key={id} data-stat-card className="lg-card" style={{
                     borderRadius: 20, padding: 18, aspectRatio: '1.15',
                     display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-                    transform: isDragging ? `translateX(${statDragX}px) scale(1.04)` : 'translateX(0) scale(1)',
-                    transition: isDragging ? 'none' : 'transform .35s cubic-bezier(.2,.8,.2,1)',
+                    transform: `translateX(${shiftX}px) scale(${isDragging ? 1.04 : 1})`,
+                    transition: isDragging
+                      ? 'none'
+                      : 'transform .35s cubic-bezier(.2,.8,.2,1)',
                     zIndex: isDragging ? 10 : 1,
                     boxShadow: isDragging ? '0 16px 40px rgba(0,0,0,0.55)' : undefined,
                     cursor: isDragging ? 'grabbing' : 'default',
