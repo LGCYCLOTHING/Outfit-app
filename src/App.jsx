@@ -205,8 +205,8 @@ function FloatingNav({ current, go }) {
           Version 0.1.0 · Edition Noire
         </div>
 
-        {/* Drag handle — swipe-to-dismiss pill, 60% width. Drag down to close;
-            drag back up before release to cancel. */}
+        {/* Drag handle — small iOS-style pill at bottom-center. Drag up to close;
+            drag back down to cancel. */}
         <div
           onPointerDown={onHandleDown}
           onPointerMove={onHandleMove}
@@ -215,16 +215,16 @@ function FloatingNav({ current, go }) {
           style={{
             position: 'absolute',
             bottom: 0,
-            left: '20%',
-            width: '60%',
-            height: 28,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 80, height: 24,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'grab',
             touchAction: 'none',
             zIndex: 5,
           }}>
           <div style={{
-            width: '100%', height: 4, borderRadius: 2,
+            width: 40, height: 4, borderRadius: 2,
             background: 'rgba(255,255,255,0.45)',
           }} />
         </div>
