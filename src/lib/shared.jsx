@@ -741,7 +741,7 @@ function findNearestIdx(x, y, refs, threshold) {
 // Rendered at the top of every screen.
 export function StatusBar() {
   return (
-    <div style={{
+    <div className="app-status-bar" style={{
       position: 'absolute', top: 0, left: 0, right: 0,
       height: 54,
       zIndex: 100,

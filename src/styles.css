@@ -148,11 +148,17 @@ body.archive-clean #stage {
     height: 100lvh !important;
     border-radius: 0;
     background: #000 !important;   /* prevents stage's grey from showing through */
-    --sa-top: env(safe-area-inset-top, 0px);
+    /* iOS already shows its own status bar — shrink the simulated reserved area
+       so the app's content sits just below the real notch and doesn't double up.
+       Each screen adds its own +12px buffer; we subtract that here to nudge
+       content upward to sit right at the bottom of the notch. */
+    --sa-top: max(0px, calc(env(safe-area-inset-top, 0px) - 14px)) !important;
     /* No bottom safe-area on phone — content extends to the very edge */
     --sa-bottom: 0px !important;
   }
   .device-island, .device-side { display: none; }
+  /* Hide the in-app simulated status bar — iOS already renders the real one */
+  .app-status-bar { display: none !important; }
   /* Hide the desktop chrome — workspace icon + side toggle buttons */
   #external-app-icon,
   #toggle-secondary,
