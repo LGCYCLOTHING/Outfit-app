@@ -104,6 +104,45 @@ export default function ScreenToday() {
   const accentDeep = t.deep;
   const accentRgba = t.softRgba;
   const weather = useWeather();
+
+  // ── Stat cards — drag handle reorder, persisted to localStorage ──
+  const [statOrder, setStatOrder] = React.useState(() => {
+    try {
+      const saved = localStorage.getItem('aevum_stats_order');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length === 2) return parsed;
+      }
+    } catch (e) {}
+    return ['week', 'fits'];
+  });
+  const [draggingStatId, setDraggingStatId] = React.useState(null);
+  const [statDragX, setStatDragX] = React.useState(0);
+  const statDragStartRef = React.useRef(0);
+
+  const onStatGripDown = (id, e) => {
+    e.stopPropagation();
+    try { e.target.setPointerCapture(e.pointerId); } catch (err) {}
+    statDragStartRef.current = e.clientX;
+    setDraggingStatId(id);
+    setStatDragX(0);
+  };
+  const onStatGripMove = (e) => {
+    if (!draggingStatId) return;
+    setStatDragX(e.clientX - statDragStartRef.current);
+  };
+  const onStatGripUp = () => {
+    if (!draggingStatId) return;
+    if (Math.abs(statDragX) > 70) {
+      setStatOrder(o => {
+        const next = [o[1], o[0]];
+        try { localStorage.setItem('aevum_stats_order', JSON.stringify(next)); } catch (e) {}
+        return next;
+      });
+    }
+    setDraggingStatId(null);
+    setStatDragX(0);
+  };
   return (
     <div style={{
       width: '100%', height: '100%', position: 'relative', overflow: 'hidden',
@@ -460,36 +499,74 @@ export default function ScreenToday() {
           </div>
         </div>
 
-        <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          {[
-            { value: '47', label: 'DAY STREAK', icon: (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2c1 4-3 6-3 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-2 3 0-3-1-5-3-8z" />
-              </svg>
-            )},
-            { value: '312', label: 'FITS LOGGED', icon: (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="3" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="M21 15l-5-5L5 21" />
-              </svg>
-            )},
-          ].map((stat, i) => (
-            <div key={i} className="lg-card" style={{
-              borderRadius: 20, padding: 18, aspectRatio: '1.15',
-              display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                {stat.icon}
-                <div style={{ display: 'grid', gridTemplateColumns: '3px 3px', gridTemplateRows: '3px 3px', gap: 3 }}>
-                  {[0,1,2,3].map(k => <div key={k} style={{ width: 3, height: 3, borderRadius: 1.5, background: 'rgba(245,240,232,0.3)' }} />)}
-                </div>
-              </div>
-              <div>
-                <div style={{ fontSize: 44, fontWeight: 700, letterSpacing: -1.5, lineHeight: 1, color: 'var(--text-primary)' }}>{stat.value}</div>
-                <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 6, letterSpacing: 1.2, fontWeight: 500 }}>{stat.label}</div>
-              </div>
+        {(() => {
+          const allLogged = readLoggedDays();
+          const weekDaysHere = getThisWeekDays();
+          const fitsThisWeek = weekDaysHere.filter(d => d.hasFit).length;
+          const statsById = {
+            week: {
+              id: 'week',
+              value: String(fitsThisWeek),
+              label: 'THIS WEEK',
+              icon: (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 10h18M8 3v4M16 3v4" />
+                </svg>
+              ),
+            },
+            fits: {
+              id: 'fits',
+              value: String(allLogged.length || 312),
+              label: 'FITS LOGGED',
+              icon: (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="3" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="M21 15l-5-5L5 21" />
+                </svg>
+              ),
+            },
+          };
+
+          return (
+            <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              {statOrder.map((id) => {
+                const stat = statsById[id];
+                const isDragging = draggingStatId === id;
+                return (
+                  <div key={id} className="lg-card" style={{
+                    borderRadius: 20, padding: 18, aspectRatio: '1.15',
+                    display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                    transform: isDragging ? `translateX(${statDragX}px) scale(1.04)` : 'translateX(0) scale(1)',
+                    transition: isDragging ? 'none' : 'transform .35s cubic-bezier(.2,.8,.2,1)',
+                    zIndex: isDragging ? 10 : 1,
+                    boxShadow: isDragging ? '0 16px 40px rgba(0,0,0,0.55)' : undefined,
+                    cursor: isDragging ? 'grabbing' : 'default',
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      {stat.icon}
+                      <div
+                        onPointerDown={(e) => onStatGripDown(id, e)}
+                        onPointerMove={onStatGripMove}
+                        onPointerUp={onStatGripUp}
+                        onPointerCancel={onStatGripUp}
+                        style={{
+                          padding: 6, margin: -6,
+                          touchAction: 'none',
+                          cursor: 'grab',
+                          display: 'grid', gridTemplateColumns: '3px 3px', gridTemplateRows: '3px 3px', gap: 3,
+                        }}>
+                        {[0,1,2,3].map(k => <div key={k} style={{ width: 3, height: 3, borderRadius: 1.5, background: 'rgba(255,255,255,0.5)', pointerEvents: 'none' }} />)}
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 44, fontWeight: 700, letterSpacing: -1.5, lineHeight: 1, color: 'var(--text-primary)' }}>{stat.value}</div>
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 6, letterSpacing: 1.2, fontWeight: 500 }}>{stat.label}</div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
+          );
+        })()}
 
         <div style={{ marginTop: 28, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 }}>
           <span style={{ fontSize: 16, color: 'var(--text-primary)', fontWeight: 500, letterSpacing: -0.1 }}>
