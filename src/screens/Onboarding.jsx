@@ -4,46 +4,37 @@ const SLIDES = [
   {
     eyebrow: 'TRACK',
     title: 'Every fit,\nremembered',
-    body: 'Log outfits with a tap.\nOne photo a day.',
-    bg: 'linear-gradient(180deg, #1a2032 0%, #0f1420 50%, #050810 100%)',
-    accent: '#8BA7B8',
-    glow: 'rgba(139, 167, 184, 0.30)',
+    body: 'Log outfits with a single tap.\nOne photo a day builds your archive.',
+    points: ['Auto-saves date, mood + weather', 'Streaks reward consistency', 'Private by default'],
+    bg: '/backgrounds/bg-dusk.png',
   },
   {
     eyebrow: 'DISCOVER',
-    title: 'AI Mix &\nMatch',
-    body: 'Smart combinations\nfrom your own closet.',
-    bg: 'linear-gradient(180deg, #1a2818 0%, #0f1a0e 50%, #050a05 100%)',
-    accent: '#9BB89F',
-    glow: 'rgba(155, 184, 159, 0.30)',
+    title: 'AI Mix\n& Match',
+    body: 'Smart combinations pulled\nfrom your own closet.',
+    points: ['Suggests fits from your pieces', 'Matches weather + occasion', 'Learns your taste over time'],
+    bg: '/backgrounds/bg-forest.png',
   },
   {
     eyebrow: 'INSIGHTS',
     title: 'Style insights\nat a glance',
-    body: 'Wardrobe pulse, color trends,\ndaily prompts.',
-    bg: 'linear-gradient(180deg, #1f1828 0%, #14101e 50%, #08060e 100%)',
-    accent: '#C8B6FF',
-    glow: 'rgba(200, 182, 255, 0.30)',
+    body: 'Wardrobe pulse, color trends,\nand daily prompts.',
+    points: ['Most-worn pieces + colors', 'Cost-per-wear tracking', 'Monthly style summary'],
+    bg: '/backgrounds/bg-ember.png',
   },
 ];
 
-export default function ScreenOnboarding({ onComplete }) {
+export default function ScreenOnboarding({ onComplete, onSkip }) {
   const [idx, setIdx] = React.useState(0);
   const scrollRef = React.useRef(null);
 
   const isLast = idx === SLIDES.length - 1;
 
   const goNext = () => {
-    if (isLast) {
-      onComplete();
-      return;
-    }
+    if (isLast) { onComplete(); return; }
     const el = scrollRef.current;
-    if (el) {
-      el.scrollTo({ left: (idx + 1) * el.clientWidth, behavior: 'smooth' });
-    } else {
-      setIdx(idx + 1);
-    }
+    if (el) el.scrollTo({ left: (idx + 1) * el.clientWidth, behavior: 'smooth' });
+    else setIdx(idx + 1);
   };
 
   const onScroll = (e) => {
@@ -53,18 +44,16 @@ export default function ScreenOnboarding({ onComplete }) {
     if (newIdx !== idx && newIdx >= 0 && newIdx < SLIDES.length) setIdx(newIdx);
   };
 
-  const current = SLIDES[idx];
-
   return (
     <div style={{
       width: '100%', height: '100%', position: 'relative', overflow: 'hidden',
       background: '#050507',
       fontFamily: 'Inter, -apple-system, system-ui, sans-serif',
     }}>
-      {/* Swipeable slides */}
       <div
         ref={scrollRef}
         onScroll={onScroll}
+        className="onb-scroll"
         style={{
           position: 'absolute', inset: 0,
           display: 'flex',
@@ -72,89 +61,96 @@ export default function ScreenOnboarding({ onComplete }) {
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
-        }}
-      >
+        }}>
         <style>{`.onb-scroll::-webkit-scrollbar{display:none}`}</style>
         {SLIDES.map((s, i) => (
-          <div key={i} className="onb-scroll" style={{
+          <div key={i} style={{
             flex: '0 0 100%', height: '100%', position: 'relative',
             scrollSnapAlign: 'start',
-            background: s.bg,
+            backgroundImage: `url('${s.bg}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
           }}>
-            {/* Top atmospheric glow */}
-            <div style={{
-              position: 'absolute', top: '-15%', left: '50%', transform: 'translateX(-50%)',
-              width: '110%', height: '60%',
-              background: `radial-gradient(ellipse at center, ${s.glow} 0%, transparent 70%)`,
-              filter: 'blur(50px)',
-              pointerEvents: 'none',
-            }} />
-
-            {/* Film grain */}
             <div style={{
               position: 'absolute', inset: 0,
-              backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")`,
-              backgroundSize: '220px 220px',
-              opacity: 0.06,
-              mixBlendMode: 'overlay',
-            }} />
-
-            {/* Bottom dark anchor for content legibility */}
-            <div style={{
-              position: 'absolute', bottom: 0, left: 0, right: 0, height: '45%',
-              background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%)',
+              background: 'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.15) 35%, rgba(0,0,0,0.75) 100%)',
               pointerEvents: 'none',
             }} />
 
-            {/* Content — bottom-left aligned per Saudi reference */}
+            {/* Content */}
             <div style={{
               position: 'absolute', inset: 0,
-              padding: 'calc(60px + var(--archive-safe-top, 54px)) 30px calc(220px + var(--archive-safe-bottom, 0px))',
-              display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
-              pointerEvents: 'none',
+              padding: 'calc(80px + var(--archive-safe-top, 54px)) 28px calc(240px + var(--archive-safe-bottom, 0px))',
+              display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
             }}>
               <div style={{
-                fontSize: 11, letterSpacing: 2.4, color: s.accent,
-                fontWeight: 500, marginBottom: 14,
+                fontSize: 10, letterSpacing: '0.35em', color: 'rgba(255,255,255,0.8)',
+                fontWeight: 500, marginBottom: 16, textTransform: 'uppercase',
+                textShadow: '0 1px 6px rgba(0,0,0,0.5)',
               }}>
                 {s.eyebrow}
               </div>
               <div style={{
-                fontFamily: '"Inter", sans-serif',
-                fontSize: 44, fontWeight: 700, color: 'var(--text-primary)',
-                lineHeight: 1.02, letterSpacing: '-0.04em',
-                whiteSpace: 'pre-line', marginBottom: 18,
+                fontFamily: 'Inter, sans-serif',
+                fontSize: 46, fontWeight: 800, color: '#fff',
+                lineHeight: 0.98, letterSpacing: '-0.045em',
+                whiteSpace: 'pre-line', marginBottom: 16,
+                textShadow: '0 2px 14px rgba(0,0,0,0.5)',
               }}>
                 {s.title}
               </div>
               <div style={{
-                fontSize: 15, color: 'var(--text-secondary)',
+                fontSize: 15, color: 'rgba(255,255,255,0.85)',
                 lineHeight: 1.5, letterSpacing: '-0.01em',
-                whiteSpace: 'pre-line', maxWidth: 320,
+                whiteSpace: 'pre-line', maxWidth: 320, marginBottom: 22,
+                textShadow: '0 1px 6px rgba(0,0,0,0.4)',
               }}>
                 {s.body}
+              </div>
+
+              {/* Points list */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {s.points.map((p, j) => (
+                  <div key={j} className="lg-card" style={{
+                    padding: '10px 14px', borderRadius: 12,
+                    display: 'flex', alignItems: 'center', gap: 10,
+                  }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                      <path d="M5 12l5 5L20 7"/>
+                    </svg>
+                    <span style={{ fontSize: 12.5, color: '#fff', fontWeight: 500 }}>{p}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Skip — top right */}
+      {/* Skip → dashboard */}
       <div
-        onClick={onComplete}
+        onClick={onSkip}
         className="archive-pressable"
         style={{
           position: 'absolute',
-          top: 'calc(22px + var(--archive-safe-top, 54px))',
-          right: 26,
-          fontSize: 13, color: 'var(--text-secondary)', fontWeight: 500,
-          cursor: 'pointer', zIndex: 10, padding: '6px 4px',
-        }}
-      >
+          top: 'calc(20px + var(--archive-safe-top, 54px))',
+          right: 22,
+          padding: '7px 14px', borderRadius: 100,
+          fontSize: 12, fontWeight: 500, color: '#fff',
+          background: 'rgba(0,0,0,0.35)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255,255,255,0.15)',
+          cursor: 'pointer', zIndex: 10,
+          display: 'flex', alignItems: 'center', gap: 6,
+        }}>
         Skip
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M5 12h14M13 6l6 6-6 6"/>
+        </svg>
       </div>
 
-      {/* Page dots — animated active */}
+      {/* Page dots */}
       <div style={{
         position: 'absolute',
         bottom: 'calc(118px + var(--archive-safe-bottom, 0px))',
@@ -168,40 +164,41 @@ export default function ScreenOnboarding({ onComplete }) {
             height: 6, borderRadius: 3,
             background: i === idx ? '#F5F0E8' : 'rgba(245,240,232,0.28)',
             transition: 'width .3s ease, background .3s ease',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.4)',
           }} />
         ))}
       </div>
 
-      {/* Get Started button */}
+      {/* Continue / Get Started */}
       <button
         onClick={goNext}
         className="archive-pressable"
         style={{
           position: 'absolute',
           bottom: 'calc(54px + var(--archive-safe-bottom, 0px))',
-          left: 24, right: 24,
+          left: 22, right: 22,
           height: 54, borderRadius: 27,
           background: '#F5F0E8', color: '#0a0a0a',
           fontSize: 15, fontWeight: 600,
           letterSpacing: '-0.01em',
           border: 'none', cursor: 'pointer',
           fontFamily: 'inherit',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+          boxShadow: '0 12px 30px rgba(0,0,0,0.5)',
           zIndex: 10,
-        }}
-      >
+        }}>
         {isLast ? 'Get Started' : 'Continue'}
       </button>
 
-      {/* Terms footer */}
+      {/* Terms */}
       <div style={{
         position: 'absolute',
-        bottom: 'calc(20px + var(--archive-safe-bottom, 0px))',
+        bottom: 'calc(22px + var(--archive-safe-bottom, 0px))',
         left: 0, right: 0,
         textAlign: 'center',
-        fontSize: 11, color: 'var(--text-muted)',
+        fontSize: 11, color: 'rgba(255,255,255,0.55)',
         letterSpacing: '-0.01em',
         zIndex: 10, pointerEvents: 'none',
+        textShadow: '0 1px 4px rgba(0,0,0,0.4)',
       }}>
         By continuing, you agree to <span style={{ textDecoration: 'underline' }}>Terms</span> & <span style={{ textDecoration: 'underline' }}>Conditions</span>
       </div>

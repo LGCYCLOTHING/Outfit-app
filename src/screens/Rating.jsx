@@ -120,16 +120,17 @@ export default function ScreenRating() {
           </div>
 
           <div style={{
-            position: 'relative', width: '60%', margin: '0 auto 4px',
+            position: 'relative', width: '78%', margin: '0 auto 4px',
             borderRadius: 22, overflow: 'hidden',
+            background: '#0a0a0a',
             boxShadow: `0 20px 50px -10px rgba(${accentRgba},0.35), 0 30px 60px -20px rgba(0,0,0,0.7)`,
           }}>
             {photo ? (
-              <div style={{ width: '100%', aspectRatio: '3/4', borderRadius: 22, overflow: 'hidden', background: '#000' }}>
-                <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <div style={{ width: '100%', aspectRatio: '4/5', borderRadius: 22, overflow: 'hidden', background: '#0a0a0a' }}>
+                <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
               </div>
             ) : (
-              <FitPhoto id={24} radius={22} ratio="3/4" photoKey={todayKey} />
+              <FitPhoto id={24} radius={22} ratio="4/5" photoKey={todayKey} />
             )}
             <input
               ref={fileRef}
@@ -157,9 +158,6 @@ export default function ScreenRating() {
           <div style={{ textAlign: 'center', marginTop: 18, marginBottom: 14 }}>
             <div style={{ fontSize: 22, fontWeight: 300, letterSpacing: -0.4, lineHeight: 1.2 }}>
               How did it feel?
-            </div>
-            <div style={{ fontSize: 14, color: 'var(--text-primary)', marginTop: 4 }}>
-              Rate honestly — the AI listens.
             </div>
           </div>
 
@@ -238,10 +236,7 @@ export default function ScreenRating() {
             </div>
           </div>
 
-          <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ flex: 1, fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.4 }}>
-              Feeds Mix &amp; Today picks.<br/>Never shown to others.
-            </div>
+          <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10 }}>
             <button onClick={saveFit} style={{
               border: 'none', cursor: 'pointer',
               padding: '13px 22px', borderRadius: 100,

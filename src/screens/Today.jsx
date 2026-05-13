@@ -623,9 +623,10 @@ export default function ScreenToday() {
                           padding: 6, margin: -6,
                           touchAction: 'none',
                           cursor: 'grab',
-                          display: 'grid', gridTemplateColumns: '3px 3px', gridTemplateRows: '3px 3px', gap: 3,
+                          display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4,
                         }}>
-                        {[0,1,2,3].map(k => <div key={k} style={{ width: 3, height: 3, borderRadius: 1.5, background: 'rgba(255,255,255,0.55)', pointerEvents: 'none' }} />)}
+                        <div style={{ width: 14, height: 2, borderRadius: 1, background: 'rgba(255,255,255,0.6)', pointerEvents: 'none' }} />
+                        <div style={{ width: 14, height: 2, borderRadius: 1, background: 'rgba(255,255,255,0.6)', pointerEvents: 'none' }} />
                       </div>
                     </div>
                     <div>

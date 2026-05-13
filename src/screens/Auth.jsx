@@ -1,19 +1,20 @@
 import React from 'react';
 
-export default function ScreenAuth({ onContinue, onBack }) {
+export default function ScreenAuth({ onContinue, onBack, onSkip }) {
   return (
     <div style={{
       width: '100%', height: '100%', position: 'relative', overflow: 'hidden',
-      background: '#0A0807',
+      backgroundImage: "url('/backgrounds/bg-forest.png')",
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
       fontFamily: 'Inter, -apple-system, system-ui, sans-serif',
       color: 'var(--text-primary)',
     }}>
-      {/* Subtle top glow */}
+      {/* Darken */}
       <div style={{
-        position: 'absolute', top: '-15%', left: '50%', transform: 'translateX(-50%)',
-        width: '110%', height: '50%',
-        background: 'radial-gradient(ellipse at center, rgba(155,184,159,0.18) 0%, transparent 70%)',
-        filter: 'blur(60px)', pointerEvents: 'none',
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.78) 100%)',
+        pointerEvents: 'none',
       }} />
 
       {/* Back button */}
@@ -33,27 +34,54 @@ export default function ScreenAuth({ onContinue, onBack }) {
         </svg>
       </div>
 
+      {/* Skip → dashboard */}
+      <div
+        onClick={onSkip}
+        className="archive-pressable"
+        style={{
+          position: 'absolute',
+          top: 'calc(20px + var(--archive-safe-top, 54px))',
+          right: 22,
+          padding: '7px 14px', borderRadius: 100,
+          fontSize: 12, fontWeight: 500, color: '#fff',
+          background: 'rgba(0,0,0,0.35)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255,255,255,0.15)',
+          cursor: 'pointer', zIndex: 10,
+          display: 'flex', alignItems: 'center', gap: 6,
+        }}>
+        Skip
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M5 12h14M13 6l6 6-6 6"/>
+        </svg>
+      </div>
+
       {/* Heading */}
       <div style={{
-        padding: 'calc(110px + var(--archive-safe-top, 54px)) 28px 0',
+        padding: 'calc(100px + var(--archive-safe-top, 54px)) 28px 0',
+        position: 'relative', zIndex: 5,
       }}>
         <div style={{
-          fontSize: 11, letterSpacing: 2.4, color: '#9BB89F',
-          fontWeight: 500, marginBottom: 14,
+          fontSize: 10, letterSpacing: '0.35em', color: 'rgba(255,255,255,0.8)',
+          fontWeight: 500, marginBottom: 14, textTransform: 'uppercase',
+          textShadow: '0 1px 6px rgba(0,0,0,0.5)',
         }}>
-          SIGN IN
+          Sign in
         </div>
         <div style={{
-          fontSize: 40, fontWeight: 700, color: 'var(--text-primary)',
-          letterSpacing: '-0.045em', lineHeight: 1.0, marginBottom: 12,
+          fontSize: 44, fontWeight: 800, color: '#fff',
+          letterSpacing: '-0.045em', lineHeight: 0.98, marginBottom: 14,
+          textShadow: '0 2px 14px rgba(0,0,0,0.5)',
         }}>
           Welcome back
         </div>
         <div style={{
-          fontSize: 15, color: 'var(--text-secondary)',
-          lineHeight: 1.5, letterSpacing: '-0.01em',
+          fontSize: 15, color: 'rgba(255,255,255,0.85)',
+          lineHeight: 1.5, letterSpacing: '-0.01em', maxWidth: 300,
+          textShadow: '0 1px 6px rgba(0,0,0,0.4)',
         }}>
-          Sign in to access your archive.
+          Sign in to sync your archive across devices — fits, pieces, streaks, and insights.
         </div>
       </div>
 
@@ -61,8 +89,9 @@ export default function ScreenAuth({ onContinue, onBack }) {
       <div style={{
         position: 'absolute',
         bottom: 'calc(28px + var(--archive-safe-bottom, 0px))',
-        left: 24, right: 24,
+        left: 22, right: 22,
         display: 'flex', flexDirection: 'column', gap: 10,
+        zIndex: 5,
       }}>
         {/* Apple — primary */}
         <button
@@ -74,7 +103,7 @@ export default function ScreenAuth({ onContinue, onBack }) {
             fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em',
             border: 'none', cursor: 'pointer', fontFamily: 'inherit',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+            boxShadow: '0 12px 30px rgba(0,0,0,0.5)',
           }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="#0a0a0a">
             <path d="M17.05 20.28c-.98.95-2.05.88-3.08.45-1.09-.45-2.09-.49-3.24 0-1.44.62-2.2.44-3.06-.45C2.79 15.16 3.5 7.4 9.05 7.13c1.35.07 2.29.74 3.08.79 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.27zM12.03 7.05c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
@@ -88,7 +117,7 @@ export default function ScreenAuth({ onContinue, onBack }) {
           className="archive-pressable liquid-glass"
           style={{
             height: 54, borderRadius: 27,
-            color: 'var(--text-primary)',
+            color: '#fff',
             fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em',
             border: 'none', cursor: 'pointer', fontFamily: 'inherit',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
@@ -108,10 +137,12 @@ export default function ScreenAuth({ onContinue, onBack }) {
           className="archive-pressable"
           style={{
             height: 54, borderRadius: 27,
-            background: 'transparent',
-            color: 'var(--text-secondary)',
+            background: 'rgba(0,0,0,0.3)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            color: '#fff',
             fontSize: 14, fontWeight: 500, letterSpacing: '-0.01em',
-            border: '1px solid rgba(245,240,232,0.18)',
+            border: '1px solid rgba(255,255,255,0.18)',
             cursor: 'pointer', fontFamily: 'inherit',
           }}>
           Continue with email
@@ -120,15 +151,16 @@ export default function ScreenAuth({ onContinue, onBack }) {
         {/* Create account link */}
         <div style={{
           textAlign: 'center', marginTop: 12,
-          fontSize: 13, color: 'var(--text-muted)',
+          fontSize: 13, color: 'rgba(255,255,255,0.7)',
           letterSpacing: '-0.01em',
+          textShadow: '0 1px 4px rgba(0,0,0,0.4)',
         }}>
           New here?{' '}
           <span
             onClick={onContinue}
             className="archive-pressable"
             style={{
-              color: 'var(--text-primary)', fontWeight: 600,
+              color: '#fff', fontWeight: 600,
               cursor: 'pointer', textDecoration: 'underline',
               textUnderlineOffset: 3,
             }}>

@@ -280,9 +280,9 @@ export default function App() {
   React.useEffect(() => { window.__archiveFinishOnboarding = finishOnboarding; }, [finishOnboarding]);
 
   const screens = {
-    splash:     <ScreenSplash onContinue={goOnboarding} />,
-    onboarding: <ScreenOnboarding onComplete={goAuth} />,
-    auth:       <ScreenAuth onContinue={goPaywall} onBack={goOnboarding} />,
+    splash:     <ScreenSplash onContinue={goOnboarding} onSkip={finishOnboarding} />,
+    onboarding: <ScreenOnboarding onComplete={goAuth} onSkip={finishOnboarding} />,
+    auth:       <ScreenAuth onContinue={goPaywall} onBack={goOnboarding} onSkip={finishOnboarding} />,
     settings:   <ScreenSettings />,
     today:    <ScreenToday />,
     pieces:   <ScreenPieces />,
