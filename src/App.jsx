@@ -52,8 +52,8 @@ function FloatingNav({ current, go }) {
     window.__archiveNavOpen = open;
   }, [open]);
 
-  // Drag-to-dismiss the popup. Pull the handle down → drawer follows the finger.
-  // Release past 120px → close. Drag back up before release → cancel close.
+  // Drag-to-dismiss: hold the bottom handle and drag UP to close. Drawer
+  // follows the finger upward; release past 120px → close, otherwise snap back.
   const onHandleDown = (e) => {
     e.target.setPointerCapture(e.pointerId);
     dragStartY.current = e.clientY;
@@ -62,12 +62,13 @@ function FloatingNav({ current, go }) {
   const onHandleMove = (e) => {
     if (!isDragging) return;
     const delta = e.clientY - dragStartY.current;
-    setDragOffset(Math.max(0, delta));
+    // Only allow upward drag (negative). Block downward motion past origin.
+    setDragOffset(Math.min(0, delta));
   };
   const onHandleUp = (e) => {
     if (!isDragging) return;
     setIsDragging(false);
-    if (dragOffset > 120) {
+    if (dragOffset < -120) {
       setOpen(false);
     }
     setDragOffset(0);
@@ -86,14 +87,6 @@ function FloatingNav({ current, go }) {
         }}
       />
 
-      {(() => {
-        // Rubber-band damping past 200px so the drag feels physical, not unbounded
-        const physical = dragOffset < 200
-          ? dragOffset
-          : 200 + (dragOffset - 200) * 0.45;
-        // Slight stretch — drawer grows taller as you pull (transform-origin top)
-        const stretch = 1 + Math.min(0.09, dragOffset / 1800);
-        return (
       <div className="liquid-glass" style={{
         position: 'absolute',
         top: 0, left: 0, right: 0,
@@ -104,14 +97,13 @@ function FloatingNav({ current, go }) {
         padding: 'calc(24px + var(--archive-safe-top, 0px)) 26px 36px',
         boxSizing: 'border-box',
         transform: open
-          ? `translateY(${physical}px) scaleY(${stretch})`
+          ? `translateY(${dragOffset}px)`
           : 'translateY(-100%)',
-        transformOrigin: 'top center',
         transition: isDragging
           ? 'none'
           : open
-            ? 'transform .65s cubic-bezier(0.34, 1.56, 0.64, 1)'
-            : 'transform .9s cubic-bezier(.16,1,.3,1)',
+            ? 'transform .55s cubic-bezier(.16,1,.3,1)'
+            : 'transform .85s cubic-bezier(.16,1,.3,1)',
         overflow: 'hidden',
       }}>
         <div style={{
@@ -237,8 +229,6 @@ function FloatingNav({ current, go }) {
           }} />
         </div>
       </div>
-        );
-      })()}
     </>
   );
 }
