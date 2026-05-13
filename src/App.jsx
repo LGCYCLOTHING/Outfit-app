@@ -86,6 +86,14 @@ function FloatingNav({ current, go }) {
         }}
       />
 
+      {(() => {
+        // Rubber-band damping past 200px so the drag feels physical, not unbounded
+        const physical = dragOffset < 200
+          ? dragOffset
+          : 200 + (dragOffset - 200) * 0.45;
+        // Slight stretch — drawer grows taller as you pull (transform-origin top)
+        const stretch = 1 + Math.min(0.09, dragOffset / 1800);
+        return (
       <div className="liquid-glass" style={{
         position: 'absolute',
         top: 0, left: 0, right: 0,
@@ -96,13 +104,14 @@ function FloatingNav({ current, go }) {
         padding: 'calc(24px + var(--archive-safe-top, 0px)) 26px 36px',
         boxSizing: 'border-box',
         transform: open
-          ? `translateY(${dragOffset}px)`
+          ? `translateY(${physical}px) scaleY(${stretch})`
           : 'translateY(-100%)',
+        transformOrigin: 'top center',
         transition: isDragging
           ? 'none'
           : open
-            ? 'transform .55s cubic-bezier(.16,1,.3,1)'
-            : 'transform .95s cubic-bezier(.16,1,.3,1)',
+            ? 'transform .65s cubic-bezier(0.34, 1.56, 0.64, 1)'
+            : 'transform .9s cubic-bezier(.16,1,.3,1)',
         overflow: 'hidden',
       }}>
         <div style={{
@@ -228,6 +237,8 @@ function FloatingNav({ current, go }) {
           }} />
         </div>
       </div>
+        );
+      })()}
     </>
   );
 }
