@@ -146,8 +146,8 @@ export default function ScreenPieces() {
             <div className="h-display" style={{ fontSize: 26, color: 'var(--text-primary)', lineHeight: 1.15, marginBottom: 10 }}>
               Build your wardrobe library.
             </div>
-            <div style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 18 }}>
-              Unlock unlimited pieces, smart matching, and wear analytics with Archive Pro.
+            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', lineHeight: 1.5, marginBottom: 18, textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
+              Unlock unlimited pieces, smart matching, and wear analytics with AĒVUM Pro.
             </div>
             <button
               onClick={() => window.__archiveGo && window.__archiveGo('paywall')}
@@ -168,24 +168,24 @@ export default function ScreenPieces() {
               { t: 'Smart matching', s: 'See which pieces work together' },
               { t: 'Wear analytics', s: 'Track cost-per-wear and rotation' },
             ].map((row, i) => (
-              <div key={i} style={{
+              <div key={i} className="lg-card" style={{
                 padding: '14px 16px', borderRadius: 14,
-                background: 'rgba(255, 240, 220, 0.04)',
-                border: '1px solid rgba(255, 240, 220, 0.07)',
                 display: 'flex', alignItems: 'center', gap: 14,
               }}>
                 <div style={{
                   width: 30, height: 30, borderRadius: 15,
-                  background: `rgba(${accentRgba},0.18)`,
+                  background: `rgba(${accentRgba},0.28)`,
+                  border: `1px solid rgba(${accentRgba},0.5)`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0,
                 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 12l5 5L20 7"/>
                   </svg>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>{row.t}</div>
-                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{row.s}</div>
+                  <div style={{ fontSize: 14, color: '#FFFFFF', letterSpacing: '-0.02em', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>{row.t}</div>
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 2, textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>{row.s}</div>
                 </div>
               </div>
             ))}
@@ -195,8 +195,10 @@ export default function ScreenPieces() {
             onClick={() => { try { localStorage.setItem('aevum_pro', '1'); } catch (e) {} setPro(true); }}
             className="archive-pressable"
             style={{
-              marginTop: 18, alignSelf: 'center', cursor: 'pointer',
-              fontSize: 12, color: 'var(--text-muted)', letterSpacing: 0.4,
+              marginTop: 18, alignSelf: 'center', cursor: 'pointer', textAlign: 'center',
+              fontSize: 12, color: 'rgba(255,255,255,0.75)', letterSpacing: 0.4,
+              textShadow: '0 1px 4px rgba(0,0,0,0.4)',
+              textDecoration: 'underline', textUnderlineOffset: 3,
             }}>
             Preview as Pro
           </div>

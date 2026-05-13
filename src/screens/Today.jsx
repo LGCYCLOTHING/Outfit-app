@@ -107,29 +107,30 @@ export default function ScreenToday() {
 
   // ── Stat cards — iPhone-style drag-to-reorder with live re-flow ──
   // DOM order never changes; visual position comes from statOrder + transform.
-  const STAT_DOM_ORDER = ['week', 'fits'];
+  const STAT_DOM_ORDER = ['week', 'fits', 'best', 'month', 'liked', 'pieces'];
   const STAT_GAP = 10;
   const [statOrder, setStatOrder] = React.useState(() => {
     try {
       const saved = localStorage.getItem('aevum_stats_order');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length === 2) return parsed;
+        if (Array.isArray(parsed) && parsed.length === STAT_DOM_ORDER.length) return parsed;
       }
     } catch (e) {}
-    return ['week', 'fits'];
+    return ['week', 'fits', 'best', 'month', 'liked', 'pieces'];
   });
   const [draggingStatId, setDraggingStatId] = React.useState(null);
-  const [statDragX, setStatDragX] = React.useState(0);
-  const [statCardWidth, setStatCardWidth] = React.useState(0);
-  const statDragStartRef = React.useRef(0);
+  const [statDrag, setStatDrag] = React.useState({ x: 0, y: 0 });
+  const [statCardSize, setStatCardSize] = React.useState({ w: 0, h: 0 });
+  const [statTargetSlot, setStatTargetSlot] = React.useState(null);
+  const statDragStartRef = React.useRef({ x: 0, y: 0 });
   const statsGridRef = React.useRef(null);
 
   React.useLayoutEffect(() => {
     const measure = () => {
       if (!statsGridRef.current) return;
       const card = statsGridRef.current.querySelector('[data-stat-card]');
-      if (card) setStatCardWidth(card.offsetWidth);
+      if (card) setStatCardSize({ w: card.offsetWidth, h: card.offsetHeight });
     };
     measure();
     window.addEventListener('resize', measure);
@@ -140,31 +141,51 @@ export default function ScreenToday() {
     };
   }, []);
 
-  const STAT_COL_DIST = statCardWidth + STAT_GAP;
-  const STAT_SWAP_THRESHOLD = statCardWidth ? statCardWidth / 2 : 80;
+  const STAT_COL_W = statCardSize.w + STAT_GAP;
+  const STAT_ROW_H = statCardSize.h + STAT_GAP;
+
+  // Convert a logical position (0..N-1) to grid (col, row)
+  const slotToGrid = (slot) => ({ col: slot % 2, row: Math.floor(slot / 2) });
 
   const onStatGripDown = (id, e) => {
     e.stopPropagation();
     try { e.target.setPointerCapture(e.pointerId); } catch (err) {}
-    statDragStartRef.current = e.clientX;
+    statDragStartRef.current = { x: e.clientX, y: e.clientY };
     setDraggingStatId(id);
-    setStatDragX(0);
+    setStatDrag({ x: 0, y: 0 });
+    setStatTargetSlot(statOrder.indexOf(id));
   };
   const onStatGripMove = (e) => {
     if (!draggingStatId) return;
-    setStatDragX(e.clientX - statDragStartRef.current);
+    const dx = e.clientX - statDragStartRef.current.x;
+    const dy = e.clientY - statDragStartRef.current.y;
+    setStatDrag({ x: dx, y: dy });
+    if (!STAT_COL_W || !STAT_ROW_H) return;
+    // Compute the slot the dragged card's center is hovering over
+    const origSlot = statOrder.indexOf(draggingStatId);
+    const orig = slotToGrid(origSlot);
+    // Round to nearest col/row based on drag delta
+    const newCol = Math.max(0, Math.min(1, Math.round(orig.col + dx / STAT_COL_W)));
+    const newRow = Math.max(0, Math.min(Math.floor((STAT_DOM_ORDER.length - 1) / 2),
+                                          orig.row + Math.round(dy / STAT_ROW_H)));
+    const newSlot = Math.min(STAT_DOM_ORDER.length - 1, newRow * 2 + newCol);
+    setStatTargetSlot(newSlot);
   };
   const onStatGripUp = () => {
     if (!draggingStatId) return;
-    if (Math.abs(statDragX) > STAT_SWAP_THRESHOLD) {
+    const origSlot = statOrder.indexOf(draggingStatId);
+    if (statTargetSlot != null && statTargetSlot !== origSlot) {
       setStatOrder(o => {
-        const next = [o[1], o[0]];
+        const next = [...o];
+        const [moved] = next.splice(origSlot, 1);
+        next.splice(statTargetSlot, 0, moved);
         try { localStorage.setItem('aevum_stats_order', JSON.stringify(next)); } catch (e) {}
         return next;
       });
     }
     setDraggingStatId(null);
-    setStatDragX(0);
+    setStatDrag({ x: 0, y: 0 });
+    setStatTargetSlot(null);
   };
   return (
     <div style={{
@@ -523,32 +544,7 @@ export default function ScreenToday() {
           const allLogged = readLoggedDays();
           const weekDaysHere = getThisWeekDays();
           const fitsThisWeek = weekDaysHere.filter(d => d.hasFit).length;
-          const statsById = {
-            week: {
-              id: 'week',
-              value: String(fitsThisWeek),
-              label: 'THIS WEEK',
-              nav: 'streak',
-              icon: (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 10h18M8 3v4M16 3v4" />
-                </svg>
-              ),
-            },
-            fits: {
-              id: 'fits',
-              value: String(allLogged.length || 312),
-              label: 'FITS LOGGED',
-              nav: 'archive',
-              icon: (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="3" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="M21 15l-5-5L5 21" />
-                </svg>
-              ),
-            },
-          };
-
-          // Extra static stat cards below the draggable pair
+          // Aggregate stat data for all 6 cards
           const sortedLogged = [...allLogged].sort();
           let bestStreak = 0, run = 0, prev = null;
           for (const day of sortedLogged) {
@@ -568,53 +564,47 @@ export default function ScreenToday() {
             return dd.getFullYear() === now.getFullYear() && dd.getMonth() === now.getMonth();
           }).length;
 
-          const extraStats = [
-            { label: 'BEST STREAK', value: String(bestStreak || 47), nav: 'streak', icon: (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2c1 4-3 6-3 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-2 3 0-3-1-5-3-8z"/>
-              </svg>
-            )},
-            { label: 'THIS MONTH', value: String(thisMonthCount || 23), nav: 'calendar', icon: (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 11h18M8 3v4M16 3v4M8 15h2M14 15h2"/>
-              </svg>
-            )},
-            { label: 'LIKED', value: String(likedCount || 8), nav: 'archive', icon: (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-              </svg>
-            )},
-            { label: 'PIECES', value: String(piecesCount || 0), nav: 'pieces', icon: (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.45)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 7l4-3h8l4 3-3 4-2-1v11H7V10L5 11 4 7z"/>
-              </svg>
-            )},
-          ];
+          const statsById = {
+            week:   { value: String(fitsThisWeek),                 label: 'THIS WEEK',   nav: 'streak' },
+            fits:   { value: String(allLogged.length || 312),      label: 'FITS LOGGED', nav: 'archive' },
+            best:   { value: String(bestStreak || 47),             label: 'BEST STREAK', nav: 'streak' },
+            month:  { value: String(thisMonthCount || 23),         label: 'THIS MONTH',  nav: 'calendar' },
+            liked:  { value: String(likedCount || 8),              label: 'LIKED',       nav: 'archive' },
+            pieces: { value: String(piecesCount || 0),             label: 'PIECES',      nav: 'pieces' },
+          };
+
+          // While dragging, compute each non-dragged card's "live" position as if
+          // the dragged card has already been inserted at statTargetSlot
+          const liveOrder = (() => {
+            if (!draggingStatId || statTargetSlot == null) return statOrder;
+            const fromIdx = statOrder.indexOf(draggingStatId);
+            if (fromIdx === statTargetSlot) return statOrder;
+            const next = [...statOrder];
+            const [moved] = next.splice(fromIdx, 1);
+            next.splice(statTargetSlot, 0, moved);
+            return next;
+          })();
 
           return (
-            <>
             <div
               ref={statsGridRef}
               style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: STAT_GAP, position: 'relative' }}>
               {STAT_DOM_ORDER.map((id) => {
                 const stat = statsById[id];
-                const logicalPos = statOrder.indexOf(id);
-                const domPos = STAT_DOM_ORDER.indexOf(id);
-                const baseShift = (logicalPos - domPos) * STAT_COL_DIST;
                 const isDragging = draggingStatId === id;
-                const isOther = draggingStatId && draggingStatId !== id;
-                // Other card slides into dragged card's slot as soon as drag crosses the swap threshold
-                const otherReflow = isOther && Math.abs(statDragX) > STAT_SWAP_THRESHOLD
-                  ? (statDragX > 0 ? -STAT_COL_DIST : STAT_COL_DIST)
-                  : 0;
-                const shiftX = isDragging ? baseShift + statDragX : baseShift + otherReflow;
+                const domSlot = STAT_DOM_ORDER.indexOf(id);
+                const logicalSlot = (isDragging ? statOrder : liveOrder).indexOf(id);
+                const dom = slotToGrid(domSlot);
+                const logical = slotToGrid(logicalSlot);
+                const shiftX = (logical.col - dom.col) * STAT_COL_W + (isDragging ? statDrag.x : 0);
+                const shiftY = (logical.row - dom.row) * STAT_ROW_H + (isDragging ? statDrag.y : 0);
                 return (
                   <div key={id} data-stat-card
                     onClick={() => { if (!isDragging) window.__archiveGo && window.__archiveGo(stat.nav); }}
                     className="lg-card archive-pressable" style={{
                     borderRadius: 18, padding: 14, aspectRatio: '1.45',
                     display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-                    transform: `translateX(${shiftX}px) scale(${isDragging ? 1.04 : 1})`,
+                    transform: `translate(${shiftX}px, ${shiftY}px) scale(${isDragging ? 1.05 : 1})`,
                     transition: isDragging
                       ? 'none'
                       : 'transform .35s cubic-bezier(.2,.8,.2,1)',
@@ -622,8 +612,7 @@ export default function ScreenToday() {
                     boxShadow: isDragging ? '0 16px 40px rgba(0,0,0,0.55)' : undefined,
                     cursor: isDragging ? 'grabbing' : 'pointer',
                   }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      {stat.icon}
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
                       <div
                         onClick={(e) => e.stopPropagation()}
                         onPointerDown={(e) => onStatGripDown(id, e)}
@@ -636,7 +625,7 @@ export default function ScreenToday() {
                           cursor: 'grab',
                           display: 'grid', gridTemplateColumns: '3px 3px', gridTemplateRows: '3px 3px', gap: 3,
                         }}>
-                        {[0,1,2,3].map(k => <div key={k} style={{ width: 3, height: 3, borderRadius: 1.5, background: 'rgba(255,255,255,0.5)', pointerEvents: 'none' }} />)}
+                        {[0,1,2,3].map(k => <div key={k} style={{ width: 3, height: 3, borderRadius: 1.5, background: 'rgba(255,255,255,0.55)', pointerEvents: 'none' }} />)}
                       </div>
                     </div>
                     <div>
@@ -647,30 +636,6 @@ export default function ScreenToday() {
                 );
               })}
             </div>
-            <div style={{ marginTop: STAT_GAP, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: STAT_GAP }}>
-              {extraStats.map((stat) => (
-                <div key={stat.label}
-                  onClick={() => window.__archiveGo && window.__archiveGo(stat.nav)}
-                  className="lg-card archive-pressable"
-                  style={{
-                    borderRadius: 18, padding: 14, aspectRatio: '1.45',
-                    display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-                    cursor: 'pointer',
-                  }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    {stat.icon}
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M9 6l6 6-6 6"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: -1.2, lineHeight: 1, color: 'var(--text-primary)' }}>{stat.value}</div>
-                    <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 5, letterSpacing: 1.1, fontWeight: 500 }}>{stat.label}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            </>
           );
         })()}
 
