@@ -33,6 +33,9 @@ function AppWordmark() {
 
 function FloatingNav({ current, go }) {
   const [open, setOpen] = React.useState(false);
+  const [dragOffset, setDragOffset] = React.useState(0);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const dragStartY = React.useRef(0);
   const tt = (window.THEMES && window.THEMES[window.__archiveTheme || 'dusk']) || THEMES[window.__archiveTheme || 'dusk'] || { light: '#9ec4d8', softRgba: '122,166,196', deep: '#1a2630', hot: '#7aa6c4' };
   const accent = tt.light;
 
@@ -49,6 +52,27 @@ function FloatingNav({ current, go }) {
     window.__archiveNavOpen = open;
   }, [open]);
 
+  // Drag-to-dismiss the popup. Pull the handle down → drawer follows the finger.
+  // Release past 120px → close. Drag back up before release → cancel close.
+  const onHandleDown = (e) => {
+    e.target.setPointerCapture(e.pointerId);
+    dragStartY.current = e.clientY;
+    setIsDragging(true);
+  };
+  const onHandleMove = (e) => {
+    if (!isDragging) return;
+    const delta = e.clientY - dragStartY.current;
+    setDragOffset(Math.max(0, delta));
+  };
+  const onHandleUp = (e) => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    if (dragOffset > 120) {
+      setOpen(false);
+    }
+    setDragOffset(0);
+  };
+
   return (
     <>
       <div
@@ -64,30 +88,25 @@ function FloatingNav({ current, go }) {
 
       <div className="liquid-glass" style={{
         position: 'absolute',
-        top: 0, left: 0, right: 0,
+        top: 0,
+        left: '50%',
+        width: '60%',
         height: '65%',
         zIndex: 100,
         borderBottomLeftRadius: 24,
         borderBottomRightRadius: 24,
-        padding: 'calc(40px + var(--archive-safe-top, 0px)) 26px calc(20px + var(--archive-safe-bottom, 0px))',
+        padding: 'calc(24px + var(--archive-safe-top, 0px)) 22px 36px',
         boxSizing: 'border-box',
-        transform: open ? 'translateY(0)' : 'translateY(-100%)',
-        transition: 'transform .65s cubic-bezier(.16,1,.3,1)',
+        transform: open
+          ? `translateX(-50%) translateY(${dragOffset}px)`
+          : 'translateX(-50%) translateY(-100%)',
+        transition: isDragging
+          ? 'none'
+          : open
+            ? 'transform .55s cubic-bezier(.16,1,.3,1)'
+            : 'transform .95s cubic-bezier(.16,1,.3,1)',
         overflow: 'hidden',
       }}>
-        <div
-          className={`archive-pressable morph-burger ${open ? 'is-x' : ''}`}
-          onClick={() => setOpen(false)}
-          style={{
-            position: 'absolute',
-            top: 'calc(20px + var(--archive-safe-top, 0px))',
-            left: 22,
-          }}>
-          <span className="morph-burger-line" />
-          <span className="morph-burger-line" />
-          <span className="morph-burger-line" />
-        </div>
-
         <div style={{
           fontFamily: '"DM Sans", sans-serif',
           fontSize: 9, fontWeight: 500, letterSpacing: 2.5,
@@ -185,6 +204,30 @@ function FloatingNav({ current, go }) {
         }}>
           AĒVUM · Daily outfit tracker<br/>
           Version 0.1.0 · Edition Noire
+        </div>
+
+        {/* Drag handle — iOS-style swipe-to-dismiss pill. Drag down to close;
+            drag back up before release to cancel. */}
+        <div
+          onPointerDown={onHandleDown}
+          onPointerMove={onHandleMove}
+          onPointerUp={onHandleUp}
+          onPointerCancel={onHandleUp}
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 80, height: 24,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'grab',
+            touchAction: 'none',
+            zIndex: 5,
+          }}>
+          <div style={{
+            width: 38, height: 4, borderRadius: 2,
+            background: 'rgba(255,255,255,0.45)',
+          }} />
         </div>
       </div>
     </>
