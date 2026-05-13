@@ -113,17 +113,24 @@ body.archive-clean #stage {
   --sa-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* On a real touch-only phone, go fullscreen (no bezel) */
-@media (hover: none) and (pointer: coarse) and (max-width: 500px) {
+/* On any real touch device (no hover + coarse pointer), or whenever the page
+   is in PWA standalone mode, go fullscreen — no bezel, no side toggles. */
+@media (hover: none) and (pointer: coarse), all and (display-mode: standalone) {
   body { background: #0a0910; }
+  .shell-container {
+    position: fixed; inset: 0;
+    gap: 0;
+  }
   .device-shell {
     position: fixed; inset: 0;
-    width: 100vw; height: 100vh; height: 100dvh;
+    width: 100vw !important; height: 100vh; height: 100dvh;
     max-width: none; aspect-ratio: auto;
     transform: none; top: 0; left: 0;
     padding: 0; border-radius: 0;
+    border: none !important;
     background: transparent; box-shadow: none;
   }
+  .device-shell--secondary { display: none !important; }
   #stage {
     inset: 0 !important;
     border-radius: 0;
@@ -131,8 +138,10 @@ body.archive-clean #stage {
     --sa-bottom: env(safe-area-inset-bottom, 0px);
   }
   .device-island, .device-side { display: none; }
-  /* No black workspace on touch phones — hide the external icon */
-  #external-app-icon { display: none !important; }
+  /* Hide the desktop chrome — workspace icon + side toggle buttons */
+  #external-app-icon,
+  #toggle-secondary,
+  #toggle-primary { display: none !important; }
 }
 /* Inside the secondary-preview iframe, also hide it */
 body.archive-clean #external-app-icon { display: none !important; }

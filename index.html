@@ -154,7 +154,8 @@
     });
 
     // On a real touch phone, hide both toggles and force single (primary only)
-    if (matchMedia('(hover: none) and (pointer: coarse) and (max-width: 500px)').matches) {
+    if (matchMedia('(hover: none) and (pointer: coarse)').matches ||
+        matchMedia('(display-mode: standalone)').matches) {
       btnSec.style.display = 'none';
       btnPri.style.display = 'none';
       applySecondary(true);
