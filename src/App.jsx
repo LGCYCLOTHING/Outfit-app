@@ -88,18 +88,16 @@ function FloatingNav({ current, go }) {
 
       <div className="liquid-glass" style={{
         position: 'absolute',
-        top: 0,
-        left: '50%',
-        width: '60%',
+        top: 0, left: 0, right: 0,
         height: '65%',
         zIndex: 100,
         borderBottomLeftRadius: 24,
         borderBottomRightRadius: 24,
-        padding: 'calc(24px + var(--archive-safe-top, 0px)) 22px 36px',
+        padding: 'calc(24px + var(--archive-safe-top, 0px)) 26px 36px',
         boxSizing: 'border-box',
         transform: open
-          ? `translateX(-50%) translateY(${dragOffset}px)`
-          : 'translateX(-50%) translateY(-100%)',
+          ? `translateY(${dragOffset}px)`
+          : 'translateY(-100%)',
         transition: isDragging
           ? 'none'
           : open
@@ -206,7 +204,7 @@ function FloatingNav({ current, go }) {
           Version 0.1.0 · Edition Noire
         </div>
 
-        {/* Drag handle — iOS-style swipe-to-dismiss pill. Drag down to close;
+        {/* Drag handle — swipe-to-dismiss pill, 60% width. Drag down to close;
             drag back up before release to cancel. */}
         <div
           onPointerDown={onHandleDown}
@@ -216,16 +214,16 @@ function FloatingNav({ current, go }) {
           style={{
             position: 'absolute',
             bottom: 0,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: 80, height: 24,
+            left: '20%',
+            width: '60%',
+            height: 28,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'grab',
             touchAction: 'none',
             zIndex: 5,
           }}>
           <div style={{
-            width: 38, height: 4, borderRadius: 2,
+            width: '100%', height: 4, borderRadius: 2,
             background: 'rgba(255,255,255,0.45)',
           }} />
         </div>
