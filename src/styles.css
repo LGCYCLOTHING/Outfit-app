@@ -27,6 +27,17 @@ html, body { margin: 0; padding: 0; background: #0a0910; height: 100%; overflow:
   text-transform: uppercase;
 }
 
+/* Generic Inter Light utilities — override the global 900-everywhere rule so
+   we can use thin display text where heavy text feels brutal. */
+.inter-light {
+  font-weight: 300 !important;
+  letter-spacing: -0.02em !important;
+}
+.inter-light-display {
+  font-weight: 300 !important;
+  letter-spacing: -0.035em !important;
+}
+
 /* ============================================
    iPhone phone-mockup bezel — clean, minimal.
    Always on. Goes fullscreen on real touch phones.

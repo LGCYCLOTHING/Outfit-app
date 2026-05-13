@@ -71,16 +71,16 @@ export default function ScreenSplash({ onContinue, onSkip }) {
         }}>
           AĒVUM · Edition Noire
         </div>
-        <div style={{
-          fontSize: 52, fontWeight: 800, color: '#fff',
-          lineHeight: 0.95, letterSpacing: '-0.05em', marginBottom: 16,
+        <div className="inter-light-display" style={{
+          fontSize: 52, color: '#fff',
+          lineHeight: 0.98, marginBottom: 16,
           textShadow: '0 2px 14px rgba(0,0,0,0.5)',
         }}>
           Your daily<br/>fit story.
         </div>
-        <div style={{
+        <div className="inter-light" style={{
           fontSize: 15, color: 'rgba(255,255,255,0.9)',
-          lineHeight: 1.5, letterSpacing: '-0.01em', maxWidth: 300,
+          lineHeight: 1.55, maxWidth: 300,
           textShadow: '0 1px 6px rgba(0,0,0,0.4)',
         }}>
           One photo a day. Every fit, remembered — with AI matching, style insights, and a private wardrobe archive.
