@@ -127,7 +127,7 @@ export default function ScreenToday() {
 
       <StatusBar />
 
-      <div style={{ position: 'relative', zIndex: 2, padding: 'calc(12px + var(--archive-safe-top, 54px)) 22px calc(120px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
+      <div style={{ position: 'relative', zIndex: 2, padding: 'calc(12px + var(--archive-safe-top, 54px)) 28px calc(120px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
         {(() => {
           const streak = computeStreak();
           const weekDays = getThisWeekDays();
@@ -184,24 +184,30 @@ export default function ScreenToday() {
                   </div>
                 </div>
 
-                {/* RIGHT — animated flame + streak number */}
+                {/* RIGHT — flame + streak number inside a darkened pill */}
                 <div
                   onClick={() => window.__archiveGo && window.__archiveGo('streak')}
                   className="archive-pressable"
                   style={{
                     display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '6px 12px 6px 10px',
+                    borderRadius: 999,
+                    background: 'rgba(0,0,0,0.35)',
+                    border: '1px solid rgba(255,255,255,0.10)',
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
                     cursor: 'pointer',
                   }}>
                   <div className="archive-flame" style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))',
                   }}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="#FFFFFF">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFFFFF">
                       <path d="M12 2c1 4-3 6-3 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-2 3 0-3-1-5-3-8z"/>
                     </svg>
                   </div>
                   <span style={{
-                    fontSize: 28, color: '#FFFFFF',
+                    fontSize: 22, color: '#FFFFFF',
                     letterSpacing: '-0.05em', lineHeight: 1,
                   }}>
                     {streak}
