@@ -148,11 +148,10 @@ body.archive-clean #stage {
     height: 100lvh !important;
     border-radius: 0;
     background: #000 !important;   /* prevents stage's grey from showing through */
-    /* iOS already shows its own status bar — shrink the simulated reserved area
-       so the app's content sits just below the real notch and doesn't double up.
-       Each screen adds its own +12px buffer; we subtract that here to nudge
-       content upward to sit right at the bottom of the notch. */
-    --sa-top: max(0px, calc(env(safe-area-inset-top, 0px) - 14px)) !important;
+    /* iOS already shows its own status bar — sit content where native apps
+       sit it (right at the safe-area boundary, with each screen's own +12px
+       buffer providing breathing room below the Dynamic Island). */
+    --sa-top: env(safe-area-inset-top, 0px) !important;
     /* No bottom safe-area on phone — content extends to the very edge */
     --sa-bottom: 0px !important;
   }
