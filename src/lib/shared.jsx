@@ -759,7 +759,7 @@ export function StatusBar() {
 
       {/* Time — left side, vertically centered with the island */}
       <div style={{
-        position: 'absolute', top: 18, left: 28,
+        position: 'absolute', top: 18, left: 44,
         fontSize: 15, fontWeight: 600, color: 'var(--text-primary)',
         letterSpacing: '-0.02em', fontFamily: '"Inter", -apple-system, sans-serif',
       }}>
@@ -768,7 +768,7 @@ export function StatusBar() {
 
       {/* Right cluster — signal + wifi + battery */}
       <div style={{
-        position: 'absolute', top: 19, right: 24,
+        position: 'absolute', top: 19, right: 40,
         display: 'flex', alignItems: 'center', gap: 6,
         color: 'var(--text-primary)',
       }}>
