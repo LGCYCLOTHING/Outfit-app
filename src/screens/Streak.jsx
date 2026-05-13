@@ -324,24 +324,29 @@ export default function ScreenStreak() {
                 <div key={i} style={{
                   flex: '0 0 auto',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-                  opacity: earned ? 1 : 0.55,
                 }}>
                   <div style={{
                     width: 52, height: 52, borderRadius: 26,
-                    background: earned ? `rgba(${accentRgba}, 0.22)` : 'rgba(255,255,255,0.08)',
-                    border: earned ? `1px solid ${accent}` : '1px dashed rgba(255,255,255,0.25)',
+                    background: earned ? `rgba(${accentRgba}, 0.28)` : 'rgba(255,255,255,0.14)',
+                    border: earned ? `1.5px solid ${accent}` : '1.5px solid rgba(255,255,255,0.55)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 22, color: earned ? accent : 'var(--text-secondary)',
+                    fontSize: 22, color: earned ? accent : '#FFFFFF',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
                   }}>
                     {m.icon}
                   </div>
                   <div style={{
-                    fontSize: 9, letterSpacing: 1, textTransform: 'uppercase',
-                    color: earned ? 'var(--text-primary)' : 'var(--text-muted)',
+                    fontSize: 10, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase',
+                    color: '#FFFFFF',
+                    textShadow: '0 1px 4px rgba(0,0,0,0.5)',
                   }}>
                     {m.label}
                   </div>
-                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>
+                  <div style={{
+                    fontSize: 10, color: '#FFFFFF',
+                    textShadow: '0 1px 4px rgba(0,0,0,0.5)',
+                    opacity: 0.8,
+                  }}>
                     {m.days}d
                   </div>
                 </div>
