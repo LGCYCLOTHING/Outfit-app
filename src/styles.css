@@ -179,19 +179,22 @@ body.archive-clean #stage {
 body.archive-clean #external-app-icon,
 body.archive-clean #show-splash-btn { display: none !important; }
 
-/* Force portrait on phones — if the device is in landscape, show a full-screen
-   "rotate to portrait" overlay so the app never renders sideways. PWA manifest
-   handles installed mode; this covers regular Safari + first-load before the
-   manifest applies. */
+/* Force portrait on phones — when the device rotates to landscape, counter-rotate
+   the entire body 90° so the app keeps rendering in portrait regardless of the
+   physical orientation. Browser can't prevent OS rotation, so this is the
+   workaround that keeps the layout intact with no overlay. */
 @media (hover: none) and (pointer: coarse) and (orientation: landscape) {
-  body::after {
-    content: 'Rotate your phone to portrait';
-    position: fixed; inset: 0; z-index: 999999;
-    background: #000; color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Inter', -apple-system, sans-serif;
-    font-size: 18px; font-weight: 500; letter-spacing: 0.04em;
-    text-align: center; padding: 24px;
+  html, body {
+    overflow: hidden !important;
+  }
+  body {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vh !important;
+    height: 100vw !important;
+    transform: rotate(90deg) translateY(-100%);
+    transform-origin: top left;
   }
 }
 
