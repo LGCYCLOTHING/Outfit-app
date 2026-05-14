@@ -182,7 +182,10 @@ body.archive-clean #show-splash-btn { display: none !important; }
 /* Force portrait on phones — when the device rotates to landscape, counter-rotate
    the entire body 90° so the app keeps rendering in portrait regardless of the
    physical orientation. Browser can't prevent OS rotation, so this is the
-   workaround that keeps the layout intact with no overlay. */
+   workaround that keeps the layout intact with no overlay.
+   We also swap the inner container dims (100vw ↔ 100vh) because the mobile
+   fullscreen rules above use viewport units that point to the landscape
+   viewport, not the rotated body's local coordinate space. */
 @media (hover: none) and (pointer: coarse) and (orientation: landscape) {
   html, body {
     overflow: hidden !important;
@@ -195,6 +198,13 @@ body.archive-clean #show-splash-btn { display: none !important; }
     height: 100vw !important;
     transform: rotate(90deg) translateY(-100%);
     transform-origin: top left;
+  }
+  .shell-container,
+  .device-shell,
+  #stage {
+    width: 100vh !important;
+    height: 100vw !important;
+    min-height: 100vw !important;
   }
 }
 
