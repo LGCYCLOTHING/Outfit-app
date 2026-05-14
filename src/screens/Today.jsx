@@ -713,7 +713,7 @@ export default function ScreenToday() {
                     transform: `translate(${shiftX}px, ${shiftY}px) scale(${isDragging ? 1.05 : 1})`,
                     transition: isDragging
                       ? 'none'
-                      : 'transform .35s cubic-bezier(.2,.8,.2,1)',
+                      : 'transform .55s cubic-bezier(.32,.72,0,1)',
                     zIndex: isDragging ? 10 : 1,
                     boxShadow: isDragging ? '0 16px 40px rgba(0,0,0,0.55)' : undefined,
                     cursor: isDragging ? 'grabbing' : 'pointer',
