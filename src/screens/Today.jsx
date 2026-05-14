@@ -679,12 +679,12 @@ export default function ScreenToday() {
           }).length;
 
           const statsById = {
-            week:   { value: String(fitsThisWeek),                 label: 'THIS WEEK',   nav: 'streak' },
-            fits:   { value: String(allLogged.length || 312),      label: 'FITS LOGGED', nav: 'archive' },
-            best:   { value: String(bestStreak || 47),             label: 'BEST STREAK', nav: 'streak' },
-            month:  { value: String(thisMonthCount || 23),         label: 'THIS MONTH',  nav: 'calendar' },
-            liked:  { value: String(likedCount || 8),              label: 'LIKED',       nav: 'archive' },
-            pieces: { value: String(piecesCount || 0),             label: 'PIECES',      nav: 'pieces' },
+            week:   { value: String(fitsThisWeek),             unit: '/ 7 days',                       label: 'THIS WEEK',   nav: 'streak' },
+            fits:   { value: String(allLogged.length || 312),  unit: 'total',                          label: 'FITS LOGGED', nav: 'archive' },
+            best:   { value: String(bestStreak || 47),         unit: (bestStreak || 47) === 1 ? 'day' : 'days', label: 'BEST STREAK', nav: 'streak' },
+            month:  { value: String(thisMonthCount || 23),     unit: '/ 30 days',                      label: 'THIS MONTH',  nav: 'calendar' },
+            liked:  { value: String(likedCount || 8),          unit: (likedCount || 8) === 1 ? 'fit' : 'fits', label: 'LIKED',       nav: 'archive' },
+            pieces: { value: String(piecesCount || 0),         unit: piecesCount === 1 ? 'piece' : 'pieces', label: 'PIECES',      nav: 'pieces' },
           };
 
           // While dragging, compute each non-dragged card's "live" position as if
@@ -726,7 +726,15 @@ export default function ScreenToday() {
                     boxShadow: isDragging ? '0 16px 40px rgba(0,0,0,0.55)' : undefined,
                     cursor: isDragging ? 'grabbing' : 'pointer',
                   }}>
-                    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
+                    {/* Label at top + small drag grip in the top-right corner */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                      <div style={{
+                        fontSize: 10, color: 'var(--text-secondary)',
+                        letterSpacing: 1.3, fontWeight: 500,
+                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                      }}>
+                        {stat.label}
+                      </div>
                       <div
                         onClick={(e) => e.stopPropagation()}
                         onPointerDown={(e) => onStatGripDown(id, e)}
@@ -734,18 +742,20 @@ export default function ScreenToday() {
                         onPointerUp={onStatGripUp}
                         onPointerCancel={onStatGripUp}
                         style={{
-                          padding: 6, margin: -6,
+                          padding: 6, margin: -6, flexShrink: 0,
                           touchAction: 'none',
                           cursor: 'grab',
-                          display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4,
+                          display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3,
+                          opacity: 0.5,
                         }}>
-                        <div style={{ width: 14, height: 2, borderRadius: 1, background: 'rgba(255,255,255,0.6)', pointerEvents: 'none' }} />
-                        <div style={{ width: 14, height: 2, borderRadius: 1, background: 'rgba(255,255,255,0.6)', pointerEvents: 'none' }} />
+                        <div style={{ width: 12, height: 1.5, borderRadius: 1, background: 'rgba(255,255,255,0.7)', pointerEvents: 'none' }} />
+                        <div style={{ width: 12, height: 1.5, borderRadius: 1, background: 'rgba(255,255,255,0.7)', pointerEvents: 'none' }} />
                       </div>
                     </div>
-                    <div>
-                      <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: -1.2, lineHeight: 1, color: 'var(--text-primary)' }}>{stat.value}</div>
-                      <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 5, letterSpacing: 1.1, fontWeight: 500 }}>{stat.label}</div>
+                    {/* Big number + inline unit, like the Streak screen */}
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                      <div style={{ fontSize: 36, fontWeight: 700, letterSpacing: -1.4, lineHeight: 1, color: 'var(--text-primary)' }}>{stat.value}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-secondary)', fontWeight: 500, letterSpacing: 0.2 }}>{stat.unit}</div>
                     </div>
                   </div>
                 );
