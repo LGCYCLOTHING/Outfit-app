@@ -249,7 +249,7 @@ export function ArchiveBurger() {
   );
 }
 
-export function PhotoPlaceholder({ ratio = '3/4', radius = 18, onAdd, photoId, photoKey, empty = false, style = {} }) {
+export function PhotoPlaceholder({ ratio = '3/4', radius = 18, onAdd, photoId, photoKey, empty = false, noBorder = false, style = {} }) {
   const pid = photoId != null ? photoId : Math.floor(Math.random() * 12);
   const saved = getSavedFitPhoto(photoKey != null ? photoKey : photoId);
   if (saved) {
@@ -328,12 +328,12 @@ export function PhotoPlaceholder({ ratio = '3/4', radius = 18, onAdd, photoId, p
   }
   // Neutral dark card with a unique gradient outline ring + centered placeholder icon
   return (
-    <div className="lg-border-gradient" style={{
+    <div className={noBorder ? '' : 'lg-border-gradient'} style={{
       position: 'relative', width: '100%', aspectRatio: ratio,
       borderRadius: radius, overflow: 'hidden',
       background: fitGradient(pid),
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      '--grad-border': fitBorder(pid),
+      ...(noBorder ? {} : { '--grad-border': fitBorder(pid) }),
       ...style,
     }}>
       {/* Centered placeholder icon — picks up the border color */}

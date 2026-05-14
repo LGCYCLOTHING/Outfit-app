@@ -22,6 +22,45 @@ export default function ScreenRating() {
   const [photo, setPhoto] = React.useState(() => getSavedFitPhoto(todayKey));
   const fileRef = React.useRef(null);
 
+  // ── Slide-up sheet state (mirrors the hamburger drawer pattern) ──
+  const [open, setOpen] = React.useState(false);
+  const [dragOffset, setDragOffset] = React.useState(0);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const dragStartY = React.useRef(0);
+
+  // Animate in after mount
+  React.useEffect(() => {
+    const raf = requestAnimationFrame(() => setOpen(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const close = () => {
+    setOpen(false);
+    setTimeout(() => {
+      if (typeof window !== 'undefined' && window.__archiveGo) window.__archiveGo('today');
+    }, 1100);
+  };
+
+  const onHandleDown = (e) => {
+    try { e.target.setPointerCapture(e.pointerId); } catch (err) {}
+    dragStartY.current = e.clientY;
+    setIsDragging(true);
+  };
+  const onHandleMove = (e) => {
+    if (!isDragging) return;
+    const delta = e.clientY - dragStartY.current;
+    setDragOffset(Math.max(0, delta));
+  };
+  const onHandleUp = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    if (dragOffset > 120) {
+      close();
+    } else {
+      setDragOffset(0);
+    }
+  };
+
   const onPickFile = (e) => {
     const f = e.target.files && e.target.files[0];
     if (!f) return;
@@ -43,7 +82,7 @@ export default function ScreenRating() {
       }
       if (typeof window !== 'undefined') window.__archiveEmpty = false;
     } catch (e) {}
-    window.__archiveGo && window.__archiveGo('today');
+    close();
   };
 
   const ratingLabels = {
@@ -56,51 +95,82 @@ export default function ScreenRating() {
   const moods = ['Confident', 'Comfortable', 'Underdressed', 'Overdressed'];
   const contexts = ['Campus', 'Work', 'Night out', 'Travel', 'Casual'];
 
+  // Transform / transition for the sheet — open: slide up, close: slide back down
+  const sheetTransform = open
+    ? `translateY(${dragOffset}px)`
+    : 'translateY(100%)';
+  const sheetTransition = isDragging
+    ? 'none'
+    : open
+      ? 'transform .9s cubic-bezier(.16,1,.3,1)'
+      : 'transform 1.2s cubic-bezier(.16,1,.3,1)';
+
   return (
     <div style={{
       width: '100%', height: '100%', position: 'relative', overflow: 'hidden',
-      background: '#050505',
       fontFamily: 'DM Sans, -apple-system, system-ui, sans-serif',
       color: '#fff',
     }}>
-      <div style={{
-        position: 'absolute', inset: 0,
-        background: 'radial-gradient(80% 60% at 50% 0%, rgba(40,30,20,0.6) 0%, #050505 70%)',
-      }} />
+      {/* Live theme background underneath — so the slide-up reveals the same
+          bg the rest of the app uses */}
       <LiquidMesh seed={5} intensity={1.1} />
 
-      <div style={{
-        position: 'absolute', top: 32, left: 24, right: 24, height: 90,
-        opacity: 0.18, pointerEvents: 'none',
-      }}>
-        <div style={{ fontSize: 28, fontWeight: 300, color: '#fff' }}>Good morning,</div>
-      </div>
+      {/* Dim backdrop — tap to close */}
+      <div
+        onClick={close}
+        style={{
+          position: 'absolute', inset: 0,
+          background: open ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0)',
+          transition: 'background .6s ease-out',
+          pointerEvents: open ? 'auto' : 'none',
+        }}
+      />
 
       <StatusBar />
 
-      <div style={{
+      {/* The sliding sheet itself */}
+      <div className="lg-sheet" style={{
         position: 'absolute', left: 0, right: 0, bottom: 0,
-        height: 720, borderTopLeftRadius: 32, borderTopRightRadius: 32,
-        background: `linear-gradient(180deg, #1a1410 0%, #0d0a08 60%, #060504 100%)`,
-        boxShadow: '0 -30px 80px rgba(0,0,0,0.7), inset 0 0.5px 0 rgba(255,255,255,0.08)',
+        height: '88%',
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
+        transform: sheetTransform,
+        transition: sheetTransition,
         overflow: 'hidden',
+        zIndex: 5,
       }}>
+        {/* Drag handle — pull this down to close */}
+        <div
+          onPointerDown={onHandleDown}
+          onPointerMove={onHandleMove}
+          onPointerUp={onHandleUp}
+          onPointerCancel={onHandleUp}
+          style={{
+            position: 'absolute', top: 0, left: '50%',
+            transform: 'translateX(-50%)',
+            width: 80, height: 28,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'grab',
+            touchAction: 'none',
+            zIndex: 10,
+          }}>
+          <div style={{
+            width: 40, height: 4, borderRadius: 2,
+            background: 'rgba(255,255,255,0.45)',
+          }} />
+        </div>
+
+        {/* Accent glow at top of sheet */}
         <div style={{
           position: 'absolute', top: -80, left: '50%', transform: 'translateX(-50%)',
           width: 520, height: 320, borderRadius: '50%',
-          background: `radial-gradient(ellipse, rgba(${accentRgba},0.28) 0%, transparent 70%)`,
+          background: `radial-gradient(ellipse, rgba(${accentRgba},0.32) 0%, transparent 70%)`,
           filter: 'blur(40px)', pointerEvents: 'none',
         }} />
 
         <div style={{
-          position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)',
-          width: 38, height: 4, borderRadius: 2,
-          background: 'rgba(255,255,255,0.2)',
-        }} />
-
-        <div style={{
           position: 'relative', zIndex: 2,
-          padding: '28px 24px 28px',
+          padding: '36px 24px 28px',
           height: '100%', display: 'flex', flexDirection: 'column',
           boxSizing: 'border-box',
         }}>
@@ -108,12 +178,12 @@ export default function ScreenRating() {
             <div style={{ fontSize: 13, color: 'var(--text-primary)', letterSpacing: -0.40, fontFamily: '"DM Sans", sans-serif' }}>
               FIT 024 · LOGGED 09:14
             </div>
-            <div className="liquid-glass" onClick={() => window.__archiveGo && window.__archiveGo('today')} style={{
+            <div className="liquid-glass archive-pressable" onClick={close} style={{
               width: 28, height: 28, borderRadius: 14,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
             }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="1" strokeLinecap="round">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.6" strokeLinecap="round">
                 <path d="M6 6l12 12M18 6L6 18"/>
               </svg>
             </div>
@@ -122,11 +192,11 @@ export default function ScreenRating() {
           <div style={{
             position: 'relative', width: '78%', margin: '0 auto 4px',
             borderRadius: 22, overflow: 'hidden',
-            background: '#0a0a0a',
+            background: 'rgba(0,0,0,0.35)',
             boxShadow: `0 20px 50px -10px rgba(${accentRgba},0.35), 0 30px 60px -20px rgba(0,0,0,0.7)`,
           }}>
             {photo ? (
-              <div style={{ width: '100%', aspectRatio: '4/5', borderRadius: 22, overflow: 'hidden', background: '#0a0a0a' }}>
+              <div style={{ width: '100%', aspectRatio: '4/5', borderRadius: 22, overflow: 'hidden', background: 'rgba(0,0,0,0.35)' }}>
                 <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
               </div>
             ) : (
@@ -172,7 +242,7 @@ export default function ScreenRating() {
                 }}>
                   <svg width="32" height="32" viewBox="0 0 24 24"
                        fill={active ? accent : 'transparent'}
-                       stroke={active ? accent : 'rgba(255,255,255,0.25)'}
+                       stroke={active ? accent : 'rgba(255,255,255,0.35)'}
                        strokeWidth="1.4" strokeLinejoin="round">
                     <path d="M12 2.5l3 6.4 7 .9-5.2 4.7L18 21l-6-3.5L6 21l1.2-6.5L2 9.8l7-.9z"/>
                   </svg>
@@ -202,11 +272,11 @@ export default function ScreenRating() {
                     cursor: 'pointer',
                     padding: '8px 14px', borderRadius: 100,
                     fontSize: 14, fontWeight: 500,
-                    background: active ? `rgba(${accentRgba},0.18)` : 'rgba(255,255,255,0.04)',
-                    color: active ? accent : 'rgba(255,255,255,0.7)',
+                    background: active ? `rgba(${accentRgba},0.22)` : 'rgba(255,255,255,0.06)',
+                    color: active ? accent : 'rgba(255,255,255,0.78)',
                     boxShadow: active
-                      ? `inset 0 0 0 0.5px rgba(${accentRgba},0.5)`
-                      : 'inset 0 0 0 0.5px rgba(255,255,255,0.06)',
+                      ? `inset 0 0 0 0.5px rgba(${accentRgba},0.55)`
+                      : 'inset 0 0 0 0.5px rgba(255,255,255,0.08)',
                   }}>{m}</div>
                 );
               })}
@@ -225,11 +295,11 @@ export default function ScreenRating() {
                     cursor: 'pointer',
                     padding: '8px 14px', borderRadius: 100,
                     fontSize: 14, fontWeight: 500,
-                    background: active ? `rgba(${accentRgba},0.18)` : 'rgba(255,255,255,0.04)',
-                    color: active ? accent : 'rgba(255,255,255,0.7)',
+                    background: active ? `rgba(${accentRgba},0.22)` : 'rgba(255,255,255,0.06)',
+                    color: active ? accent : 'rgba(255,255,255,0.78)',
                     boxShadow: active
-                      ? `inset 0 0 0 0.5px rgba(${accentRgba},0.5)`
-                      : 'inset 0 0 0 0.5px rgba(255,255,255,0.06)',
+                      ? `inset 0 0 0 0.5px rgba(${accentRgba},0.55)`
+                      : 'inset 0 0 0 0.5px rgba(255,255,255,0.08)',
                   }}>{c}</div>
                 );
               })}

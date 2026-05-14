@@ -105,6 +105,34 @@ export default function ScreenToday() {
   const accentRgba = t.softRgba;
   const weather = useWeather();
 
+  // ── Today's fit carousel — scroll-driven active dot ──
+  const [picksIdx, setPicksIdx] = React.useState(0);
+  const picksRowRef = React.useRef(null);
+  const onPicksScroll = React.useCallback((e) => {
+    const el = e.currentTarget;
+    const viewportCenter = el.scrollLeft + el.clientWidth / 2;
+    const cards = el.querySelectorAll('[data-pick-idx]');
+    let best = 0, bestDist = Infinity;
+    cards.forEach((card) => {
+      const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+      const dist = Math.abs(cardCenter - viewportCenter);
+      if (dist < bestDist) { bestDist = dist; best = parseInt(card.dataset.pickIdx, 10) || 0; }
+    });
+    setPicksIdx(best);
+  }, []);
+  const onPicksDown = React.useCallback((e) => {
+    const el = e.currentTarget;
+    const startX = e.clientX;
+    const startScroll = el.scrollLeft;
+    const onMove = (m) => { el.scrollLeft = startScroll - (m.clientX - startX); };
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  }, []);
+
   // ── Stat cards — iPhone-style drag-to-reorder with live re-flow ──
   // DOM order never changes; visual position comes from statOrder + transform.
   const STAT_DOM_ORDER = ['week', 'fits', 'best', 'month', 'liked', 'pieces'];
@@ -489,22 +517,11 @@ export default function ScreenToday() {
             { id: 7,  num: '019', tag: 'AI Pick',   title: 'Charcoal layered',            sub: 'Built from 4 pieces you own',          pct: '89%' },
             { id: 11, num: '014', tag: 'Comfort',   title: 'Olive denim + tee',           sub: 'Light, breathable for 60s+ weather',   pct: '86%' },
           ];
-          // Mouse-drag-to-scroll for desktop (touch swipe works natively)
-          const onPicksDown = (e) => {
-            const el = e.currentTarget;
-            const startX = e.clientX;
-            const startScroll = el.scrollLeft;
-            const onMove = (m) => { el.scrollLeft = startScroll - (m.clientX - startX); };
-            const onUp = () => {
-              window.removeEventListener('pointermove', onMove);
-              window.removeEventListener('pointerup', onUp);
-            };
-            window.addEventListener('pointermove', onMove);
-            window.addEventListener('pointerup', onUp);
-          };
           return (
             <>
             <div className="picks-row"
+              ref={picksRowRef}
+              onScroll={onPicksScroll}
               onPointerDown={onPicksDown}
               style={{
               display: 'flex',
@@ -515,22 +532,24 @@ export default function ScreenToday() {
               WebkitOverflowScrolling: 'touch',
               scrollbarWidth: 'none',
               margin: '0 -28px',
-              padding: '0 28px 6px',
+              paddingLeft: '6%',
+              paddingRight: '6%',
+              paddingBottom: 6,
               cursor: 'grab',
             }}>
               <style>{`.picks-row::-webkit-scrollbar{display:none}`}</style>
               {picks.map((p, i) => (
                 <div key={p.id}
-                  className={i === 0 ? 'lg-active lg-spotlight' : 'lg-card'}
+                  data-pick-idx={i}
                   style={{
-                    flex: '0 0 88%',
-                    scrollSnapAlign: 'start',
+                    flex: '0 0 calc(100% - 12%)',
+                    scrollSnapAlign: 'center',
                     borderRadius: 24, overflow: 'hidden', position: 'relative',
                   }}>
                   <div onClick={() => window.__archiveGo && window.__archiveGo('detail')}
-                    style={{ position: 'relative', padding: 18, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', cursor: 'pointer' }}>
+                    style={{ position: 'relative', padding: 0, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', cursor: 'pointer' }}>
                     <div style={{ borderRadius: 18, overflow: 'hidden', position: 'relative' }}>
-                      <PhotoPlaceholder ratio="4/5" radius={18} photoId={p.id} photoKey={i === 0 ? ymd(new Date()) : undefined} />
+                      <PhotoPlaceholder ratio="4/5" radius={18} photoId={p.id} photoKey={i === 0 ? ymd(new Date()) : undefined} noBorder />
                       <div style={{
                         position: 'absolute', top: 12, left: 12,
                         padding: '6px 11px', borderRadius: 100,
@@ -555,7 +574,7 @@ export default function ScreenToday() {
                         </svg>
                       </div>
                     </div>
-                    <div style={{ marginTop: 16, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 }}>
+                    <div style={{ marginTop: 14, padding: '0 4px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 20, fontWeight: 500, lineHeight: 1.2, marginBottom: 6, letterSpacing: -0.2 }}>
                           {p.title}
@@ -578,13 +597,14 @@ export default function ScreenToday() {
                   </div>
                 </div>
               ))}
-              {/* + Add fit — trailing card, opens Rating to log a new one */}
+              {/* + Add fit — trailing card */}
               <div
                 onClick={() => window.__archiveGo && window.__archiveGo('rating')}
                 className="lg-card archive-pressable"
+                data-pick-idx={picks.length}
                 style={{
-                  flex: '0 0 60%',
-                  scrollSnapAlign: 'start',
+                  flex: '0 0 calc(100% - 12%)',
+                  scrollSnapAlign: 'center',
                   borderRadius: 24,
                   overflow: 'hidden',
                   border: '1px dashed rgba(255,255,255,0.25)',
@@ -612,13 +632,13 @@ export default function ScreenToday() {
                 </div>
               </div>
             </div>
-            {/* Page indicator dots — picks + the "+" card */}
+            {/* Page indicator dots — tracks the actual scroll position */}
             <div style={{ display: 'flex', justifyContent: 'center', gap: 5, marginTop: 10, marginBottom: 4 }}>
               {[...picks, 'add'].map((_, i) => (
                 <div key={i} style={{
-                  width: i === 0 ? 16 : 5, height: 5, borderRadius: 3,
-                  background: i === 0 ? accent : 'rgba(255,255,255,0.25)',
-                  transition: 'width .25s ease',
+                  width: i === picksIdx ? 16 : 5, height: 5, borderRadius: 3,
+                  background: i === picksIdx ? accent : 'rgba(255,255,255,0.25)',
+                  transition: 'width .25s ease, background .25s ease',
                 }} />
               ))}
             </div>
