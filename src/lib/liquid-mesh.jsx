@@ -1,53 +1,7 @@
 import React from 'react';
 
-// Per-theme gradient configs — exact spec.
-// secondary (bottom-left, baked at 0.2 opacity via rgba), main (top-right), base color.
-const THEME_BG = {
-  slate: {
-    secondary: 'radial-gradient(ellipse 40% 35% at 10% 90%, rgba(0,77,58,0.2) 0%, transparent 60%)',
-    main:      'radial-gradient(ellipse 65% 55% at 85% 10%, #00BFA5 0%, #004D3A 30%, #060E08 70%)',
-    base:      '#060E08',
-  },
-  ivory: {
-    secondary: 'radial-gradient(ellipse 40% 35% at 10% 90%, rgba(61,32,16,0.2) 0%, transparent 60%)',
-    main:      'radial-gradient(ellipse 65% 55% at 85% 10%, #C8956C 0%, #3D2010 30%, #0C0A06 70%)',
-    base:      '#0C0A06',
-  },
-  forest: {
-    secondary: 'radial-gradient(ellipse 40% 35% at 10% 90%, rgba(15,42,24,0.2) 0%, transparent 60%)',
-    main:      'radial-gradient(ellipse 65% 55% at 85% 10%, #2D7D4A 0%, #0F2A18 30%, #060E08 70%)',
-    base:      '#060E08',
-  },
-  smoke: {
-    secondary: 'radial-gradient(ellipse 40% 35% at 10% 90%, rgba(26,26,26,0.2) 0%, transparent 60%)',
-    main:      'radial-gradient(ellipse 65% 55% at 85% 10%, #808080 0%, #1A1A1A 30%, #080808 70%)',
-    base:      '#080808',
-  },
-  dusk: {
-    secondary: 'radial-gradient(ellipse 40% 35% at 10% 90%, rgba(26,10,61,0.2) 0%, transparent 60%)',
-    main:      'radial-gradient(ellipse 65% 55% at 85% 10%, #6B3FA0 0%, #1A0A3D 30%, #07040F 70%)',
-    base:      '#07040F',
-  },
-  ember: {
-    secondary: 'radial-gradient(ellipse 40% 35% at 10% 90%, rgba(42,14,4,0.2) 0%, transparent 60%)',
-    main:      'radial-gradient(ellipse 65% 55% at 85% 10%, #C4500A 0%, #2A0E04 30%, #0A0600 70%)',
-    base:      '#0A0600',
-  },
-  noir: {
-    secondary: 'radial-gradient(ellipse 40% 35% at 10% 90%, rgba(40,40,40,0.18) 0%, transparent 60%)',
-    main:      'radial-gradient(ellipse 65% 55% at 85% 10%, #2a2a2a 0%, #0d0d0d 30%, #000 70%)',
-    base:      '#000000',
-  },
-};
-
 // Themes that only have a dark background — light mode falls back to the dark image
 const DARK_ONLY_THEMES = new Set(['noir']);
-
-function bgFor(themeId) {
-  const cfg = THEME_BG[themeId] || THEME_BG.dusk;
-  // Stack: secondary, main, base. Per spec.
-  return `${cfg.secondary}, ${cfg.main}, ${cfg.base}`;
-}
 
 // Build a "background variant" key from theme id + light flag.
 // e.g. "dusk:dark", "ivory:light". Used so the crossfade fires for either
@@ -93,8 +47,9 @@ export default function LiquidMesh({ seed = 0, intensity = 1 }) {
     @keyframes archive-bg-fade-out { from { opacity: 1; } to { opacity: 0; } }
   `;
 
-  // A single layer = gradient fallback + bg image on top, scoped to one variant.
-  // The whole stack fades in/out so gradient + image transition together.
+  // A single layer = just the bg image. No CSS-gradient fallback (it was
+  // flashing through during crossfade transitions); the parent's solid bg
+  // covers the brief load window.
   const ThemeLayer = ({ variant, anim }) => {
     const { themeId, light } = parseVariant(variant);
     const useLight = light && !DARK_ONLY_THEMES.has(themeId);
@@ -102,19 +57,14 @@ export default function LiquidMesh({ seed = 0, intensity = 1 }) {
       ? `/backgrounds/bg-${themeId}-light.png`
       : `/backgrounds/bg-${themeId}.png`;
     return (
-      <div style={{ position: 'absolute', inset: 0, animation: anim || 'none' }}>
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: useLight ? '#F5F0E8' : bgFor(themeId),
-        }} />
-        <div style={{
-          position: 'absolute', inset: 0,
-          backgroundImage: `url('${imageSrc}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed',
-        }} />
-      </div>
+      <div style={{
+        position: 'absolute', inset: 0,
+        animation: anim || 'none',
+        backgroundImage: `url('${imageSrc}')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }} />
     );
   };
 

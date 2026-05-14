@@ -13,7 +13,7 @@ export default function ScreenYou() {
   const accentDeep = t.deep;
   const activeId = t.id;
 
-  const swatches = ['ivory', 'slate', 'forest', 'smoke', 'dusk', 'ember', 'noir'].map(id => THEMES[id]);
+  const swatches = ['ivory', 'slate', 'forest', 'dusk', 'ember', 'noir'].map(id => THEMES[id]);
   // Icon picker uses themes that have actual icon-<id>.png files
   const iconSwatches = swatches.filter(s => !s.darkOnly);
 

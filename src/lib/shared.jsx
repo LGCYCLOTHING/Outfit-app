@@ -20,7 +20,6 @@ export const THEMES = {
   ivory:  { id:'ivory',  name:'Ivory',  sub:'warm cream',     light:'#C8A97E', hot:'#A88D63', deep:'#2A2018', softRgba:'200,169,126', darkBg:'/themes/bg-2.png' },
   slate:  { id:'slate',  name:'Slate',  sub:'jade mint',      light:'#3DDFB4', hot:'#1FB58E', deep:'#08221C', softRgba:'61,223,180',  darkBg:'/themes/bg-1.png' },
   forest: { id:'forest', name:'Forest', sub:'deep olive',     light:'#4A7C59', hot:'#386649', deep:'#0F1F14', softRgba:'74,124,89',   darkBg:'/themes/bg-3.png' },
-  smoke:  { id:'smoke',  name:'Smoke',  sub:'silver chrome',  light:'#8C8880', hot:'#6E6A62', deep:'#181614', softRgba:'140,136,128', darkBg:'/themes/bg-4.png' },
   dusk:   { id:'dusk',   name:'Dusk',   sub:'muted twilight', light:'#7C6E9E', hot:'#5F5380', deep:'#14101E', softRgba:'124,110,158', darkBg:'/themes/bg-5.png' },
   ember:  { id:'ember',  name:'Ember',  sub:'warm amber',     light:'#C8956C', hot:'#A87852', deep:'#200E06', softRgba:'200,149,108', darkBg:'/themes/bg-6.png' },
   noir:   { id:'noir',   name:'Noir',   sub:'pure black',     light:'#888888', hot:'#555555', deep:'#000000', softRgba:'160,160,160', darkBg:'/backgrounds/bg-noir.png', darkOnly: true },
