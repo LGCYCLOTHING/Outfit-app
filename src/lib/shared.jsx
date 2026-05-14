@@ -430,6 +430,12 @@ export function TabBar({ active = 'today', theme }) {
         <path d="M9 2h6"/>
       </svg>
     )},
+    // Center log-fit button — liquid glass, opens the Rating modal
+    { id: 'rating', label: 'Log', isAction: true, icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+    )},
     { id: 'mix', label: 'Mix', icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M16 4l4 4-4 4"/>
@@ -443,13 +449,6 @@ export function TabBar({ active = 'today', theme }) {
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="8.5" r="3.5"/>
         <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/>
-      </svg>
-    )},
-    // Right-side log-fit button — opens the Rating modal. Rendered with a raised
-    // glass treatment so it reads as a primary action, not a tab.
-    { id: 'rating', label: 'Log', isAction: true, icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 5v14M5 12h14"/>
       </svg>
     )},
   ];
@@ -702,19 +701,20 @@ function SlidingBubbleNav({ items, active, itemRefs, onPointerDown, onClickItem,
               onPointerDown={(e) => onPointerDown(e, i)}
               onClick={() => onClickItem(i)}
               style={it.isAction ? {
-                // Raised glass log button — primary action
+                // Transparent liquid-glass log button — primary action, center of nav
                 position: 'relative', zIndex: 2,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                width: 38, height: 38, borderRadius: 19,
+                width: 40, height: 40, borderRadius: 20,
                 marginInline: 2,
-                color: '#0a0a0a',
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.72) 100%)',
-                border: '1px solid rgba(255,255,255,0.45)',
+                color: 'var(--text-primary)',
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.06) 100%)',
+                backdropFilter: 'blur(20px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                border: '1px solid rgba(255,255,255,0.25)',
                 boxShadow:
-                  'inset 0 1px 0 rgba(255,255,255,0.6), ' +
+                  'inset 0 1px 0 rgba(255,255,255,0.3), ' +
                   'inset 0 -1px 0 rgba(0,0,0,0.06), ' +
-                  '0 6px 14px rgba(0,0,0,0.35), ' +
-                  '0 1px 2px rgba(0,0,0,0.2)',
+                  '0 4px 12px rgba(0,0,0,0.25)',
                 cursor: 'pointer', userSelect: 'none',
                 transform: `scale(${scale})`,
                 transition: 'transform 200ms cubic-bezier(.2,.8,.2,1)',

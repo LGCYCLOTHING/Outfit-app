@@ -83,87 +83,7 @@ export default function ScreenYou() {
           </div>
         </div>
 
-        {/* Quick links — Pieces moved here from the bottom nav */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
-          {[
-            { id: 'pieces',   title: 'Pieces',   sub: 'Wardrobe catalog', icon: (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 8a2 2 0 1 1 2-2"/><path d="M12 8v2"/>
-                <path d="M12 10L3 17c-.5.4-.3 1.2.3 1.2h17.4c.6 0 .8-.8.3-1.2L12 10z"/>
-              </svg>
-            )},
-            { id: 'streak',   title: 'Streak',   sub: 'Stats + milestones', icon: (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2c1 4-3 6-3 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-2 3 0-3-1-5-3-8z"/>
-              </svg>
-            )},
-            { id: 'settings', title: 'Settings', sub: 'Notifications, data, account', icon: (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09a1.7 1.7 0 0 0 1.55-1.11 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.05a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55h.05a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.05a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/>
-              </svg>
-            )},
-          ].map(row => (
-            <div key={row.id}
-              onClick={() => window.__archiveGo && window.__archiveGo(row.id)}
-              className="lg-card archive-pressable"
-              style={{
-                padding: '12px 14px', borderRadius: 14,
-                display: 'flex', alignItems: 'center', gap: 12,
-                cursor: 'pointer',
-              }}>
-              <div style={{
-                width: 30, height: 30, borderRadius: 10,
-                background: `rgba(${accentRgba},0.22)`,
-                border: `1px solid rgba(${accentRgba},0.4)`,
-                color: accent,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0,
-              }}>
-                {row.icon}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 14, color: 'var(--text-primary)', letterSpacing: '-0.02em', fontWeight: 600 }}>{row.title}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{row.sub}</div>
-              </div>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 6l6 6-6 6"/>
-              </svg>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-          <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
-          <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
-            DISPLAY MODE
-          </span>
-        </div>
-        <Glass radius={18} style={{ padding: 6, marginBottom: 22, display: 'flex' }}>
-          {[
-            { id: 'dark', label: 'Dark' },
-            { id: 'light', label: 'Light' },
-          ].map(opt => {
-            const active = (opt.id === 'light') === isLight;
-            return (
-              <div key={opt.id}
-                onClick={() => { if (active) return; toggleLight(); }}
-                style={{
-                  flex: 1, textAlign: 'center', padding: '12px 0',
-                  borderRadius: 13,
-                  background: active ? `rgba(${accentRgba},0.16)` : 'transparent',
-                  boxShadow: active ? `inset 0 0 0 0.5px rgba(${accentRgba},0.35)` : 'none',
-                  fontSize: 15, fontWeight: 500,
-                  color: active ? accent : 'rgba(255,255,255,0.65)',
-                  cursor: 'pointer',
-                  transition: 'all .2s ease',
-                }}>
-                {opt.label}
-              </div>
-            );
-          })}
-        </Glass>
-
+        {/* ────────── APPEARANCE first ────────── */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
           <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
           <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
@@ -310,6 +230,98 @@ export default function ScreenYou() {
               </div>
             );
           })}
+        </div>
+
+        {/* ────────── DISPLAY MODE ────────── */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, marginTop: 22 }}>
+          <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
+          <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
+            DISPLAY MODE
+          </span>
+        </div>
+        <Glass radius={18} style={{ padding: 6, marginBottom: 22, display: 'flex' }}>
+          {[
+            { id: 'dark', label: 'Dark' },
+            { id: 'light', label: 'Light' },
+          ].map(opt => {
+            const active = (opt.id === 'light') === isLight;
+            return (
+              <div key={opt.id}
+                onClick={() => { if (active) return; toggleLight(); }}
+                style={{
+                  flex: 1, textAlign: 'center', padding: '12px 0',
+                  borderRadius: 13,
+                  background: active ? `rgba(${accentRgba},0.16)` : 'transparent',
+                  boxShadow: active ? `inset 0 0 0 0.5px rgba(${accentRgba},0.35)` : 'none',
+                  fontSize: 15, fontWeight: 500,
+                  color: active ? accent : 'rgba(255,255,255,0.65)',
+                  cursor: 'pointer',
+                  transition: 'all .2s ease',
+                }}>
+                {opt.label}
+              </div>
+            );
+          })}
+        </Glass>
+
+        {/* ────────── QUICK LINKS — feature destinations ────────── */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+          <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
+          <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
+            SHORTCUTS
+          </span>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
+          {[
+            { id: 'pieces',   title: 'Pieces',         sub: 'Wardrobe catalog',         icon: (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 8a2 2 0 1 1 2-2"/><path d="M12 8v2"/>
+                <path d="M12 10L3 17c-.5.4-.3 1.2.3 1.2h17.4c.6 0 .8-.8.3-1.2L12 10z"/>
+              </svg>
+            )},
+            { id: 'streak',   title: 'Streak',         sub: 'Stats + milestones',       icon: (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2c1 4-3 6-3 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-2 3 0-3-1-5-3-8z"/>
+              </svg>
+            )},
+            { id: 'calendar', title: 'Calendar',       sub: 'Browse fits by month',     icon: (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>
+              </svg>
+            )},
+            { id: 'share',    title: 'Share archive',  sub: 'Generate a shareable card', icon: (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v14"/>
+              </svg>
+            )},
+          ].map(row => (
+            <div key={row.id}
+              onClick={() => window.__archiveGo && window.__archiveGo(row.id)}
+              className="lg-card archive-pressable"
+              style={{
+                padding: '12px 14px', borderRadius: 14,
+                display: 'flex', alignItems: 'center', gap: 12,
+                cursor: 'pointer',
+              }}>
+              <div style={{
+                width: 30, height: 30, borderRadius: 10,
+                background: `rgba(${accentRgba},0.22)`,
+                border: `1px solid rgba(${accentRgba},0.4)`,
+                color: accent,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0,
+              }}>
+                {row.icon}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 14, color: 'var(--text-primary)', letterSpacing: '-0.02em', fontWeight: 600 }}>{row.title}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{row.sub}</div>
+              </div>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 6l6 6-6 6"/>
+              </svg>
+            </div>
+          ))}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, marginTop: 22 }}>
