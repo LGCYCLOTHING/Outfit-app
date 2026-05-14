@@ -179,6 +179,14 @@ body.archive-clean #stage {
 body.archive-clean #external-app-icon,
 body.archive-clean #show-splash-btn { display: none !important; }
 
+/* Fade the bottom nav out while the Rating modal is open so the Save fit
+   button isn't obscured. Class is toggled in App.jsx on screen === 'rating'. */
+body.aevum-modal-open .nav-bar {
+  opacity: 0;
+  transform: translateY(60px);
+  pointer-events: none;
+}
+
 /* Force portrait on phones — when the device rotates to landscape, counter-rotate
    the entire body 90° so the app keeps rendering in portrait regardless of the
    physical orientation. Browser can't prevent OS rotation, so this is the
@@ -480,6 +488,8 @@ body * {
    ═════════════════════════════════════════════════════════════════ */
 .nav-bar {
   position: relative;
+  /* Smoothly fade + slide the whole nav when a modal opens */
+  transition: opacity .5s ease, transform .55s cubic-bezier(.16,1,.3,1);
   background:
     linear-gradient(135deg,
       rgba(255, 255, 255, 0.14) 0%,

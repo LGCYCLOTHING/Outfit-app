@@ -264,6 +264,12 @@ export default function App() {
     };
   }, []);
 
+  // Toggle a body class while the Rating modal is open so the bottom nav can
+  // CSS-fade out of the way (.nav-bar has the transition; see styles.css).
+  React.useEffect(() => {
+    document.body.classList.toggle('aevum-modal-open', screen === 'rating');
+  }, [screen]);
+
   // Bump key for any screen that needs a fresh mount on each visit (e.g. the
   // Rating slide-up sheet relies on a clean state to animate up correctly).
   const [ratingVisit, setRatingVisit] = React.useState(0);

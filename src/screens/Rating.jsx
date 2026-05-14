@@ -189,18 +189,9 @@ export default function ScreenRating() {
           height: '100%', display: 'flex', flexDirection: 'column',
           boxSizing: 'border-box',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 14 }}>
             <div style={{ fontSize: 13, color: 'var(--text-primary)', letterSpacing: -0.40, fontFamily: '"DM Sans", sans-serif' }}>
               FIT 024 · LOGGED 09:14
-            </div>
-            <div className="liquid-glass archive-pressable" onClick={close} style={{
-              width: 28, height: 28, borderRadius: 14,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer',
-            }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.6" strokeLinecap="round">
-                <path d="M6 6l12 12M18 6L6 18"/>
-              </svg>
             </div>
           </div>
 

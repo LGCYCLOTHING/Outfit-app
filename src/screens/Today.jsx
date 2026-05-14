@@ -544,10 +544,10 @@ export default function ScreenToday() {
                   style={{
                     flex: '0 0 calc(100% - 12%)',
                     scrollSnapAlign: 'center',
-                    borderRadius: 24, overflow: 'hidden', position: 'relative',
+                    borderRadius: 24, position: 'relative',
                   }}>
                   <div onClick={() => window.__archiveGo && window.__archiveGo('detail')}
-                    style={{ position: 'relative', padding: 0, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', cursor: 'pointer' }}>
+                    style={{ position: 'relative', padding: 0, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', cursor: 'pointer', gap: 12 }}>
                     <div style={{ borderRadius: 18, overflow: 'hidden', position: 'relative' }}>
                       <PhotoPlaceholder ratio="4/5" radius={18} photoId={p.id} photoKey={i === 0 ? ymd(new Date()) : undefined} noBorder />
                       <div style={{
@@ -574,18 +574,28 @@ export default function ScreenToday() {
                         </svg>
                       </div>
                     </div>
-                    <div style={{ marginTop: 14, padding: '0 4px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 }}>
+                    <div className="lg-card" style={{
+                      padding: '14px 18px',
+                      borderRadius: 20,
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+                    }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 20, fontWeight: 500, lineHeight: 1.2, marginBottom: 6, letterSpacing: -0.2 }}>
+                        <div style={{
+                          fontSize: 18, fontWeight: 500, lineHeight: 1.2, marginBottom: 4, letterSpacing: -0.2,
+                          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                        }}>
                           {p.title}
                         </div>
-                        <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                        <div style={{
+                          fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.4,
+                          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                        }}>
                           {p.sub}
                         </div>
                       </div>
                       <button className="liquid-glass" onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('rating'); }} style={{
                         border: 'none', cursor: 'pointer',
-                        width: 44, height: 44, borderRadius: 22, flexShrink: 0,
+                        width: 40, height: 40, borderRadius: 20, flexShrink: 0,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         color: 'var(--text-primary)'
                       }}>
