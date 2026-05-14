@@ -172,11 +172,16 @@ export default function ScreenYou() {
         <div style={{ marginTop: 14, marginBottom: 4 }}>
           <div
             onClick={() => setIconPickerOpen(o => !o)}
-            className="lg-card archive-pressable"
+            className="archive-pressable"
             style={{
               padding: '10px 14px 10px 10px', borderRadius: 14,
               display: 'flex', alignItems: 'center', gap: 12,
               cursor: 'pointer',
+              background: 'rgba(255,240,220,0.04)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255,240,220,0.07)',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
             }}>
             <div style={{
               width: 36, height: 36, borderRadius: 10,
@@ -347,11 +352,16 @@ export default function ScreenYou() {
           ].map(row => (
             <div key={row.id}
               onClick={() => window.__archiveGo && window.__archiveGo(row.id)}
-              className="lg-card archive-pressable"
+              className="archive-pressable"
               style={{
                 padding: '12px 14px', borderRadius: 14,
                 display: 'flex', alignItems: 'center', gap: 12,
                 cursor: 'pointer',
+                background: 'rgba(255,240,220,0.04)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,240,220,0.07)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
               }}>
               <div style={{
                 width: 30, height: 30, borderRadius: 10,
@@ -383,8 +393,16 @@ export default function ScreenYou() {
           </span>
         </div>
 
-        <div onClick={() => window.__archiveGo && window.__archiveGo('paywall')} style={{ cursor: 'pointer' }}>
-          <GlowCard glow="br" intensity={0.85}>
+        <div onClick={() => window.__archiveGo && window.__archiveGo('paywall')} style={{
+          cursor: 'pointer',
+          borderRadius: 16,
+          background: 'rgba(255,240,220,0.04)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255,240,220,0.07)',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
+        }}>
+          <div>
             <div style={{ padding: 18, display: 'flex', alignItems: 'center', gap: 14 }}>
               <div style={{
                 position: 'relative', width: 52, height: 52, borderRadius: 26, flexShrink: 0,
@@ -421,7 +439,7 @@ export default function ScreenYou() {
                 <path d="M9 6l6 6-6 6"/>
               </svg>
             </div>
-          </GlowCard>
+          </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, marginTop: 26 }}>

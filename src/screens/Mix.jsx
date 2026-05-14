@@ -72,13 +72,18 @@ export default function ScreenMix() {
         </div>
 
         {combos.map((c, idx) => (
-          <div key={idx} style={{ marginBottom: 18, position: 'relative' }}>
-            <GlowCard
-              glow={idx % 2 === 0 ? 'br' : 'bl'}
-              accent={c.locked ? 'rgba(180,180,200,0.6)' : accentHot}
-              intensity={c.locked ? 0.4 : 1}
-              style={{ padding: 16 }}
-            >
+          <div key={idx} style={{
+            marginBottom: 18, position: 'relative',
+            /* Match the Streak / Today stat card treatment — soft cream-tinted glass */
+            background: 'rgba(255,240,220,0.04)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,240,220,0.07)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
+            borderRadius: 18,
+            padding: 16,
+          }}>
+            <div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 12, color: 'var(--text-primary)', fontFamily: '"DM Sans", sans-serif', letterSpacing: -0.30 }}>
@@ -166,7 +171,7 @@ export default function ScreenMix() {
                   </svg>
                 </span>
               </div>
-            </GlowCard>
+            </div>
           </div>
         ))}
       </div>
