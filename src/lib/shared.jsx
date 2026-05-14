@@ -439,18 +439,17 @@ export function TabBar({ active = 'today', theme }) {
         <path d="M4 17h2.5c1 0 1.9-.5 2.5-1.3"/>
       </svg>
     )},
-    { id: 'pieces', label: 'Pieces', icon: (
-      // Hanger — wardrobe pieces
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 8a2 2 0 1 1 2-2"/>
-        <path d="M12 8v2"/>
-        <path d="M12 10L3 17c-.5.4-.3 1.2.3 1.2h17.4c.6 0 .8-.8.3-1.2L12 10z"/>
-      </svg>
-    )},
     { id: 'you', label: 'You', icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="8.5" r="3.5"/>
         <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/>
+      </svg>
+    )},
+    // Right-side log-fit button — opens the Rating modal. Rendered with a raised
+    // glass treatment so it reads as a primary action, not a tab.
+    { id: 'rating', label: 'Log', isAction: true, icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 5v14M5 12h14"/>
       </svg>
     )},
   ];
@@ -702,7 +701,25 @@ function SlidingBubbleNav({ items, active, itemRefs, onPointerDown, onClickItem,
               ref={el => itemRefs.current[i] = el}
               onPointerDown={(e) => onPointerDown(e, i)}
               onClick={() => onClickItem(i)}
-              style={{
+              style={it.isAction ? {
+                // Raised glass log button — primary action
+                position: 'relative', zIndex: 2,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: 38, height: 38, borderRadius: 19,
+                marginInline: 2,
+                color: '#0a0a0a',
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.72) 100%)',
+                border: '1px solid rgba(255,255,255,0.45)',
+                boxShadow:
+                  'inset 0 1px 0 rgba(255,255,255,0.6), ' +
+                  'inset 0 -1px 0 rgba(0,0,0,0.06), ' +
+                  '0 6px 14px rgba(0,0,0,0.35), ' +
+                  '0 1px 2px rgba(0,0,0,0.2)',
+                cursor: 'pointer', userSelect: 'none',
+                transform: `scale(${scale})`,
+                transition: 'transform 200ms cubic-bezier(.2,.8,.2,1)',
+                touchAction: 'none',
+              } : {
                 position: 'relative', zIndex: 1,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 padding: '8px 14px',
