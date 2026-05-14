@@ -610,14 +610,12 @@ export default function ScreenToday() {
               {/* + Add fit — trailing card */}
               <div
                 onClick={() => window.__archiveGo && window.__archiveGo('rating')}
-                className="lg-card archive-pressable"
+                className="archive-pressable"
                 data-pick-idx={picks.length}
                 style={{
                   flex: '0 0 calc(100% - 12%)',
                   scrollSnapAlign: 'center',
                   borderRadius: 24,
-                  overflow: 'hidden',
-                  border: '1px dashed rgba(255,255,255,0.25)',
                   display: 'flex', flexDirection: 'column',
                   alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer',
