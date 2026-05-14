@@ -37,6 +37,10 @@ export default function ScreenYou() {
   const [iconOverride, setIconOverride] = React.useState(() => {
     try { return localStorage.getItem('aevum_app_icon'); } catch (e) { return null; }
   });
+  // Collapsed by default — app icon is a rarely-touched setting, so it lives
+  // as a small expander tucked inside the Appearance section
+  const [iconPickerOpen, setIconPickerOpen] = React.useState(false);
+  const currentIconId = iconOverride || activeId;
   const pickIcon = (id) => {
     try {
       if (id) localStorage.setItem('aevum_app_icon', id);
@@ -163,73 +167,119 @@ export default function ScreenYou() {
           })}
         </div>
 
-        {/* ────────── APP ICON PICKER ────────── */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 26, marginBottom: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
-            <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', letterSpacing: -0.4, fontFamily: '"DM Sans", sans-serif' }}>
-              APP ICON
-            </span>
-          </div>
+        {/* App icon — tucked into Appearance as a single expandable row, since
+           people change theme often but rarely the icon */}
+        <div style={{ marginTop: 14, marginBottom: 4 }}>
           <div
-            onClick={() => pickIcon(null)}
-            className="archive-pressable lg-pill"
+            onClick={() => setIconPickerOpen(o => !o)}
+            className="lg-card archive-pressable"
             style={{
-              padding: '6px 12px', borderRadius: 100, cursor: 'pointer',
-              fontSize: 11, color: iconOverride === null ? accent : 'var(--text-secondary)',
-              fontWeight: 500, letterSpacing: 0.3,
-              boxShadow: iconOverride === null ? `inset 0 0 0 1px ${accent}` : undefined,
+              padding: '10px 14px 10px 10px', borderRadius: 14,
+              display: 'flex', alignItems: 'center', gap: 12,
+              cursor: 'pointer',
             }}>
-            Match theme
-          </div>
-        </div>
-        <div style={{
-          display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8,
-          marginBottom: 22,
-        }}>
-          {iconSwatches.map(s => {
-            const isPicked = iconOverride === s.id;
-            return (
-              <div key={s.id}
-                onClick={() => pickIcon(s.id)}
-                className="archive-pressable"
-                style={{
-                  position: 'relative', aspectRatio: '1', borderRadius: 14,
-                  overflow: 'hidden', cursor: 'pointer',
-                  border: isPicked ? `1.5px solid ${s.light}` : '1px solid rgba(255,255,255,0.08)',
-                  boxShadow: isPicked
-                    ? `0 0 0 2px rgba(0,0,0,0.4), 0 6px 14px -4px rgba(${s.softRgba},0.45)`
-                    : '0 2px 8px rgba(0,0,0,0.3)',
-                  transition: 'border-color .2s, box-shadow .2s',
-                }}>
-                <img
-                  src={`/icons/icon-${s.id}.png`}
-                  alt=""
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                />
-                {/* AĒVUM wordmark composited on top — Inter 300, 0.26em tracking, white */}
-                <div className="aevum-wordmark" style={{
-                  position: 'absolute', inset: 0,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: '#fff', fontSize: 7.5, paddingLeft: '0.26em',
-                  textShadow: '0 1px 4px rgba(0,0,0,0.45)',
-                  pointerEvents: 'none',
-                }}>AĒVUM</div>
-                {isPicked && (
-                  <div style={{
-                    position: 'absolute', top: 5, right: 5,
-                    width: 14, height: 14, borderRadius: 7,
-                    background: s.light,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M5 12l5 5L20 7"/>
-                    </svg>
-                  </div>
-                )}
+            <div style={{
+              width: 36, height: 36, borderRadius: 10,
+              overflow: 'hidden',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
+              flexShrink: 0,
+              position: 'relative',
+            }}>
+              <img
+                src={`/icons/icon-${currentIconId === 'noir' ? 'ivory' : currentIconId}.png`}
+                alt=""
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+              <div className="aevum-wordmark" style={{
+                position: 'absolute', inset: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', fontSize: 5.5, paddingLeft: '0.26em',
+                textShadow: '0 1px 3px rgba(0,0,0,0.45)',
+                pointerEvents: 'none',
+              }}>AĒVUM</div>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13, color: 'var(--text-primary)', letterSpacing: '-0.02em', fontWeight: 600 }}>App icon</div>
+              <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
+                {iconOverride ? `Locked to ${currentIconId}` : 'Matches active theme'}
               </div>
-            );
-          })}
+            </div>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+              style={{ transform: iconPickerOpen ? 'rotate(90deg)' : 'none', transition: 'transform .25s ease' }}>
+              <path d="M9 6l6 6-6 6"/>
+            </svg>
+          </div>
+
+          {/* Expanded picker grid */}
+          <div style={{
+            overflow: 'hidden',
+            maxHeight: iconPickerOpen ? 240 : 0,
+            opacity: iconPickerOpen ? 1 : 0,
+            transition: 'max-height .35s cubic-bezier(.16,1,.3,1), opacity .25s ease',
+          }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+              marginTop: 10, marginBottom: 8,
+            }}>
+              <div
+                onClick={() => pickIcon(null)}
+                className="archive-pressable lg-pill"
+                style={{
+                  padding: '5px 11px', borderRadius: 100, cursor: 'pointer',
+                  fontSize: 10.5, color: iconOverride === null ? accent : 'var(--text-secondary)',
+                  fontWeight: 500, letterSpacing: 0.3,
+                  boxShadow: iconOverride === null ? `inset 0 0 0 1px ${accent}` : undefined,
+                }}>
+                Match theme
+              </div>
+            </div>
+            <div style={{
+              display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 6,
+            }}>
+              {iconSwatches.map(s => {
+                const isPicked = iconOverride === s.id;
+                return (
+                  <div key={s.id}
+                    onClick={() => pickIcon(s.id)}
+                    className="archive-pressable"
+                    style={{
+                      position: 'relative', aspectRatio: '1', borderRadius: 12,
+                      overflow: 'hidden', cursor: 'pointer',
+                      border: isPicked ? `1.5px solid ${s.light}` : '1px solid rgba(255,255,255,0.08)',
+                      boxShadow: isPicked
+                        ? `0 0 0 2px rgba(0,0,0,0.4), 0 6px 14px -4px rgba(${s.softRgba},0.45)`
+                        : '0 2px 8px rgba(0,0,0,0.3)',
+                      transition: 'border-color .2s, box-shadow .2s',
+                    }}>
+                    <img
+                      src={`/icons/icon-${s.id}.png`}
+                      alt=""
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                    <div className="aevum-wordmark" style={{
+                      position: 'absolute', inset: 0,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: '#fff', fontSize: 6, paddingLeft: '0.26em',
+                      textShadow: '0 1px 4px rgba(0,0,0,0.45)',
+                      pointerEvents: 'none',
+                    }}>AĒVUM</div>
+                    {isPicked && (
+                      <div style={{
+                        position: 'absolute', top: 4, right: 4,
+                        width: 12, height: 12, borderRadius: 6,
+                        background: s.light,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M5 12l5 5L20 7"/>
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
         {/* ────────── DISPLAY MODE ────────── */}
