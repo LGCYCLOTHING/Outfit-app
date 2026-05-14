@@ -321,7 +321,7 @@ export default function App() {
     <>
       <div style={{ position: 'absolute', inset: 0 }}>
         {Object.keys(screens).map(id => (
-          <div key={id} className={'screen-wrap archive-screen' + ((screen === id || (id === modalBgScreen && screen === 'rating')) ? '' : ' hidden')}>
+          <div key={id} className={'screen-wrap archive-screen' + ((screen === id || (screen === 'rating' && id === 'today')) ? '' : ' hidden')}>
             {screens[id]}
           </div>
         ))}
