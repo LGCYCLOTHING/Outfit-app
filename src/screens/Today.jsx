@@ -715,15 +715,22 @@ export default function ScreenToday() {
                 return (
                   <div key={id} data-stat-card
                     onClick={() => { if (!isDragging) window.__archiveGo && window.__archiveGo(stat.nav); }}
-                    className="lg-card archive-pressable" style={{
-                    borderRadius: 18, padding: 14, aspectRatio: '1.45',
+                    className="archive-pressable" style={{
+                    /* Match the Streak screen card treatment — softer cream-tinted glass */
+                    background: 'rgba(255,240,220,0.04)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255,240,220,0.07)',
+                    boxShadow: isDragging
+                      ? '0 16px 40px rgba(0,0,0,0.55)'
+                      : '0 4px 16px rgba(0,0,0,0.22)',
+                    borderRadius: 16, padding: 14, aspectRatio: '1.45',
                     display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
                     transform: `translate(${shiftX}px, ${shiftY}px) scale(${isDragging ? 1.05 : 1})`,
                     transition: isDragging
                       ? 'none'
-                      : 'transform .55s cubic-bezier(.32,.72,0,1)',
+                      : 'transform .55s cubic-bezier(.32,.72,0,1), box-shadow .3s ease',
                     zIndex: isDragging ? 10 : 1,
-                    boxShadow: isDragging ? '0 16px 40px rgba(0,0,0,0.55)' : undefined,
                     cursor: isDragging ? 'grabbing' : 'pointer',
                   }}>
                     {/* Label at top + small drag grip in the top-right corner */}
