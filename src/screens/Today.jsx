@@ -327,10 +327,15 @@ export default function ScreenToday() {
               </div>
 
               {/* Week strip — compact glass card */}
-              <div className="lg-card" style={{
+              <div style={{
                 borderRadius: 14,
                 padding: '6px 14px',
                 margin: '10px 0 18px',
+                background: 'rgba(255,240,220,0.04)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,240,220,0.07)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
               }}>
                 <div style={{
                   display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)',
@@ -423,12 +428,17 @@ export default function ScreenToday() {
         {/* Simplified "This week" — single compact pill that opens story mode */}
         <div
           onClick={() => window.__archiveGo && window.__archiveGo('story')}
-          className="lg-card archive-pressable"
+          className="archive-pressable"
           style={{
             marginTop: 22, marginBottom: 22,
             padding: '14px 16px', borderRadius: 14,
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             cursor: 'pointer',
+            background: 'rgba(255,240,220,0.04)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,240,220,0.07)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
           }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             {/* Mini stacked story-glimpse indicator */}
@@ -574,10 +584,15 @@ export default function ScreenToday() {
                         </svg>
                       </div>
                     </div>
-                    <div className="lg-card" style={{
+                    <div style={{
                       padding: '14px 18px',
                       borderRadius: 20,
                       display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+                      background: 'rgba(255,240,220,0.04)',
+                      backdropFilter: 'blur(20px)',
+                      WebkitBackdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255,240,220,0.07)',
+                      boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
                     }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{
@@ -801,7 +816,13 @@ export default function ScreenToday() {
             WARDROBE PULSE
           </span>
         </div>
-        <Glass radius={20} style={{ padding: 18 }}>
+        <div style={{
+          borderRadius: 20, padding: 18,
+          background: 'rgba(255,240,220,0.04)',
+          backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255,240,220,0.07)',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
+        }}>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 }}>
             <span style={{ fontSize: 18, fontWeight: 500, letterSpacing: -0.3 }}>Most worn this month</span>
             <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 500 }}>Apr</span>
@@ -824,7 +845,7 @@ export default function ScreenToday() {
               </div>
             </div>
           )}
-        </Glass>
+        </div>
 
         <div style={{ marginTop: 24, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
@@ -832,7 +853,13 @@ export default function ScreenToday() {
             STYLE INSIGHT
           </span>
         </div>
-        <GlowCard glow="tl" active={false}>
+        <div style={{
+          borderRadius: 20,
+          background: 'rgba(255,240,220,0.04)',
+          backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255,240,220,0.07)',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
+        }}>
           <div style={{ padding: 18 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
               <div style={{
@@ -854,7 +881,7 @@ export default function ScreenToday() {
               </div>
             </div>
           </div>
-        </GlowCard>
+        </div>
 
         <div style={{ marginTop: 24, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
@@ -869,7 +896,13 @@ export default function ScreenToday() {
             { label: 'Vintage worn', value: '4×', total: ' this wk', pct: 100 },
             { label: 'Closet rotated', value: '67', total: '%', pct: 67 }
           ].map((g, i) =>
-            <Glass key={i} radius={16} style={{ padding: 14 }}>
+            <div key={i} style={{
+              borderRadius: 16, padding: 14,
+              background: 'rgba(255,240,220,0.04)',
+              backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255,240,220,0.07)',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
+            }}>
               <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-secondary)', letterSpacing: -0.2, textTransform: 'uppercase', marginBottom: 8 }}>{g.label}</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, marginBottom: 8 }}>
                 <span className="h-display" style={{ fontSize: 28, lineHeight: 1, color: 'var(--text-primary)', letterSpacing: -0.6 }}>{g.value}</span>
@@ -881,7 +914,7 @@ export default function ScreenToday() {
                   background: `linear-gradient(90deg, ${accent} 0%, ${accentHot} 100%)`
                 }} />
               </div>
-            </Glass>
+            </div>
           )}
         </div>
 
@@ -891,7 +924,13 @@ export default function ScreenToday() {
             DAILY PROMPT
           </span>
         </div>
-        <Glass radius={20} style={{ padding: 20, marginBottom: 8 }}>
+        <div style={{
+          borderRadius: 20, padding: 20, marginBottom: 8,
+          background: 'rgba(255,240,220,0.04)',
+          backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255,240,220,0.07)',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
+        }}>
           <div className="h-display" style={{ fontSize: 26, lineHeight: 1.15, color: 'var(--text-primary)', marginBottom: 12, letterSpacing: -0.4 }}>
             Style something you <em>haven't worn</em> in 30 days.
           </div>
@@ -909,7 +948,7 @@ export default function ScreenToday() {
               color: 'var(--text-primary)', fontSize: 14, fontWeight: 500, letterSpacing: -0.2
             }}>Skip</button>
           </div>
-        </Glass>
+        </div>
       </div>
 
       <TabBar active="today" />
