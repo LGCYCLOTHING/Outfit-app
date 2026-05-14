@@ -1,6 +1,5 @@
 import React from 'react';
-import { useTheme, StatusBar, FitPhoto, getSavedFitPhoto, saveFitPhoto } from '../lib/shared.jsx';
-import LiquidMesh from '../lib/liquid-mesh.jsx';
+import { useTheme, FitPhoto, getSavedFitPhoto, saveFitPhoto } from '../lib/shared.jsx';
 
 function ymd(d) {
   const y = d.getFullYear();
@@ -126,9 +125,8 @@ export default function ScreenRating() {
       fontFamily: 'DM Sans, -apple-system, system-ui, sans-serif',
       color: '#fff',
     }}>
-      {/* Live theme background underneath — so the slide-up reveals the same
-          bg the rest of the app uses */}
-      <LiquidMesh seed={5} intensity={1.1} />
+      {/* Modal mode: no LiquidMesh here. The underlying screen (Today, Archive,
+          etc.) is kept visible by App.jsx so we show through it. */}
 
       {/* Dim backdrop — tap to close */}
       <div
@@ -141,7 +139,7 @@ export default function ScreenRating() {
         }}
       />
 
-      <StatusBar />
+      {/* StatusBar already on underlying screen — don't duplicate */}
 
       {/* The sliding sheet itself */}
       <div className="lg-sheet" style={{

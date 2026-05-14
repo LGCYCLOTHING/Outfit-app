@@ -267,11 +267,20 @@ export default function App() {
   // Bump key for any screen that needs a fresh mount on each visit (e.g. the
   // Rating slide-up sheet relies on a clean state to animate up correctly).
   const [ratingVisit, setRatingVisit] = React.useState(0);
+  // When the Rating modal is open, keep the previous screen visible behind it.
+  const [modalBgScreen, setModalBgScreen] = React.useState(null);
 
   const go = React.useCallback((id) => {
-    if (id === 'rating') setRatingVisit(v => v + 1);
+    if (id === 'rating') {
+      setRatingVisit(v => v + 1);
+      // Remember whatever screen we came from so it stays visible underneath
+      setModalBgScreen(prev => prev || (typeof window !== 'undefined' ? (window.__archiveScreen || 'today') : 'today'));
+    } else {
+      setModalBgScreen(null);
+    }
     setScreen(id);
     if (typeof window !== 'undefined') {
+      window.__archiveScreen = id;
       window.dispatchEvent(new CustomEvent('archive:navigate', { detail: id }));
     }
   }, []);
@@ -312,7 +321,7 @@ export default function App() {
     <>
       <div style={{ position: 'absolute', inset: 0 }}>
         {Object.keys(screens).map(id => (
-          <div key={id} className={'screen-wrap archive-screen' + (screen === id ? '' : ' hidden')}>
+          <div key={id} className={'screen-wrap archive-screen' + ((screen === id || (id === modalBgScreen && screen === 'rating')) ? '' : ' hidden')}>
             {screens[id]}
           </div>
         ))}
