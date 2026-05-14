@@ -33,7 +33,15 @@ const THEME_BG = {
     main:      'radial-gradient(ellipse 65% 55% at 85% 10%, #C4500A 0%, #2A0E04 30%, #0A0600 70%)',
     base:      '#0A0600',
   },
+  noir: {
+    secondary: 'radial-gradient(ellipse 40% 35% at 10% 90%, rgba(40,40,40,0.18) 0%, transparent 60%)',
+    main:      'radial-gradient(ellipse 65% 55% at 85% 10%, #2a2a2a 0%, #0d0d0d 30%, #000 70%)',
+    base:      '#000000',
+  },
 };
+
+// Themes that only have a dark background — light mode falls back to the dark image
+const DARK_ONLY_THEMES = new Set(['noir']);
 
 function bgFor(themeId) {
   const cfg = THEME_BG[themeId] || THEME_BG.dusk;
@@ -89,14 +97,15 @@ export default function LiquidMesh({ seed = 0, intensity = 1 }) {
   // The whole stack fades in/out so gradient + image transition together.
   const ThemeLayer = ({ variant, anim }) => {
     const { themeId, light } = parseVariant(variant);
-    const imageSrc = light
+    const useLight = light && !DARK_ONLY_THEMES.has(themeId);
+    const imageSrc = useLight
       ? `/backgrounds/bg-${themeId}-light.png`
       : `/backgrounds/bg-${themeId}.png`;
     return (
       <div style={{ position: 'absolute', inset: 0, animation: anim || 'none' }}>
         <div style={{
           position: 'absolute', inset: 0,
-          background: light ? '#F5F0E8' : bgFor(themeId),
+          background: useLight ? '#F5F0E8' : bgFor(themeId),
         }} />
         <div style={{
           position: 'absolute', inset: 0,

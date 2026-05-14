@@ -13,7 +13,9 @@ export default function ScreenYou() {
   const accentDeep = t.deep;
   const activeId = t.id;
 
-  const swatches = ['ivory', 'slate', 'forest', 'smoke', 'dusk', 'ember'].map(id => THEMES[id]);
+  const swatches = ['ivory', 'slate', 'forest', 'smoke', 'dusk', 'ember', 'noir'].map(id => THEMES[id]);
+  // Icon picker uses themes that have actual icon-<id>.png files
+  const iconSwatches = swatches.filter(s => !s.darkOnly);
 
   // Vivid Soft-Horizon gradient stops — brighter highlight + saturated middle + deep edge
   const SUNSET = {
@@ -23,6 +25,7 @@ export default function ScreenYou() {
     slate:  { hi: '#B4F4DC', mid1: '#5BDDB2', mid2: '#1FB58E', deep: '#08221C' },
     smoke:  { hi: '#EAE5DC', mid1: '#B5AFA4', mid2: '#807870', deep: '#3D3833' },
     ivory:  { hi: '#FFEED1', mid1: '#F0CC92', mid2: '#B98D52', deep: '#5A4628' },
+    noir:   { hi: '#555555', mid1: '#333333', mid2: '#1a1a1a', deep: '#000000' },
   };
 
   const setTheme = (id) => {
@@ -138,10 +141,13 @@ export default function ScreenYou() {
                   cursor: 'pointer',
                   transition: 'border-color .25s ease, box-shadow .25s ease',
                 }}>
-                {/* Per-theme icon as the swatch background */}
+                {/* Per-theme swatch — uses the icon image when available, falls
+                   back to the theme's bg image for dark-only themes like noir */}
                 <div style={{
                   position: 'absolute', inset: 0,
-                  backgroundImage: `url('/icons/icon-${s.id}.png'), radial-gradient(circle at 50% 42%, ${SUNSET[s.id].mid2} 0%, ${SUNSET[s.id].deep} 70%)`,
+                  backgroundImage: s.darkOnly
+                    ? `url('/backgrounds/bg-${s.id}.png'), radial-gradient(circle at 50% 42%, ${SUNSET[s.id].mid2} 0%, ${SUNSET[s.id].deep} 70%)`
+                    : `url('/icons/icon-${s.id}.png'), radial-gradient(circle at 50% 42%, ${SUNSET[s.id].mid2} 0%, ${SUNSET[s.id].deep} 70%)`,
                   backgroundSize: 'cover, cover',
                   backgroundPosition: 'center, center',
                   backgroundRepeat: 'no-repeat, no-repeat',
@@ -211,7 +217,7 @@ export default function ScreenYou() {
           display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8,
           marginBottom: 22,
         }}>
-          {swatches.map(s => {
+          {iconSwatches.map(s => {
             const isPicked = iconOverride === s.id;
             return (
               <div key={s.id}

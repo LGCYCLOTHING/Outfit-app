@@ -23,6 +23,7 @@ export const THEMES = {
   smoke:  { id:'smoke',  name:'Smoke',  sub:'silver chrome',  light:'#8C8880', hot:'#6E6A62', deep:'#181614', softRgba:'140,136,128', darkBg:'/themes/bg-4.png' },
   dusk:   { id:'dusk',   name:'Dusk',   sub:'muted twilight', light:'#7C6E9E', hot:'#5F5380', deep:'#14101E', softRgba:'124,110,158', darkBg:'/themes/bg-5.png' },
   ember:  { id:'ember',  name:'Ember',  sub:'warm amber',     light:'#C8956C', hot:'#A87852', deep:'#200E06', softRgba:'200,149,108', darkBg:'/themes/bg-6.png' },
+  noir:   { id:'noir',   name:'Noir',   sub:'pure black',     light:'#888888', hot:'#555555', deep:'#000000', softRgba:'160,160,160', darkBg:'/backgrounds/bg-noir.png', darkOnly: true },
 };
 export const DEFAULT_THEME = 'dusk';
 

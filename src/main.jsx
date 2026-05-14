@@ -7,6 +7,10 @@ import App from './App.jsx';
 // theme/override. Also rewrites every <link rel="apple-touch-icon"> + the
 // PWA favicon to the corresponding -mark.png so that the NEXT "Add to Home
 // Screen" captures whichever icon the user currently has selected.
+// Themes that don't have a dedicated icon set — fall back to ivory for the
+// preview badge + home-screen icon.
+const ICONLESS_THEMES = new Set(['noir']);
+
 function updateExternalAppIcon() {
   if (typeof window === 'undefined') return;
   let id = 'ivory';
@@ -14,6 +18,7 @@ function updateExternalAppIcon() {
     const override = localStorage.getItem('aevum_app_icon');
     id = override || window.__archiveTheme || 'ivory';
   } catch (e) { id = window.__archiveTheme || 'ivory'; }
+  if (ICONLESS_THEMES.has(id)) id = 'ivory';
 
   // In-app desktop preview badge (uses the no-text variant; wordmark is HTML)
   const img = document.getElementById('external-app-icon-img');
