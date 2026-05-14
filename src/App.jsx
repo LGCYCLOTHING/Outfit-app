@@ -264,7 +264,17 @@ export default function App() {
     };
   }, []);
 
-  const go = React.useCallback((id) => setScreen(id), []);
+  // Bump key for any screen that needs a fresh mount on each visit (e.g. the
+  // Rating slide-up sheet relies on a clean state to animate up correctly).
+  const [ratingVisit, setRatingVisit] = React.useState(0);
+
+  const go = React.useCallback((id) => {
+    if (id === 'rating') setRatingVisit(v => v + 1);
+    setScreen(id);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('archive:navigate', { detail: id }));
+    }
+  }, []);
   React.useEffect(() => { window.__archiveGo = go; }, [go]);
 
   // Multi-step onboarding flow: splash → onboarding → auth → paywall → today (empty)
@@ -291,7 +301,7 @@ export default function App() {
     mix:      <ScreenMix />,
     you:      <ScreenYou />,
     paywall:  <ScreenPaywall />,
-    rating:   <ScreenRating />,
+    rating:   <ScreenRating key={`rating-${ratingVisit}`} />,
     detail:   <ScreenDetail />,
     calendar: <ScreenCalendar />,
     share:    <ScreenShare />,

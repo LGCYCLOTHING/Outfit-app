@@ -34,6 +34,21 @@ export default function ScreenRating() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
+  // Re-animate the sheet up whenever the user navigates to 'rating' again
+  // (App.jsx keeps screens mounted so the on-mount useEffect won't re-fire).
+  React.useEffect(() => {
+    const handler = (e) => {
+      if (e && e.detail === 'rating') {
+        setOpen(false);
+        setDragOffset(0);
+        // next frame → open=true → CSS transition animates from translateY(100%) → 0
+        requestAnimationFrame(() => requestAnimationFrame(() => setOpen(true)));
+      }
+    };
+    window.addEventListener('archive:navigate', handler);
+    return () => window.removeEventListener('archive:navigate', handler);
+  }, []);
+
   const close = () => {
     setOpen(false);
     setTimeout(() => {
