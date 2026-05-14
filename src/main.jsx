@@ -34,6 +34,14 @@ if (typeof window !== 'undefined') {
       if (el) el.style.display = 'none';
     }
   } catch (e) {}
+  // Best-effort orientation lock for PWA standalone mode. Chrome/Edge support
+  // screen.orientation.lock; Safari ignores it (so we also have a CSS overlay
+  // that handles landscape on phones).
+  try {
+    if (screen && screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('portrait').catch(() => {});
+    }
+  } catch (e) {}
 }
 
 if (typeof window !== 'undefined') {
