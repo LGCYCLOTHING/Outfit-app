@@ -50,6 +50,8 @@ export default function ScreenRating() {
 
   const close = () => {
     setOpen(false);
+    // Bring the nav back IMMEDIATELY (don't wait for the slow slide-down to finish)
+    if (typeof document !== 'undefined') document.body.classList.remove('aevum-modal-open');
     setTimeout(() => {
       if (typeof window !== 'undefined' && window.__archiveGo) window.__archiveGo('today');
     }, 1100);
