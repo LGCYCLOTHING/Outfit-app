@@ -128,14 +128,16 @@ export default function ScreenRating() {
       {/* Modal mode: no LiquidMesh here. The underlying screen (Today, Archive,
           etc.) is kept visible by App.jsx so we show through it. */}
 
-      {/* Dim backdrop — tap to close */}
+      {/* Transparent backdrop — tap-to-close only, no dim overlay (matches the
+          hamburger drawer behavior: underlying screen stays fully visible) */}
       <div
         onClick={close}
         style={{
           position: 'absolute', inset: 0,
-          background: open ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0)',
-          transition: 'background .6s ease-out',
+          background: 'transparent',
+          opacity: open ? 1 : 0,
           pointerEvents: open ? 'auto' : 'none',
+          transition: 'opacity .28s ease-out',
         }}
       />
 
