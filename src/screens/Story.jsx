@@ -122,6 +122,64 @@ export default function ScreenStory() {
   const fit = fits[idx] || null;
   const isLiked = fit ? liked.has(fit.dateKey) : false;
 
+  // ── Drag-to-dismiss (Instagram-style swipe-down to close) ─────────────
+  const [dragY, setDragY] = React.useState(0);
+  const [closing, setClosing] = React.useState(false);
+  const dragRef = React.useRef({ active: false, startX: 0, startY: 0, dy: 0, didDrag: false });
+  const DRAG_THRESHOLD = 110; // px past which release dismisses
+
+  const onPointerDown = (e) => {
+    setPaused(true);
+    dragRef.current = {
+      active: true, startX: e.clientX, startY: e.clientY,
+      dy: 0, didDrag: false,
+    };
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
+  };
+  const onPointerMove = (e) => {
+    const s = dragRef.current;
+    if (!s.active) return;
+    const dx = e.clientX - s.startX;
+    const dy = e.clientY - s.startY;
+    // Only enter drag mode when vertical movement dominates and exceeds 10px.
+    if (!s.didDrag && Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) {
+      s.didDrag = true;
+    }
+    if (s.didDrag) {
+      s.dy = Math.max(0, dy); // downward only
+      setDragY(s.dy);
+    }
+  };
+  const onPointerUp = (e) => {
+    const s = dragRef.current;
+    setPaused(false);
+    if (s.didDrag) {
+      if (s.dy > DRAG_THRESHOLD) {
+        // Slide further out then exit
+        setClosing(true);
+        setTimeout(() => {
+          window.__archiveGo && window.__archiveGo('today');
+        }, 220);
+      } else {
+        setDragY(0);
+      }
+    }
+    s.active = false;
+  };
+  const onTapZoneClick = (e) => {
+    // Suppress tap navigation if the gesture turned into a drag.
+    if (dragRef.current.didDrag) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    if (x < rect.width * 0.33) goPrev(); else goNext();
+  };
+
+  const dragProgress = Math.min(1, dragY / 300);
+  const scale = closing ? 0.7 : (1 - dragProgress * 0.12);
+  const translate = closing ? '120%' : `${dragY}px`;
+  const radius = closing ? 28 : Math.min(28, dragY * 0.25);
+  const dimOpacity = closing ? 0 : (1 - dragProgress * 0.35);
+
   const toggleLike = () => {
     if (!fit) return;
     setLiked(prev => {
@@ -153,6 +211,14 @@ export default function ScreenStory() {
       background: '#000',
       fontFamily: 'DM Sans, -apple-system, system-ui, sans-serif',
       color: '#fff',
+      // Drag-to-dismiss transform — only animates on release, not while dragging
+      transform: `translateY(${translate}) scale(${scale})`,
+      borderRadius: radius,
+      opacity: dimOpacity,
+      transition: dragRef.current.active
+        ? 'none'
+        : 'transform .32s cubic-bezier(.16,1,.3,1), border-radius .25s ease, opacity .25s ease',
+      willChange: 'transform',
     }}>
       {/* Background — real saved photo if it exists, otherwise stable gradient */}
       <div style={{
@@ -186,17 +252,17 @@ export default function ScreenStory() {
         }} />
       </div>
 
-      {/* Tap zones for prev/next (lower z than controls below) */}
+      {/* Tap zone — handles prev/next taps AND swipe-down to dismiss */}
       <div
-        onClick={(e) => {
-          const rect = e.currentTarget.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          if (x < rect.width * 0.33) goPrev(); else goNext();
+        onClick={onTapZoneClick}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+        style={{
+          position: 'absolute', inset: 0, zIndex: 10,
+          cursor: 'pointer', touchAction: 'pan-y',
         }}
-        onPointerDown={() => setPaused(true)}
-        onPointerUp={() => setPaused(false)}
-        onPointerLeave={() => setPaused(false)}
-        style={{ position: 'absolute', inset: 0, zIndex: 10, cursor: 'pointer' }}
       />
 
       {/* Progress segments */}
