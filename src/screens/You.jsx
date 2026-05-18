@@ -7,6 +7,7 @@ import LiquidMesh from '../lib/liquid-mesh.jsx';
 import { calculateWeeklyScore } from '../lib/fitScore.js';
 import { getWardrobeCompletion } from '../lib/wardrobe.js';
 import { UNLOCK_THRESHOLD, getTotalFitCount, computeStyleDNA } from '../lib/styleDNA.js';
+import { pushProfile } from '../lib/sync.js';
 
 export default function ScreenYou() {
   const t = useTheme();
@@ -59,7 +60,9 @@ export default function ScreenYou() {
 
   const setTheme = (id) => {
     window.__archiveTheme = id;
+    try { localStorage.setItem('aevum_theme_id', id); } catch (e) {}
     window.dispatchEvent(new CustomEvent('archive:themechange', { detail: id }));
+    pushProfile({ theme: id });
   };
 
   // Manual icon override — null = follow the active theme
@@ -77,6 +80,7 @@ export default function ScreenYou() {
     } catch (e) {}
     setIconOverride(id);
     window.dispatchEvent(new CustomEvent('archive:iconchange', { detail: id }));
+    pushProfile({ selected_icon: id || null });
   };
 
   const isLight = !!window.__archiveLight;

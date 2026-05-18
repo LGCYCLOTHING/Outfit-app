@@ -5,6 +5,7 @@
 import { getSavedFitPhotos, getSavedFitMeta } from './shared.jsx';
 import { calculateWeeklyScore } from './fitScore.js';
 import { getWardrobeCompletion } from './wardrobe.js';
+import { pushAchievement } from './sync.js';
 
 const STORAGE_KEY = 'aevum_achievements';
 
@@ -142,10 +143,14 @@ export function setStoredUnlocked(ids) {
 }
 
 // Diff current vs stored, persist current, return the freshly-unlocked ones.
+// Each newly-unlocked achievement is also pushed to Supabase (no-op for guest users).
 export function syncAchievementsAndGetNew() {
   const current = evaluateAchievements();
   const prev = new Set(getStoredUnlocked());
   const fresh = current.filter(id => !prev.has(id));
   setStoredUnlocked(current);
+  for (const id of fresh) {
+    try { pushAchievement(id); } catch (e) {}
+  }
   return { unlocked: current, fresh };
 }

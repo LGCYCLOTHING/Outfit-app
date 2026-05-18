@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTheme, FitPhoto, getSavedFitPhotos, appendFitPhoto, replaceFitPhoto, appendFitMeta, replaceFitMeta } from '../lib/shared.jsx';
-import { refreshWeeklyScore } from '../lib/fitScore.js';
+import { refreshWeeklyScore, isoWeekLabel } from '../lib/fitScore.js';
+import { pushFitSave, pushFitPieces, pushWeeklyScore } from '../lib/sync.js';
 
 function ymd(d) {
   const y = d.getFullYear();
@@ -205,9 +206,21 @@ export default function ScreenRating() {
         else localStorage.removeItem(PIECES_KEY);
       } catch (e) {}
       // Recompute the weekly score and persist + broadcast.
-      try { refreshWeeklyScore(); } catch (e) {}
+      let updatedScore = 0;
+      try { updatedScore = refreshWeeklyScore().score; } catch (e) {}
       try { window.dispatchEvent(new CustomEvent('archive:fitschanged', { detail: { key: todayKey } })); } catch (e) {}
       try { window.dispatchEvent(new CustomEvent('archive:scorechanged')); } catch (e) {}
+      // Write-through to Supabase (no-op when not signed in).
+      try {
+        const photos = JSON.parse(localStorage.getItem('aevum_fit_photos_' + todayKey) || '[]');
+        const idx = editIndex != null ? editIndex : Math.max(0, photos.length - 1);
+        pushFitSave({
+          dateKey: todayKey, idx,
+          photo, stars, mood, ctx, note,
+        });
+        pushFitPieces(todayKey, Array.from(selectedPieces));
+        pushWeeklyScore(isoWeekLabel(), updatedScore);
+      } catch (e) {}
     } catch (e) {}
     close();
   };

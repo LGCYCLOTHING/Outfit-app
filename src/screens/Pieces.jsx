@@ -8,6 +8,7 @@ import {
   TARGET_OPTIONS, getWardrobeTarget, setWardrobeTarget, getWardrobeCompletion,
 } from '../lib/wardrobe.js';
 import { syncAchievementsAndGetNew, ACHIEVEMENTS } from '../lib/achievements.js';
+import { pushPieceSave, pushPieceDelete, pushAchievement } from '../lib/sync.js';
 
 const CATEGORIES = ['Tops', 'Bottoms', 'Shoes', 'Accessories', 'Outerwear'];
 
@@ -119,23 +120,34 @@ export default function ScreenPieces() {
 
   const savePiece = () => {
     if (!name.trim()) return;
-    const next = [...pieces, {
+    const newPiece = {
       id: Date.now(),
       name: name.trim(),
       color: color.trim(),
       category,
       photo: photo || null,
       createdAt: Date.now(),
-    }];
+    };
+    const next = [...pieces, newPiece];
     setPieces(next);
     writePieces(next);
     resetForm();
+    // Write-through to Supabase (uploads photo if it's a data URL, swaps in
+    // the public URL for the persisted record).
+    pushPieceSave(newPiece).then(remoteId => {
+      if (remoteId && remoteId !== newPiece.id) {
+        const updated = readPieces().map(p => p.id === newPiece.id ? { ...p, id: remoteId } : p);
+        setPieces(updated);
+        writePieces(updated);
+      }
+    });
   };
 
   const removePiece = (id) => {
     const next = pieces.filter(p => p.id !== id);
     setPieces(next);
     writePieces(next);
+    pushPieceDelete(id);
   };
 
   // Paywall lock

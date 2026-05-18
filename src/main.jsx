@@ -112,4 +112,9 @@ if (window.visualViewport) {
 fitFrame();
 queueMicrotask(fitFrame);
 
+// Kick off Supabase session restore + auth listener.
+import('./lib/sync.js').then(({ initSupabaseSync }) => {
+  try { initSupabaseSync(); } catch (e) {}
+}).catch(() => {});
+
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);

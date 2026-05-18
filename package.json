@@ -10,6 +10,7 @@
     "bake:icons": "node scripts/bake-icons.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.106.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

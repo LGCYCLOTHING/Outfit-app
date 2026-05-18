@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTheme, bgColor, fgColor, StatusBar, THEMES } from '../lib/shared.jsx';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
+import { pushProfile, pushNotificationSetting } from '../lib/sync.js';
 
 // iOS-style toggle switch
 function Toggle({ on, onChange, accent }) {
@@ -207,7 +208,12 @@ export default function ScreenSettings() {
 
   const toggleLight = () => {
     window.__archiveLight = !window.__archiveLight;
+    try {
+      if (window.__archiveLight) localStorage.setItem('aevum_light', '1');
+      else localStorage.removeItem('aevum_light');
+    } catch (e) {}
     window.dispatchEvent(new CustomEvent('archive:lightchange'));
+    pushProfile({ display_mode: window.__archiveLight ? 'light' : 'dark' });
   };
 
   return (
