@@ -170,54 +170,70 @@ export default function ScreenArchive() {
         ) : (
         <React.Fragment>
 
-        {/* Header */}
-        <div style={{ padding: '0 24px', marginBottom: 22, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+        {/* ─── Modern header — magazine-style stat hero ─── */}
+        <div style={{ padding: '0 24px', marginBottom: 18 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <ArchiveBurger />
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: 0.8 }}>
-                312 fits · 18 months
+              <div style={{ fontSize: 11, color: '#fff', fontWeight: 600, letterSpacing: 2.2 }}>
+                ARCHIVE
               </div>
             </div>
-            <div className="h-display" style={{ fontSize: 48, color: 'var(--text-primary)', lineHeight: 1 }}>
-              The <em>archive</em>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <div onClick={() => {}} className="archive-pressable" style={{
+                width: 34, height: 34, borderRadius: 10,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: SAGE_BG, boxShadow: `inset 0 0 0 1px ${SAGE_BORDER}`,
+                cursor: 'pointer',
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={SAGE} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+                </svg>
+              </div>
+              <div onClick={() => window.__archiveGo && window.__archiveGo('calendar')} className="archive-pressable" style={{
+                width: 34, height: 34, borderRadius: 10,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer',
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>
+                </svg>
+              </div>
             </div>
           </div>
-          <div className="lg-card" style={{
-            display: 'flex', padding: 4, borderRadius: 12, gap: 2,
-            marginTop: 28,
-          }}>
-            <div style={{
-              width: 34, height: 30, borderRadius: 8,
-              background: SAGE_BG,
-              boxShadow: `inset 0 0 0 1px ${SAGE_BORDER}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={SAGE} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-              </svg>
-            </div>
-            <div onClick={() => window.__archiveGo && window.__archiveGo('calendar')} className="archive-pressable" style={{
-              width: 34, height: 30, borderRadius: 8, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.55)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>
-              </svg>
-            </div>
-          </div>
-        </div>
 
-        {/* Search — clickable / focusable */}
-        <div style={{ padding: '0 24px', marginBottom: 18 }}>
-          <div onClick={() => searchInputRef.current?.focus()} className="lg-card" style={{
-            borderRadius: 100, padding: '13px 18px', display: 'flex', alignItems: 'center', gap: 12,
-            cursor: 'text',
-            boxShadow: searchFocused
-              ? `0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,240,220,0.08), inset 0 0 0 1px ${SAGE_BORDER}`
-              : undefined,
+          {/* Big stat block — replaces "The archive" headline */}
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, marginBottom: 6 }}>
+            <div style={{
+              fontFamily: 'Cormorant Garamond, serif',
+              fontSize: 80, fontWeight: 300, lineHeight: 0.9,
+              letterSpacing: -2.5, color: '#fff',
+            }}>312</div>
+            <div style={{
+              fontFamily: 'Cormorant Garamond, serif',
+              fontSize: 32, fontWeight: 300, fontStyle: 'italic',
+              color: 'rgba(255,255,255,0.5)', lineHeight: 1, marginBottom: 8,
+            }}>fits</div>
+          </div>
+          <div style={{
+            fontSize: 11, color: 'rgba(255,255,255,0.55)', letterSpacing: 1.6, fontWeight: 500,
+            marginBottom: 22,
           }}>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={searchFocused ? SAGE : 'rgba(245,240,232,0.55)'} strokeWidth="1.7" strokeLinecap="round">
+            ACROSS 18 MONTHS · 47 DAY STREAK
+          </div>
+
+          {/* Search — pill with embedded sort selector on the right */}
+          <div onClick={() => searchInputRef.current?.focus()}
+            className="lg-card"
+            style={{
+              borderRadius: 100, padding: '6px 6px 6px 18px',
+              display: 'flex', alignItems: 'center', gap: 10,
+              cursor: 'text',
+              boxShadow: searchFocused
+                ? `0 4px 24px rgba(0,0,0,0.4), inset 0 0 0 1px ${SAGE_BORDER}`
+                : undefined,
+            }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={searchFocused ? SAGE : 'rgba(255,255,255,0.55)'} strokeWidth="1.8" strokeLinecap="round">
               <circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/>
             </svg>
             <input
@@ -227,59 +243,49 @@ export default function ScreenArchive() {
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
               style={{
-                flex: 1, fontSize: 15, color: 'var(--text-primary)',
+                flex: 1, fontSize: 14, color: '#fff',
                 background: 'transparent', border: 'none', outline: 'none',
-                fontFamily: 'inherit',
+                fontFamily: 'inherit', padding: '8px 0',
               }}
             />
-            <div onClick={cycleSort} className="archive-pressable" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.55)" strokeWidth="1.6" strokeLinecap="round">
-                <line x1="4" y1="6" x2="11" y2="6"/><line x1="15" y1="6" x2="20" y2="6"/>
-                <line x1="4" y1="12" x2="6" y2="12"/><line x1="10" y1="12" x2="20" y2="12"/>
-                <line x1="4" y1="18" x2="13" y2="18"/><line x1="17" y1="18" x2="20" y2="18"/>
-                <circle cx="13" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="15" cy="18" r="2"/>
+            <div onClick={(e) => { e.stopPropagation(); cycleSort(); }}
+              className="archive-pressable"
+              style={{
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '7px 12px', borderRadius: 100,
+                background: 'rgba(255,255,255,0.08)',
+                fontSize: 12, color: '#fff', fontWeight: 500, letterSpacing: 0.1,
+                cursor: 'pointer', whiteSpace: 'nowrap',
+              }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 6h13M3 12h9M3 18h5"/><path d="M17 9l4-4-4-4M21 5h-9"/>
               </svg>
+              {sortMode}
             </div>
           </div>
         </div>
 
-        {/* Filter chips — functional */}
-        <div className="chip-row" style={{ display: 'flex', gap: 8, padding: '0 24px 4px', overflowX: 'auto', marginBottom: 18 }}>
+        {/* Filter chips — compact, modern */}
+        <div className="chip-row" style={{ display: 'flex', gap: 6, padding: '0 24px 4px', overflowX: 'auto', marginBottom: 24, marginTop: 18 }}>
           <style>{`.chip-row::-webkit-scrollbar{display:none}`}</style>
           {tags.map((tag) => {
             const active = tag === activeTag;
             return (
               <div key={tag}
                 onClick={() => setActiveTag(tag)}
-                className={active ? '' : 'lg-pill archive-pressable'}
+                className="archive-pressable"
                 style={{
-                  padding: '10px 20px', borderRadius: 100, whiteSpace: 'nowrap',
-                  fontSize: 14, fontWeight: 500, cursor: 'pointer',
-                  background: active ? SAGE_BG : undefined,
-                  border: active ? `1.5px solid ${SAGE_BORDER}` : undefined,
-                  boxShadow: active ? `inset 0 1px 0 rgba(255,240,220,0.08)` : undefined,
-                  color: active ? SAGE : 'rgba(245,240,232,0.6)',
+                  padding: '8px 16px', borderRadius: 100, whiteSpace: 'nowrap',
+                  fontSize: 13, fontWeight: 500, cursor: 'pointer',
+                  background: active ? SAGE_BG : 'rgba(255,255,255,0.05)',
+                  boxShadow: active
+                    ? `inset 0 0 0 1px ${SAGE_BORDER}`
+                    : 'inset 0 0 0 0.5px rgba(255,255,255,0.08)',
+                  color: active ? SAGE : 'rgba(255,255,255,0.65)',
                   transition: 'all .18s ease',
                 }}>{tag}</div>
             );
           })}
-        </div>
-
-        {/* NEW Sort row */}
-        <div style={{ padding: '0 24px', marginBottom: 22, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ fontSize: 10, color: '#fff', letterSpacing: 1.2, fontWeight: 500 }}>
-            SORTED BY
-          </div>
-          <div onClick={cycleSort} className="lg-pill archive-pressable" style={{
-            padding: '6px 12px 6px 14px', borderRadius: 100, cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 8,
-            fontSize: 12, color: 'var(--text-primary)', fontWeight: 500, letterSpacing: 0.3,
-          }}>
-            {sortMode}
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.55)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6 9l6 6 6-6"/>
-            </svg>
-          </div>
         </div>
 
         {/* Featured Fit banner */}
