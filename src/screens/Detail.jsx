@@ -293,44 +293,71 @@ export default function ScreenDetail() {
         </div>
       </div>
 
-      <div style={{
-        position: 'absolute',
-        bottom: 'calc(22px + var(--archive-safe-bottom, 0px))',
-        left: '50%', transform: 'translateX(-50%)',
-        zIndex: 5,
-        display: 'flex', alignItems: 'center', gap: 4,
-        padding: 6, borderRadius: 100,
-        background: 'rgba(26,20,16,0.92)',
-        backdropFilter: 'blur(20px)',
-        boxShadow: '0 14px 40px -8px rgba(0,0,0,0.45)',
-      }}>
-        {[
-          { id: 'archive', icon: <path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/>, label: 'Archive' },
-          { id: 'heart',   icon: <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>, label: 'Save', accent: true },
-          { id: 'share',   icon: <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v14"/>, label: 'Share' },
-          { id: 'close',   icon: <path d="M18 6L6 18M6 6l12 12"/>, label: 'Dismiss', dismiss: true },
-        ].map(b => (
+      <DetailNavBar accent={accent} accentHot={accentHot} accentRgba={accentRgba} />
+    </div>
+  );
+}
+
+function DetailNavBar({ accent, accentHot, accentRgba }) {
+  const detailKey = 23;
+  const readLiked = () => {
+    try { return new Set(JSON.parse(localStorage.getItem('aevum_liked_fits') || '[]')); }
+    catch (e) { return new Set(); }
+  };
+  const [liked, setLiked] = React.useState(() => readLiked().has(detailKey));
+  React.useEffect(() => {
+    const refresh = () => setLiked(readLiked().has(detailKey));
+    window.addEventListener('archive:likeschanged', refresh);
+    return () => window.removeEventListener('archive:likeschanged', refresh);
+  }, []);
+  const toggle = () => {
+    const set = readLiked();
+    if (set.has(detailKey)) set.delete(detailKey); else set.add(detailKey);
+    try { localStorage.setItem('aevum_liked_fits', JSON.stringify(Array.from(set))); } catch (e) {}
+    setLiked(set.has(detailKey));
+    try { window.dispatchEvent(new CustomEvent('archive:likeschanged')); } catch (e) {}
+  };
+
+  const items = [
+    { id: 'archive', icon: <path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/>, onClick: () => window.__archiveGo && window.__archiveGo('archive') },
+    { id: 'heart',   icon: <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>, accent: true, onClick: toggle },
+    { id: 'share',   icon: <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v14"/>, onClick: () => window.__archiveGo && window.__archiveGo('share') },
+    { id: 'close',   icon: <path d="M18 6L6 18M6 6l12 12"/>, onClick: () => window.__archiveGo && window.__archiveGo('archive') },
+  ];
+
+  return (
+    <div className="liquid-glass" style={{
+      position: 'absolute',
+      bottom: 'calc(22px + var(--archive-safe-bottom, 0px))',
+      left: '50%', transform: 'translateX(-50%)',
+      zIndex: 5,
+      display: 'flex', alignItems: 'center', gap: 4,
+      padding: 6, borderRadius: 100,
+      boxShadow: '0 14px 40px -8px rgba(0,0,0,0.45)',
+    }}>
+      {items.map(b => {
+        const isHeart = b.id === 'heart';
+        const heartFill = isHeart && liked;
+        return (
           <div key={b.id}
-            onClick={() => {
-              if (b.id === 'share')   window.__archiveGo && window.__archiveGo('share');
-              if (b.id === 'archive') window.__archiveGo && window.__archiveGo('archive');
-              if (b.id === 'close')   window.__archiveGo && window.__archiveGo('archive');
-            }}
+            onClick={(e) => { e.stopPropagation(); b.onClick(); }}
+            className="archive-pressable"
             style={{
               width: 44, height: 44, borderRadius: 22,
               background: b.accent ? `linear-gradient(135deg, ${accent}, ${accentHot})` : 'transparent',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
-              boxShadow: 'none',
+              boxShadow: b.accent ? `0 6px 16px -4px rgba(${accentRgba},0.55)` : 'none',
             }}>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
-              stroke={b.accent ? '#1a1410' : 'rgba(255,255,255,0.85)'}
+            <svg width="17" height="17" viewBox="0 0 24 24"
+              fill={isHeart && heartFill ? '#F08AB0' : 'none'}
+              stroke={isHeart && heartFill ? '#F08AB0' : (b.accent ? '#1a1410' : '#fff')}
               strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
               {b.icon}
             </svg>
           </div>
-        ))}
-      </div>
+        );
+      })}
     </div>
   );
 }

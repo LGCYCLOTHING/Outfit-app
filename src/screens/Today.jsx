@@ -638,16 +638,17 @@ export default function ScreenToday() {
                     <div style={{ borderRadius: 18, overflow: 'hidden', position: 'relative' }}>
                       <PhotoPlaceholder ratio="4/5" radius={18} photoId={p.id} photoKey={i === 0 ? ymd(new Date()) : undefined} noBorder />
                       {/* Heart — top-left. Adds today's photo to Archive's LIKED. */}
-                      <div className="liquid-glass archive-pressable" onClick={(e) => { e.stopPropagation(); toggleTodayLike(); }} style={{
+                      <div className="archive-pressable" onClick={(e) => { e.stopPropagation(); toggleTodayLike(); }} style={{
                         position: 'absolute', top: 12, left: 12,
-                        width: 32, height: 32, borderRadius: 16,
+                        width: 32, height: 32,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))',
                       }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24"
+                        <svg width="20" height="20" viewBox="0 0 24 24"
                           fill={todayLiked ? '#F08AB0' : 'none'}
                           stroke={todayLiked ? '#F08AB0' : '#fff'}
-                          strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                          strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                         </svg>
                       </div>

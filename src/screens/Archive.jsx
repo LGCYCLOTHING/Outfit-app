@@ -312,12 +312,12 @@ export default function ScreenArchive() {
               </div>
             </div>
 
-            <div className="liquid-glass archive-pressable" onClick={(e) => { e.stopPropagation(); toggleFav(23); }} style={{
+            <div className="archive-pressable" onClick={(e) => { e.stopPropagation(); toggleFav(23); }} style={{
               position: 'absolute', top: 16, right: 16,
-              width: 38, height: 38, borderRadius: 19,
+              width: 38, height: 38,
               display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
             }}>
-              <HeartIcon size={16} color={favorited.has(23) ? SAGE : '#F5F0E8'} filled={favorited.has(23)} />
+              <HeartIcon size={20} color={favorited.has(23) ? SAGE : '#F5F0E8'} filled={favorited.has(23)} />
             </div>
 
             <div className="liquid-glass archive-pressable" onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('detail'); }} style={{
@@ -379,12 +379,11 @@ export default function ScreenArchive() {
                       className="archive-pressable"
                       style={{
                         position: 'absolute', top: 6, right: 6,
-                        width: 22, height: 22, borderRadius: 11,
-                        background: SAGE_BG, boxShadow: `inset 0 0 0 1px ${SAGE_BORDER}`,
+                        width: 22, height: 22,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         cursor: 'pointer',
                       }}>
-                      <HeartIcon size={10} color={SAGE} filled />
+                      <HeartIcon size={14} color={SAGE} filled />
                     </div>
                     <div style={{
                       position: 'absolute', bottom: 8, left: 10,
@@ -450,12 +449,12 @@ export default function ScreenArchive() {
                       #{f.n}
                     </div>
 
-                    <div className="liquid-glass archive-pressable" onClick={(e) => { e.stopPropagation(); toggleFav(f.id); }} style={{
+                    <div className="archive-pressable" onClick={(e) => { e.stopPropagation(); toggleFav(f.id); }} style={{
                       position: 'absolute', top: 8, right: 8,
-                      width: 32, height: 32, borderRadius: 16,
+                      width: 32, height: 32,
                       display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
                     }}>
-                      <HeartIcon size={13} color={isFav ? SAGE : '#F5F0E8'} filled={isFav} />
+                      <HeartIcon size={17} color={isFav ? SAGE : '#F5F0E8'} filled={isFav} />
                     </div>
 
                     <div style={{
