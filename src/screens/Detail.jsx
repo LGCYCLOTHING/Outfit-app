@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTheme, StatusBar, FitPhoto, getSavedFitPhoto, saveFitPhoto } from '../lib/shared.jsx';
+import { useTheme, StatusBar, FitPhoto, getSavedFitPhoto, appendFitPhoto } from '../lib/shared.jsx';
 
 function ymd(d) {
   const y = d.getFullYear();
@@ -73,13 +73,49 @@ export default function ScreenDetail() {
   const header = deriveHeader(photoKey);
   const fileRef = React.useRef(null);
   const onPickFile = (e) => {
-    const f = e.target.files && e.target.files[0];
+    const input = e.target;
+    const f = input.files && input.files[0];
     if (!f) return;
     const reader = new FileReader();
     reader.onload = () => {
-      const dataUrl = reader.result;
-      saveFitPhoto(photoKey, dataUrl);
-      setPhoto(dataUrl);
+      const img = new Image();
+      img.onload = () => {
+        // Downscale before persisting (12MP iPhone shot would blow the quota).
+        const MAX = 1400;
+        let { width, height } = img;
+        const scale = Math.min(1, MAX / Math.max(width, height));
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        let dataUrl;
+        try { dataUrl = canvas.toDataURL('image/jpeg', 0.85); }
+        catch (err) { dataUrl = reader.result; }
+
+        // Logs the fit on the date this Detail screen represents. Only
+        // date-keyed Details (string ymd) actually persist — numeric demo ids
+        // (e.g. archive id 23) keep the old replace-first-photo behavior so
+        // mock fits aren't accidentally turned into multi-photo logs.
+        const isDate = typeof photoKey === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(photoKey);
+        if (isDate) {
+          appendFitPhoto(photoKey, dataUrl);
+          try {
+            const logged = JSON.parse(localStorage.getItem('aevum_fits_logged') || '[]');
+            if (!logged.includes(photoKey)) {
+              logged.push(photoKey);
+              localStorage.setItem('aevum_fits_logged', JSON.stringify(logged));
+            }
+          } catch (err) {}
+        } else {
+          try { localStorage.setItem('aevum_fit_photo_' + photoKey, dataUrl); } catch (err) {}
+          try { window.dispatchEvent(new CustomEvent('archive:fitschanged', { detail: { key: photoKey } })); } catch (err) {}
+        }
+        setPhoto(dataUrl);
+        try { input.value = ''; } catch (err) {}
+      };
+      img.onerror = () => { try { input.value = ''; } catch (err) {} };
+      img.src = reader.result;
     };
     reader.readAsDataURL(f);
   };
