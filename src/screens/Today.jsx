@@ -511,14 +511,6 @@ export default function ScreenToday() {
               Today's fit
             </span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 14, color: accent, fontWeight: 500,
-              padding: '4px 10px', borderRadius: 100, background: `rgba(${accentRgba},0.12)`,
-              boxShadow: `inset 0 0 0 0.5px rgba(${accentRgba},0.35)` }}>
-              {t.name}
-            </span>
-            <span style={{ fontSize: 15, color: 'var(--text-primary)', fontFamily: '"DM Sans", sans-serif', fontWeight: 500 }}>94%</span>
-          </div>
         </div>
 
         {(() => {

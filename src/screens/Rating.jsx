@@ -17,6 +17,13 @@ export default function ScreenRating() {
   const [stars, setStars] = React.useState(4);
   const [mood, setMood] = React.useState('Confident');
   const [ctx, setCtx] = React.useState('Campus');
+  // Tick bumps on every interactive change so we can replay CSS keyframes
+  const [starsTick, setStarsTick] = React.useState(0);
+  const [moodTick, setMoodTick] = React.useState(0);
+  const [ctxTick, setCtxTick] = React.useState(0);
+  const pickStars = (n) => { setStars(n); setStarsTick(t => t + 1); };
+  const pickMood  = (m) => { setMood(m);  setMoodTick(t => t + 1); };
+  const pickCtx   = (c) => { setCtx(c);   setCtxTick(t => t + 1); };
   const todayKey = ymd(new Date());
   const [photo, setPhoto] = React.useState(() => getSavedFitPhoto(todayKey));
   const fileRef = React.useRef(null);
@@ -187,143 +194,181 @@ export default function ScreenRating() {
 
         <div style={{
           position: 'relative', zIndex: 2,
-          padding: '36px 24px 28px',
           height: '100%', display: 'flex', flexDirection: 'column',
           boxSizing: 'border-box',
+          paddingTop: 32,
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 14 }}>
-            <div style={{ fontSize: 13, color: accent, letterSpacing: -0.40, fontFamily: '"DM Sans", sans-serif' }}>
-              FIT 024 · LOGGED 09:14
-            </div>
-          </div>
-
+          {/* Scrollable content body */}
           <div style={{
-            position: 'relative', width: '78%', margin: '0 auto 4px',
-            borderRadius: 0, overflow: 'visible',
-            background: 'rgba(0,0,0,0.35)',
-            boxShadow: `0 20px 50px -10px rgba(${accentRgba},0.35), 0 30px 60px -20px rgba(0,0,0,0.7)`,
+            flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden',
+            padding: '0 24px 16px',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
           }}>
-            {photo ? (
-              <div style={{ width: '100%', aspectRatio: '4/5', background: 'rgba(0,0,0,0.35)' }}>
-                <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
-              </div>
-            ) : (
-              <FitPhoto id={24} radius={0} ratio="4/5" photoKey={todayKey} />
-            )}
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              onChange={onPickFile}
-              style={{ display: 'none' }}
-            />
-            <div
-              onClick={() => fileRef.current && fileRef.current.click()}
-              className="liquid-glass archive-pressable"
-              style={{
-                position: 'absolute', bottom: 10, right: 10,
-                width: 34, height: 34, borderRadius: 17,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer',
-              }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 7h3l2-2.5h8L18 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
-                <circle cx="12" cy="13" r="3.5"/>
-              </svg>
-            </div>
-          </div>
-
-          <div style={{ textAlign: 'center', marginTop: 18, marginBottom: 14 }}>
-            <div style={{ fontSize: 22, fontWeight: 300, letterSpacing: -0.4, lineHeight: 1.2 }}>
-              How did it feel?
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 8 }}>
-            {[1,2,3,4,5].map(n => {
-              const active = n <= stars;
-              return (
-                <div key={n} onClick={() => setStars(n)} style={{
-                  cursor: 'pointer', width: 32, height: 32,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  filter: 'none',
+            <style>{`.rating-scroll::-webkit-scrollbar{display:none}`}</style>
+            <div className="rating-scroll">
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: 14 }}>
+                <div style={{
+                  fontSize: 11, color: accent, letterSpacing: 1.6,
+                  fontFamily: '"DM Sans", sans-serif', fontWeight: 600,
                 }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24"
-                       fill={active ? accent : 'transparent'}
-                       stroke={active ? accent : 'rgba(255,255,255,0.35)'}
-                       strokeWidth="1.4" strokeLinejoin="round">
-                    <path d="M12 2.5l3 6.4 7 .9-5.2 4.7L18 21l-6-3.5L6 21l1.2-6.5L2 9.8l7-.9z"/>
+                  FIT 024 · LOGGED 09:14
+                </div>
+              </div>
+
+              {/* Photo — full bleed within content area, no rounded corners, contain */}
+              <div style={{
+                position: 'relative', width: '100%',
+                margin: '0 auto 18px',
+                background: 'rgba(0,0,0,0.35)',
+                boxShadow: `0 20px 50px -10px rgba(${accentRgba},0.30), 0 30px 60px -20px rgba(0,0,0,0.7)`,
+                aspectRatio: '4/5',
+                overflow: 'visible',
+              }}>
+                {photo ? (
+                  <img src={photo} alt="" style={{
+                    width: '100%', height: '100%',
+                    objectFit: 'contain', display: 'block',
+                  }} />
+                ) : (
+                  <FitPhoto id={24} radius={0} ratio="4/5" photoKey={todayKey} />
+                )}
+                <input
+                  ref={fileRef} type="file" accept="image/*"
+                  onChange={onPickFile} style={{ display: 'none' }}
+                />
+                <div
+                  onClick={() => fileRef.current && fileRef.current.click()}
+                  className="liquid-glass archive-pressable"
+                  style={{
+                    position: 'absolute', bottom: 10, right: 10,
+                    width: 36, height: 36, borderRadius: 18,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer',
+                  }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 7h3l2-2.5h8L18 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
+                    <circle cx="12" cy="13" r="3.5"/>
                   </svg>
                 </div>
-              );
-            })}
+              </div>
+
+              <div style={{ textAlign: 'center', marginBottom: 12 }}>
+                <div style={{ fontSize: 22, fontWeight: 300, letterSpacing: -0.4, lineHeight: 1.2 }}>
+                  How did it feel?
+                </div>
+              </div>
+
+              {/* Stars — staggered pop animation when rating changes */}
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 6 }}>
+                {[1,2,3,4,5].map(n => {
+                  const active = n <= stars;
+                  return (
+                    <div key={n} onClick={() => pickStars(n)}
+                      className="archive-pressable"
+                      style={{
+                        width: 36, height: 36, borderRadius: 8,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                      <svg key={`${n}-${starsTick}`} width="26" height="26" viewBox="0 0 24 24"
+                           fill={active ? accent : 'transparent'}
+                           stroke={active ? accent : 'rgba(255,255,255,0.35)'}
+                           strokeWidth="1.4" strokeLinejoin="round"
+                           style={{
+                             animation: active ? `star-pop .42s cubic-bezier(.34,1.56,.64,1) ${(n - 1) * 0.04}s` : 'none',
+                             transformOrigin: 'center',
+                           }}>
+                        <path d="M12 2.5l3 6.4 7 .9-5.2 4.7L18 21l-6-3.5L6 21l1.2-6.5L2 9.8l7-.9z"/>
+                      </svg>
+                    </div>
+                  );
+                })}
+              </div>
+              <div key={`label-${starsTick}`} style={{
+                textAlign: 'center', color: accent, fontWeight: 500,
+                letterSpacing: 0.3, marginBottom: 18,
+                fontStyle: 'italic',
+                fontFamily: 'Cormorant Garamond, serif',
+                fontSize: 16,
+                animation: 'star-pop .35s ease',
+                transformOrigin: 'center',
+              }}>
+                {ratingLabels[stars]}
+              </div>
+
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ fontSize: 10, color: 'var(--text-secondary)', letterSpacing: 1.2, marginBottom: 8, fontFamily: '"DM Sans", sans-serif' }}>
+                  MOOD
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {moods.map(m => {
+                    const active = m === mood;
+                    return (
+                      <div key={`${m}-${active ? moodTick : 0}`}
+                        onClick={() => pickMood(m)}
+                        className="archive-pressable"
+                        style={{
+                          padding: '7px 13px', borderRadius: 100,
+                          fontSize: 12.5, fontWeight: 500,
+                          background: active ? `rgba(${accentRgba},0.22)` : 'rgba(255,255,255,0.06)',
+                          color: active ? accent : 'rgba(255,255,255,0.78)',
+                          boxShadow: active
+                            ? `inset 0 0 0 0.5px rgba(${accentRgba},0.55)`
+                            : 'inset 0 0 0 0.5px rgba(255,255,255,0.08)',
+                          animation: active ? 'pill-pop .25s ease' : 'none',
+                        }}>{m}</div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div style={{ marginBottom: 4 }}>
+                <div style={{ fontSize: 10, color: 'var(--text-secondary)', letterSpacing: 1.2, marginBottom: 8, fontFamily: '"DM Sans", sans-serif' }}>
+                  CONTEXT
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {contexts.map(c => {
+                    const active = c === ctx;
+                    return (
+                      <div key={`${c}-${active ? ctxTick : 0}`}
+                        onClick={() => pickCtx(c)}
+                        className="archive-pressable"
+                        style={{
+                          padding: '7px 13px', borderRadius: 100,
+                          fontSize: 12.5, fontWeight: 500,
+                          background: active ? `rgba(${accentRgba},0.22)` : 'rgba(255,255,255,0.06)',
+                          color: active ? accent : 'rgba(255,255,255,0.78)',
+                          boxShadow: active
+                            ? `inset 0 0 0 0.5px rgba(${accentRgba},0.55)`
+                            : 'inset 0 0 0 0.5px rgba(255,255,255,0.08)',
+                          animation: active ? 'pill-pop .25s ease' : 'none',
+                        }}>{c}</div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           </div>
+
+          {/* Sticky Save footer — full-width centered button */}
           <div style={{
-            textAlign: 'center', color: accent, fontWeight: 500,
-            letterSpacing: 0.3, marginBottom: 16,
-            fontStyle: 'italic',
-            fontFamily: 'Cormorant Garamond, serif',
-            fontSize: 15,
+            flexShrink: 0,
+            padding: '14px 24px calc(20px + var(--archive-safe-bottom, 0px))',
+            background: 'linear-gradient(to top, rgba(20,18,16,0.95) 0%, rgba(20,18,16,0.0) 100%)',
+            pointerEvents: 'auto',
           }}>
-            {ratingLabels[stars]}
-          </div>
-
-          <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 10, color: 'var(--text-secondary)', letterSpacing: 1.2, marginBottom: 6, fontFamily: '"DM Sans", sans-serif' }}>
-              MOOD
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {moods.map(m => {
-                const active = m === mood;
-                return (
-                  <div key={m} onClick={() => setMood(m)} style={{
-                    cursor: 'pointer',
-                    padding: '6px 11px', borderRadius: 100,
-                    fontSize: 12, fontWeight: 500,
-                    background: active ? `rgba(${accentRgba},0.22)` : 'rgba(255,255,255,0.06)',
-                    color: active ? accent : 'rgba(255,255,255,0.78)',
-                    boxShadow: active
-                      ? `inset 0 0 0 0.5px rgba(${accentRgba},0.55)`
-                      : 'inset 0 0 0 0.5px rgba(255,255,255,0.08)',
-                  }}>{m}</div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 10, color: 'var(--text-secondary)', letterSpacing: 1.2, marginBottom: 6, fontFamily: '"DM Sans", sans-serif' }}>
-              CONTEXT
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {contexts.map(c => {
-                const active = c === ctx;
-                return (
-                  <div key={c} onClick={() => setCtx(c)} style={{
-                    cursor: 'pointer',
-                    padding: '6px 11px', borderRadius: 100,
-                    fontSize: 12, fontWeight: 500,
-                    background: active ? `rgba(${accentRgba},0.22)` : 'rgba(255,255,255,0.06)',
-                    color: active ? accent : 'rgba(255,255,255,0.78)',
-                    boxShadow: active
-                      ? `inset 0 0 0 0.5px rgba(${accentRgba},0.55)`
-                      : 'inset 0 0 0 0.5px rgba(255,255,255,0.08)',
-                  }}>{c}</div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10 }}>
-            <button onClick={saveFit} style={{
-              border: 'none', cursor: 'pointer',
-              padding: '11px 20px', borderRadius: 100,
-              background: `linear-gradient(135deg, ${accent} 0%, ${accentHot} 100%)`,
-              color: '#0a0a0a', fontSize: 14, fontWeight: 500,
-              display: 'flex', alignItems: 'center', gap: 8,
-            }}>
+            <button onClick={saveFit}
+              className="archive-pressable"
+              style={{
+                width: '100%', height: 52, borderRadius: 26, border: 'none', cursor: 'pointer',
+                background: `linear-gradient(135deg, ${accent} 0%, ${accentHot} 100%)`,
+                color: '#0a0a0a', fontSize: 15, fontWeight: 600,
+                letterSpacing: '-0.01em', fontFamily: 'inherit',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                boxShadow: `0 10px 28px -6px rgba(${accentRgba}, 0.6)`,
+              }}>
               Save fit
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12l5 5L20 7"/>
               </svg>
             </button>
