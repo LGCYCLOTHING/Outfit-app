@@ -556,7 +556,7 @@ export default function ScreenToday() {
                     scrollSnapAlign: 'center',
                     borderRadius: 24, position: 'relative',
                   }}>
-                  <div onClick={() => window.__archiveGo && window.__archiveGo('detail')}
+                  <div onClick={() => window.__archiveGo && window.__archiveGo('rating')}
                     style={{ position: 'relative', padding: 0, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', cursor: 'pointer', gap: 12 }}>
                     <div style={{ borderRadius: 18, overflow: 'hidden', position: 'relative' }}>
                       <PhotoPlaceholder ratio="4/5" radius={18} photoId={p.id} photoKey={i === 0 ? ymd(new Date()) : undefined} noBorder />

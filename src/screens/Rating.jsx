@@ -199,16 +199,16 @@ export default function ScreenRating() {
 
           <div style={{
             position: 'relative', width: '78%', margin: '0 auto 4px',
-            borderRadius: 22, overflow: 'hidden',
+            borderRadius: 0, overflow: 'visible',
             background: 'rgba(0,0,0,0.35)',
             boxShadow: `0 20px 50px -10px rgba(${accentRgba},0.35), 0 30px 60px -20px rgba(0,0,0,0.7)`,
           }}>
             {photo ? (
-              <div style={{ width: '100%', aspectRatio: '4/5', borderRadius: 22, overflow: 'hidden', background: 'rgba(0,0,0,0.35)' }}>
+              <div style={{ width: '100%', aspectRatio: '4/5', background: 'rgba(0,0,0,0.35)' }}>
                 <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
               </div>
             ) : (
-              <FitPhoto id={24} radius={22} ratio="4/5" photoKey={todayKey} />
+              <FitPhoto id={24} radius={0} ratio="4/5" photoKey={todayKey} />
             )}
             <input
               ref={fileRef}
@@ -244,11 +244,11 @@ export default function ScreenRating() {
               const active = n <= stars;
               return (
                 <div key={n} onClick={() => setStars(n)} style={{
-                  cursor: 'pointer', width: 38, height: 38,
+                  cursor: 'pointer', width: 32, height: 32,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   filter: 'none',
                 }}>
-                  <svg width="32" height="32" viewBox="0 0 24 24"
+                  <svg width="24" height="24" viewBox="0 0 24 24"
                        fill={active ? accent : 'transparent'}
                        stroke={active ? accent : 'rgba(255,255,255,0.35)'}
                        strokeWidth="1.4" strokeLinejoin="round">
@@ -260,26 +260,26 @@ export default function ScreenRating() {
           </div>
           <div style={{
             textAlign: 'center', color: accent, fontWeight: 500,
-            letterSpacing: 0.3, marginBottom: 22,
+            letterSpacing: 0.3, marginBottom: 16,
             fontStyle: 'italic',
             fontFamily: 'Cormorant Garamond, serif',
-            fontSize: 18,
+            fontSize: 15,
           }}>
             {ratingLabels[stars]}
           </div>
 
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 12, color: 'var(--text-primary)', letterSpacing: -0.38, fontFamily: '"DM Sans", sans-serif', marginBottom: 8 }}>
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 10, color: 'var(--text-secondary)', letterSpacing: 1.2, marginBottom: 6, fontFamily: '"DM Sans", sans-serif' }}>
               MOOD
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               {moods.map(m => {
                 const active = m === mood;
                 return (
                   <div key={m} onClick={() => setMood(m)} style={{
                     cursor: 'pointer',
-                    padding: '8px 14px', borderRadius: 100,
-                    fontSize: 14, fontWeight: 500,
+                    padding: '6px 11px', borderRadius: 100,
+                    fontSize: 12, fontWeight: 500,
                     background: active ? `rgba(${accentRgba},0.22)` : 'rgba(255,255,255,0.06)',
                     color: active ? accent : 'rgba(255,255,255,0.78)',
                     boxShadow: active
@@ -291,18 +291,18 @@ export default function ScreenRating() {
             </div>
           </div>
 
-          <div style={{ marginBottom: 22 }}>
-            <div style={{ fontSize: 12, color: 'var(--text-primary)', letterSpacing: -0.38, fontFamily: '"DM Sans", sans-serif', marginBottom: 8 }}>
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 10, color: 'var(--text-secondary)', letterSpacing: 1.2, marginBottom: 6, fontFamily: '"DM Sans", sans-serif' }}>
               CONTEXT
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               {contexts.map(c => {
                 const active = c === ctx;
                 return (
                   <div key={c} onClick={() => setCtx(c)} style={{
                     cursor: 'pointer',
-                    padding: '8px 14px', borderRadius: 100,
-                    fontSize: 14, fontWeight: 500,
+                    padding: '6px 11px', borderRadius: 100,
+                    fontSize: 12, fontWeight: 500,
                     background: active ? `rgba(${accentRgba},0.22)` : 'rgba(255,255,255,0.06)',
                     color: active ? accent : 'rgba(255,255,255,0.78)',
                     boxShadow: active
@@ -317,13 +317,13 @@ export default function ScreenRating() {
           <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10 }}>
             <button onClick={saveFit} style={{
               border: 'none', cursor: 'pointer',
-              padding: '13px 22px', borderRadius: 100,
+              padding: '11px 20px', borderRadius: 100,
               background: `linear-gradient(135deg, ${accent} 0%, ${accentHot} 100%)`,
-              color: '#0a0a0a', fontSize: 16, fontWeight: 500,
+              color: '#0a0a0a', fontSize: 14, fontWeight: 500,
               display: 'flex', alignItems: 'center', gap: 8,
             }}>
               Save fit
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12l5 5L20 7"/>
               </svg>
             </button>
