@@ -648,10 +648,57 @@ export default function ScreenToday() {
           );
         })()}
 
-        {/* This week — Instagram-style story circles with actual weekly photos */}
+        {/* This week — only render past + today tiles; if nothing's logged
+            yet show a single inviting empty-state card instead of 4 dead
+            future boxes. */}
         {(() => {
-          const days = getThisWeekDays();
+          const allDays = getThisWeekDays();
+          // Drop future days from the strip entirely.
+          const days = allDays.filter(d => !d.isFuture);
           const loggedCount = days.filter(d => d.hasFit).length;
+
+          // Empty-state: no logged days yet this week → no tile row, just one prompt.
+          if (loggedCount === 0) {
+            return (
+              <div
+                onClick={() => window.__archiveGo && window.__archiveGo('rating')}
+                className="archive-pressable"
+                style={{
+                  marginTop: 22, marginBottom: 22,
+                  padding: '16px 18px', borderRadius: 18,
+                  background: 'rgba(255,240,220,0.04)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255,240,220,0.07)',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
+                  display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer',
+                }}>
+                <div style={{
+                  width: 42, height: 42, borderRadius: 12,
+                  background: `linear-gradient(135deg, ${accent} 0%, ${accentHot} 100%)`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0,
+                  boxShadow: `0 6px 16px -2px rgba(${accentRgba},0.5)`,
+                }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" strokeWidth="2.6" strokeLinecap="round">
+                    <path d="M12 5v14M5 12h14"/>
+                  </svg>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 15, fontWeight: 500, color: '#fff', letterSpacing: -0.2, marginBottom: 2 }}>
+                    This week starts here
+                  </div>
+                  <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                    Log a fit and it shows up across the week.
+                  </div>
+                </div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.45)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 6l6 6-6 6"/>
+                </svg>
+              </div>
+            );
+          }
+
           return (
             <div style={{ marginTop: 22, marginBottom: 22 }}>
               <div style={{
@@ -666,27 +713,24 @@ export default function ScreenToday() {
                     {String(loggedCount).padStart(2, '0')} · {String(days.length).padStart(2, '0')}
                   </span>
                 </div>
-                {loggedCount > 0 && (
-                  <span
-                    onClick={() => window.__archiveGo && window.__archiveGo('story')}
-                    className="archive-pressable"
-                    style={{
-                      fontSize: 13, color: accent, fontWeight: 500, cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', gap: 4,
-                    }}>
-                    Play all
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M9 6l6 6-6 6"/>
-                    </svg>
-                  </span>
-                )}
+                <span
+                  onClick={() => window.__archiveGo && window.__archiveGo('story')}
+                  className="archive-pressable"
+                  style={{
+                    fontSize: 13, color: accent, fontWeight: 500, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', gap: 4,
+                  }}>
+                  Play all
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 6l6 6-6 6"/>
+                  </svg>
+                </span>
               </div>
               <div className="chip-row" style={{
                 display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 4,
               }}>
                 {days.map((d) => {
                   const photo = getSavedFitPhoto(d.dateKey);
-                  const muted = !d.hasFit && !d.isToday;
                   return (
                     <div key={d.dateKey}
                       onClick={() => d.hasFit && window.__archiveGo && window.__archiveGo('story')}
@@ -698,7 +742,6 @@ export default function ScreenToday() {
                         overflow: 'hidden',
                         background: '#0a0a0a',
                         cursor: d.hasFit ? 'pointer' : 'default',
-                        opacity: d.isFuture ? 0.35 : 1,
                         boxShadow: d.isToday
                           ? `0 0 0 1.5px ${accent}, 0 6px 16px -4px rgba(${accentRgba},0.5)`
                           : d.hasFit
@@ -712,12 +755,11 @@ export default function ScreenToday() {
                       ) : (
                         <div style={{
                           width: '100%', height: '100%',
-                          background: muted
-                            ? 'rgba(255,255,255,0.03)'
-                            : `linear-gradient(160deg, ${accentDeep || '#1a1612'}, #0a0708)`,
+                          background: d.hasFit
+                            ? `linear-gradient(160deg, ${accentDeep || '#1a1612'}, #0a0708)`
+                            : 'rgba(255,255,255,0.03)',
                         }} />
                       )}
-                      {/* gradient scrim so the label always reads */}
                       <div style={{
                         position: 'absolute', inset: 0,
                         background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 55%)',
