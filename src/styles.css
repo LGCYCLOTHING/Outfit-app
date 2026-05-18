@@ -732,21 +732,7 @@ body * {
 }
 
 /* Specular highlight arc for the sliding nav active bubble (highest quality treatment) */
-.nav-active-bubble::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 10%;
-  width: 80%; height: 1px;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.7) 30%,
-    rgba(255, 255, 255, 1) 50%,
-    rgba(255, 255, 255, 0.7) 70%,
-    transparent 100%);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 1;
-}
+/* (removed) top-edge highlight line on the active nav bubble — was too noisy */
 
 /* Gradient outline ring — pair with --grad-border CSS var per element.
    Uses mask-composite trick to clip a gradient down to just the border ring. */

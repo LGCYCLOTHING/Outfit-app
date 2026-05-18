@@ -645,7 +645,7 @@ function SlidingBubbleNav({ items, active, itemRefs, onPointerDown, onClickItem,
 
   return (
     <div style={{
-      position: 'absolute', bottom: 'max(16px, var(--archive-safe-bottom, 16px))', left: 0, right: 0, zIndex: 30,
+      position: 'absolute', bottom: 'max(28px, calc(var(--archive-safe-bottom, 16px) + 14px))', left: 0, right: 0, zIndex: 30,
       display: 'flex', justifyContent: 'center', pointerEvents: 'none',
     }}>
       <div
@@ -655,7 +655,7 @@ function SlidingBubbleNav({ items, active, itemRefs, onPointerDown, onClickItem,
           pointerEvents: 'auto',
           position: 'relative',
           width: '82%',
-          padding: '6px 8px',
+          padding: '11px 10px',
           borderRadius: 999,
           display: 'flex', alignItems: 'center', justifyContent: 'space-around',
         }}>
@@ -667,7 +667,7 @@ function SlidingBubbleNav({ items, active, itemRefs, onPointerDown, onClickItem,
             top: '50%',
             left: bubble.left,
             width: bubble.width,
-            height: 36,
+            height: 44,
             transform: `translateY(-50%) scaleX(${stretching ? 1.3 : 1})`,
             transformOrigin: 'center',
             background: 'linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 100%)',
@@ -676,7 +676,6 @@ function SlidingBubbleNav({ items, active, itemRefs, onPointerDown, onClickItem,
             border: '1px solid rgba(255,255,255,0.2)',
             borderRadius: 999,
             boxShadow:
-              'inset 0 1px 0 rgba(255,255,255,0.3), ' +
               'inset 0 -1px 0 rgba(255,255,255,0.05), ' +
               '0 8px 32px rgba(0,0,0,0.4), ' +
               '0 20px 60px rgba(0,0,0,0.2)',
