@@ -838,15 +838,15 @@ export default function ScreenToday() {
           </div>
         }
 
-        {/* ── Fit Score gauge — Whoop-style speedometer above the photo ── */}
+        {/* ── Fit Score gauge — compact, no card wrapper ── */}
         {(() => {
           const score = fitScore.score;
-          const R = 96, STROKE = 18;
-          const PAD = STROKE / 2 + 4;
+          const R = 58, STROKE = 11;
+          const PAD = STROKE / 2 + 3;
           const cx = R + PAD;
           const cy = R + PAD;
           const vbW = cx * 2;
-          const vbH = cy + STROKE / 2 + 4;
+          const vbH = cy + STROKE / 2 + 2;
           const fullLen = Math.PI * R;
           const p = gaugeProgress;
           const angle = Math.PI * (1 - p);
@@ -859,16 +859,10 @@ export default function ScreenToday() {
               onClick={() => window.__archiveGo && window.__archiveGo('fitscore')}
               className="archive-pressable"
               style={{
-                marginTop: 14, marginBottom: 12,
-                padding: '22px 18px 16px', borderRadius: 22,
-                background: 'rgba(255,240,220,0.04)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255,240,220,0.07)',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
+                marginTop: 10, marginBottom: 6,
                 cursor: 'pointer',
               }}>
-              <div style={{ position: 'relative', width: '100%', maxWidth: 300, margin: '0 auto' }}>
+              <div style={{ position: 'relative', width: 170, margin: '0 auto' }}>
                 <svg viewBox={`0 0 ${vbW} ${vbH}`} style={{ width: '100%', display: 'block', overflow: 'visible' }}>
                   <defs>
                     <linearGradient id="fit-gauge-grad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -877,7 +871,6 @@ export default function ScreenToday() {
                       <stop offset="100%" stopColor={accent} />
                     </linearGradient>
                   </defs>
-                  {/* Background track */}
                   <path
                     d={arcD}
                     stroke="rgba(255,255,255,0.10)"
@@ -885,7 +878,6 @@ export default function ScreenToday() {
                     strokeLinecap="round"
                     fill="none"
                   />
-                  {/* Filled arc — animates by dashoffset on mount and score change */}
                   <path
                     d={arcD}
                     stroke="url(#fit-gauge-grad)"
@@ -895,41 +887,39 @@ export default function ScreenToday() {
                     strokeDasharray={fullLen}
                     strokeDashoffset={fullLen - fullLen * p}
                     style={{
-                      filter: `drop-shadow(0 0 6px ${accent})`,
+                      filter: `drop-shadow(0 0 4px ${accent})`,
                       transition: `stroke-dashoffset 1200ms ${ease}`,
                     }}
                   />
-                  {/* White needle dot at the tip of the filled portion */}
                   <circle
                     cx={dotX}
                     cy={dotY}
-                    r={STROKE / 2 - 2}
+                    r={STROKE / 2 - 1.5}
                     fill="#fff"
                     style={{
-                      filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.35))',
+                      filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.35))',
                       transition: `cx 1200ms ${ease}, cy 1200ms ${ease}`,
                     }}
                   />
                 </svg>
-                {/* Score number + label, centered inside the arc */}
                 <div style={{
                   position: 'absolute',
                   left: 0, right: 0,
-                  top: `${(cy - 14) / vbH * 100}%`,
+                  top: `${(cy - 8) / vbH * 100}%`,
                   transform: 'translateY(-50%)',
                   textAlign: 'center',
                   pointerEvents: 'none',
                 }}>
                   <div style={{
-                    fontSize: 48, fontWeight: 700, color: '#fff',
-                    letterSpacing: -1.8, lineHeight: 1,
+                    fontSize: 28, fontWeight: 700, color: '#fff',
+                    letterSpacing: -1, lineHeight: 1,
                     fontFamily: '"DM Sans", -apple-system, system-ui, sans-serif',
                   }}>
                     {score}
                   </div>
                   <div style={{
-                    fontSize: 10, color: 'rgba(255,255,255,0.55)',
-                    letterSpacing: 2.4, fontWeight: 500, marginTop: 6,
+                    fontSize: 8.5, color: 'rgba(255,255,255,0.55)',
+                    letterSpacing: 2, fontWeight: 500, marginTop: 3,
                     fontFamily: '"DM Sans", sans-serif',
                   }}>
                     FIT SCORE
