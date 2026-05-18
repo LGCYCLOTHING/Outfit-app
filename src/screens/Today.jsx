@@ -155,6 +155,10 @@ export default function ScreenToday() {
     setPicksIdx(best);
   }, []);
   const onPicksDown = React.useCallback((e) => {
+    // Mouse-only click-drag-to-scroll. On touch we let the browser handle the
+    // gesture natively — intercepting pointermove on touch causes a noticeable
+    // delay before scrolling kicks in.
+    if (e.pointerType !== 'mouse') return;
     const el = e.currentTarget;
     const startX = e.clientX;
     const startScroll = el.scrollLeft;
@@ -701,14 +705,27 @@ export default function ScreenToday() {
               {/* Trailing spacer — keeps the last card centered when scrolled to end */}
               <div aria-hidden="true" style={{ flex: '0 0 8%' }} />
             </div>
-            {/* Page indicator dots — tracks the actual scroll position */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 14, marginBottom: 4 }}>
+            {/* Page indicator dots — tap to jump to that card */}
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, marginTop: 14, marginBottom: 4 }}>
               {[...picks, 'add'].map((_, i) => (
-                <div key={i} style={{
-                  width: i === picksIdx ? 28 : 8, height: 8, borderRadius: 4,
-                  background: i === picksIdx ? '#fff' : 'rgba(255,255,255,0.35)',
-                  transition: 'width .25s ease, background .25s ease',
-                }} />
+                <div key={i}
+                  onClick={() => {
+                    const row = picksRowRef.current;
+                    if (!row) return;
+                    const target = row.querySelector(`[data-pick-idx="${i}"]`);
+                    if (!target) return;
+                    const left = target.offsetLeft - (row.clientWidth - target.offsetWidth) / 2;
+                    row.scrollTo({ left, behavior: 'smooth' });
+                  }}
+                  className="archive-pressable"
+                  style={{
+                    width: i === picksIdx ? 28 : 8, height: 8, borderRadius: 4,
+                    background: i === picksIdx ? '#fff' : 'rgba(255,255,255,0.35)',
+                    cursor: 'pointer',
+                    // Larger invisible hit target without changing visual size
+                    boxShadow: '0 0 0 6px transparent',
+                    transition: 'width .25s ease, background .25s ease',
+                  }} />
               ))}
             </div>
             </>

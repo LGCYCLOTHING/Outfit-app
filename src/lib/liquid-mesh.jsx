@@ -63,7 +63,10 @@ export default function LiquidMesh({ seed = 0, intensity = 1 }) {
         backgroundImage: `url('${imageSrc}')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
+        // Note: deliberately NOT background-attachment: fixed — that causes
+        // significant scroll lag on iOS Safari (forces a full repaint of the
+        // bg on every scroll frame). The mesh is in an absolute-positioned
+        // container that doesn't scroll itself, so the visual is the same.
       }} />
     );
   };
