@@ -200,10 +200,44 @@ export default function ScreenRating() {
       }
       if (typeof window !== 'undefined') window.__archiveEmpty = false;
       // Persist the set of pieces worn for this date.
+      // Also keep a denormalized times_worn + last_worn on each piece so
+      // Most Worn reads don't have to iterate the junction lists every time.
       try {
-        const arr = Array.from(selectedPieces);
-        if (arr.length) localStorage.setItem(PIECES_KEY, JSON.stringify(arr));
+        const newIds = Array.from(selectedPieces);
+
+        // Diff against whatever was previously stored for this date so editing
+        // a fit doesn't double-count wears.
+        let prevIds = [];
+        try { prevIds = JSON.parse(localStorage.getItem(PIECES_KEY) || '[]'); }
+        catch (err) {}
+        const prevSet = new Set(prevIds);
+        const newSet = new Set(newIds);
+        const added = newIds.filter(id => !prevSet.has(id));
+        const removed = prevIds.filter(id => !newSet.has(id));
+
+        if (newIds.length) localStorage.setItem(PIECES_KEY, JSON.stringify(newIds));
         else localStorage.removeItem(PIECES_KEY);
+
+        if (added.length || removed.length) {
+          let catalog = [];
+          try { catalog = JSON.parse(localStorage.getItem('aevum_pieces') || '[]'); }
+          catch (err) {}
+          const next = catalog.map(p => {
+            if (added.includes(p.id)) {
+              const tw = (typeof p.times_worn === 'number' ? p.times_worn : 0) + 1;
+              // last_worn should reflect the most recent wear; only push it
+              // forward if today is newer than what's stored.
+              const last = (p.last_worn && p.last_worn > todayKey) ? p.last_worn : todayKey;
+              return { ...p, times_worn: tw, last_worn: last };
+            }
+            if (removed.includes(p.id)) {
+              const tw = Math.max(0, (typeof p.times_worn === 'number' ? p.times_worn : 0) - 1);
+              return { ...p, times_worn: tw };
+            }
+            return p;
+          });
+          localStorage.setItem('aevum_pieces', JSON.stringify(next));
+        }
       } catch (e) {}
       // Recompute the weekly score and persist + broadcast.
       let updatedScore = 0;
@@ -467,7 +501,7 @@ export default function ScreenRating() {
               <div style={{
                 fontSize: 9.5, color: 'var(--text-secondary)', letterSpacing: 1.4,
                 fontFamily: '"DM Sans", sans-serif',
-              }}>PIECES WORN TODAY</div>
+              }}>PIECES WORN</div>
               {piecesCatalog.length > 0 && (
                 <div style={{
                   fontSize: 9.5, color: selectedPieces.size > 0 ? accent : 'rgba(255,255,255,0.35)',
