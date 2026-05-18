@@ -63,8 +63,8 @@ export default function ScreenMix() {
   const combos = React.useMemo(() => ([
     {
       title: 'Soft tailoring × denim',
-      defaultReason: "Your cream knit (#006) hasn't met those vintage Levi's. Pair with the espresso loafer for a 60/40 contrast you tend to favor at brunch.",
-      conf: 92, locked: false, pieces: '3 pieces · brunch',
+      defaultReason: "Three relaxed pulls from your closet — different palettes, all anchored by clean white sneakers. Easy to rotate through the week.",
+      conf: 92, locked: false, pieces: '3 pieces · everyday',
     },
     {
       title: 'Rust + olive monochrome',
