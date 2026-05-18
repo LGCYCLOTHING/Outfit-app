@@ -235,50 +235,56 @@ export default function ScreenRating() {
             </div>
           </div>
 
-          {/* Photo — 4/5 aspect, capped height so the rest fits without scrolling.
-              Width derives from height + aspect-ratio so the photo box stays
-              centered with no crop (object-fit: contain). */}
+          {/* Photo — natural aspect ratio (no frame, no letterbox), capped by
+              max-height so the rest of the sheet fits without scrolling. */}
           <div style={{
             position: 'relative',
             margin: '0 auto 12px',
-            background: 'rgba(0,0,0,0.35)',
-            boxShadow: `0 20px 50px -10px rgba(${accentRgba},0.30), 0 30px 60px -20px rgba(0,0,0,0.7)`,
-            aspectRatio: '4/5',
-            height: 'min(44vh, 360px)',
-            overflow: 'visible',
+            display: 'flex', justifyContent: 'center',
           }}>
-            {photo ? (
-              <img src={photo} alt="" style={{
-                width: '100%', height: '100%',
-                objectFit: 'contain', display: 'block',
-              }} />
-            ) : (
-              <FitPhoto id={24} radius={0} ratio="4/5" photoKey={todayKey} noBorder style={{ width: '100%', height: '100%' }} />
-            )}
-            {/* Camera button — native <label>+<input> so iOS opens the picker
-                reliably (programmatic .click() on a hidden input is flaky). */}
-            <label
-              className="liquid-glass archive-pressable"
-              style={{
-                position: 'absolute', bottom: 8, right: 8,
-                width: 36, height: 36, borderRadius: 18,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer',
-              }}>
-              <input
-                ref={fileRef} type="file" accept="image/*"
-                onChange={onPickFile}
+            <div style={{ position: 'relative', display: 'inline-block', maxWidth: '86vw' }}>
+              {photo ? (
+                <img src={photo} alt="" style={{
+                  display: 'block',
+                  maxWidth: '100%',
+                  maxHeight: 'min(44vh, 360px)',
+                  width: 'auto', height: 'auto',
+                  boxShadow: `0 20px 50px -10px rgba(${accentRgba},0.30), 0 30px 60px -20px rgba(0,0,0,0.7)`,
+                }} />
+              ) : (
+                <div style={{
+                  aspectRatio: '4/5',
+                  height: 'min(44vh, 360px)',
+                  boxShadow: `0 20px 50px -10px rgba(${accentRgba},0.30), 0 30px 60px -20px rgba(0,0,0,0.7)`,
+                }}>
+                  <FitPhoto id={24} radius={0} ratio="4/5" photoKey={todayKey} noBorder style={{ width: '100%', height: '100%' }} />
+                </div>
+              )}
+              {/* Camera button — native <label>+<input> so iOS opens the picker
+                  reliably (programmatic .click() on a hidden input is flaky). */}
+              <label
+                className="liquid-glass archive-pressable"
                 style={{
-                  position: 'absolute', inset: 0,
-                  opacity: 0, cursor: 'pointer',
-                  fontSize: 0,
-                }}
-              />
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ pointerEvents: 'none' }}>
-                <path d="M3 7h3l2-2.5h8L18 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
-                <circle cx="12" cy="13" r="3.5"/>
-              </svg>
-            </label>
+                  position: 'absolute', bottom: 8, right: 8,
+                  width: 36, height: 36, borderRadius: 18,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer',
+                }}>
+                <input
+                  ref={fileRef} type="file" accept="image/*"
+                  onChange={onPickFile}
+                  style={{
+                    position: 'absolute', inset: 0,
+                    opacity: 0, cursor: 'pointer',
+                    fontSize: 0,
+                  }}
+                />
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ pointerEvents: 'none' }}>
+                  <path d="M3 7h3l2-2.5h8L18 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
+                  <circle cx="12" cy="13" r="3.5"/>
+                </svg>
+              </label>
+            </div>
           </div>
 
           {/* Stars + label — compact, inline */}

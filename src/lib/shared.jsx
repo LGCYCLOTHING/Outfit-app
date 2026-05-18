@@ -90,16 +90,15 @@ export function FitPhoto({ id = 1, label, date, ratio = '3/4', radius = 18, show
   }
   const saved = getSavedFitPhoto(photoKey != null ? photoKey : id);
   if (saved) {
+    // No aspect-ratio container — the image determines its own shape, so
+    // there's no letterbox bar or surrounding frame.
     return (
-      <div style={{
-        position: 'relative', width: '100%', aspectRatio: ratio,
-        borderRadius: radius, overflow: 'hidden',
-        background: '#000',
-        ...(noBorder ? {} : { boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)' }),
+      <img src={saved} alt="" style={{
+        display: 'block',
+        width: '100%', height: 'auto',
+        borderRadius: radius,
         ...style,
-      }}>
-        <img src={saved} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
-      </div>
+      }} />
     );
   }
   return (
@@ -256,16 +255,15 @@ export function PhotoPlaceholder({ ratio = '3/4', radius = 18, onAdd, photoId, p
   const pid = photoId != null ? photoId : Math.floor(Math.random() * 12);
   const saved = getSavedFitPhoto(photoKey != null ? photoKey : photoId);
   if (saved) {
+    // No aspect-ratio container — the image determines its own shape, so
+    // there's no letterbox bar or surrounding frame.
     return (
-      <div style={{
-        position: 'relative', width: '100%', aspectRatio: ratio,
-        borderRadius: radius, overflow: 'hidden',
-        background: '#000',
-        ...(noBorder ? {} : { boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)' }),
+      <img src={saved} alt="" style={{
+        display: 'block',
+        width: '100%', height: 'auto',
+        borderRadius: radius,
         ...style,
-      }}>
-        <img src={saved} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
-      </div>
+      }} />
     );
   }
   if (typeof window !== 'undefined' && window.__archiveEmpty) {
