@@ -8,16 +8,39 @@ function ymd(d) {
   return `${y}-${m}-${day}`;
 }
 
-// Resolve which photo to show. Callers (Today, Archive, Story) can stash a key
-// on window.__archiveDetailKey before navigating; otherwise we fall back to
-// today's logged photo, then to the demo id 23.
+// Resolve which photo key to show. Callers (Today, Archive, Story) stash a key
+// on window.__archiveDetailKey before navigating. We honor whatever was stashed
+// (even if no photo is saved for it) so the header reflects the day they tapped.
 function resolveDetailPhotoKey() {
   const stashed = typeof window !== 'undefined' ? window.__archiveDetailKey : null;
-  if (stashed != null && getSavedFitPhoto(stashed)) return stashed;
-  const todayKey = ymd(new Date());
-  if (getSavedFitPhoto(todayKey)) return todayKey;
-  if (stashed != null) return stashed; // keep the id even without a photo (for label etc.)
-  return 23;
+  if (stashed != null) return stashed;
+  return 23; // legacy demo
+}
+
+const SHORT_MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const LONG_MONTHS  = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+
+function isDateKey(v) {
+  return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+}
+function deriveHeader(key) {
+  if (isDateKey(key)) {
+    const d = new Date(key);
+    const shortLabel = `${SHORT_MONTHS[d.getMonth()]} ${String(d.getDate()).padStart(2, '0')}`;
+    const longMonth = LONG_MONTHS[d.getMonth()];
+    return {
+      topLabel: shortLabel,
+      eyebrow: longMonth,
+      isDate: true,
+    };
+  }
+  // numeric demo fallback
+  const n = typeof key === 'number' ? key : 23;
+  return {
+    topLabel: `FIT ${String(n).padStart(3, '0')} · MAR 14`,
+    eyebrow: 'MARCH · OUTDOOR · DAY',
+    isDate: false,
+  };
 }
 
 export default function ScreenDetail() {
@@ -31,16 +54,23 @@ export default function ScreenDetail() {
 
   const [photoKey, setPhotoKey] = React.useState(() => resolveDetailPhotoKey());
   const [photo, setPhoto] = React.useState(() => getSavedFitPhoto(photoKey));
-  // If the user logs a new fit while looking at the detail screen, refresh.
+  // Refresh when: the user logs a new fit, OR when they re-navigate to detail
+  // (different day tapped — App.jsx keeps this screen mounted between visits).
   React.useEffect(() => {
     const refresh = () => {
       const k = resolveDetailPhotoKey();
       setPhotoKey(k);
       setPhoto(getSavedFitPhoto(k));
     };
+    const onNav = (e) => { if (e && e.detail === 'detail') refresh(); };
     window.addEventListener('archive:fitschanged', refresh);
-    return () => window.removeEventListener('archive:fitschanged', refresh);
+    window.addEventListener('archive:navigate', onNav);
+    return () => {
+      window.removeEventListener('archive:fitschanged', refresh);
+      window.removeEventListener('archive:navigate', onNav);
+    };
   }, []);
+  const header = deriveHeader(photoKey);
   const fileRef = React.useRef(null);
   const onPickFile = (e) => {
     const f = e.target.files && e.target.files[0];
@@ -106,7 +136,7 @@ export default function ScreenDetail() {
             fontSize: 12, color: 'rgba(26,20,16,0.55)',
             letterSpacing: -0.50, fontFamily: '"DM Sans", sans-serif',
           }}>
-            FIT 023 · MAR 14
+            {header.topLabel}
           </div>
           <div style={{
             width: 38, height: 38, borderRadius: 19,
@@ -127,7 +157,7 @@ export default function ScreenDetail() {
           color: 'rgba(26,20,16,0.55)',
           fontFamily: '"DM Sans", sans-serif',
         }}>
-          MARCH · OUTDOOR · DAY
+          {header.eyebrow}
         </div>
 
         <div style={{ padding: '0 30px', textAlign: 'center', marginBottom: 28 }}>
@@ -136,15 +166,26 @@ export default function ScreenDetail() {
             fontSize: 44, fontWeight: 400, lineHeight: 1.05,
             letterSpacing: -0.5, color: '#1a1410',
           }}>
-            Rust suede &<br/>
-            <span style={{ fontStyle: 'italic' }}>cream knit.</span>
+            {header.isDate ? (
+              photo ? (
+                <>Logged <span style={{ fontStyle: 'italic' }}>fit.</span></>
+              ) : (
+                <>No fit <span style={{ fontStyle: 'italic' }}>logged.</span></>
+              )
+            ) : (
+              <>Rust suede &<br/><span style={{ fontStyle: 'italic' }}>cream knit.</span></>
+            )}
           </div>
           <div style={{
             fontSize: 15, color: 'rgba(26,20,16,0.6)',
             marginTop: 12, lineHeight: 1.55,
             maxWidth: 280, margin: '12px auto 0',
           }}>
-            Worn three times. A reliable autumn baseline — tonal, warm, photographs well in low light.
+            {header.isDate
+              ? (photo
+                  ? 'Tap the camera to replace this photo, or open Pieces below to add what you wore.'
+                  : 'Nothing logged for this day yet. Tap the camera to add a photo.')
+              : 'Worn three times. A reliable autumn baseline — tonal, warm, photographs well in low light.'}
           </div>
         </div>
 
