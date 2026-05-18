@@ -605,41 +605,6 @@ export default function ScreenToday() {
                         </svg>
                       </div>
                     </div>
-                    <div style={{
-                      padding: '14px 18px',
-                      borderRadius: 20,
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-                      background: 'rgba(255,240,220,0.04)',
-                      backdropFilter: 'blur(20px)',
-                      WebkitBackdropFilter: 'blur(20px)',
-                      border: '1px solid rgba(255,240,220,0.07)',
-                      boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
-                    }}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{
-                          fontSize: 18, fontWeight: 500, lineHeight: 1.2, marginBottom: 4, letterSpacing: -0.2,
-                          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                        }}>
-                          {p.title}
-                        </div>
-                        <div style={{
-                          fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.4,
-                          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                        }}>
-                          {p.sub}
-                        </div>
-                      </div>
-                      <button className="liquid-glass" onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('rating'); }} style={{
-                        border: 'none', cursor: 'pointer',
-                        width: 40, height: 40, borderRadius: 20, flexShrink: 0,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: 'var(--text-primary)'
-                      }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M5 12h14M13 6l6 6-6 6" />
-                        </svg>
-                      </button>
-                    </div>
                   </div>
                 </div>
               ))}
@@ -679,11 +644,11 @@ export default function ScreenToday() {
               <div aria-hidden="true" style={{ flex: '0 0 8%' }} />
             </div>
             {/* Page indicator dots — tracks the actual scroll position */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 5, marginTop: 10, marginBottom: 4 }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 14, marginBottom: 4 }}>
               {[...picks, 'add'].map((_, i) => (
                 <div key={i} style={{
-                  width: i === picksIdx ? 16 : 5, height: 5, borderRadius: 3,
-                  background: i === picksIdx ? accent : 'rgba(255,255,255,0.25)',
+                  width: i === picksIdx ? 28 : 8, height: 8, borderRadius: 4,
+                  background: i === picksIdx ? '#fff' : 'rgba(255,255,255,0.35)',
                   transition: 'width .25s ease, background .25s ease',
                 }} />
               ))}
