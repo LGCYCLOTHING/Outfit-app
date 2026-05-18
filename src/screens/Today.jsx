@@ -551,6 +551,7 @@ export default function ScreenToday() {
                   <div onClick={() => window.__archiveGo && window.__archiveGo('rating')}
                     style={{ position: 'relative', padding: 0, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', cursor: 'pointer', gap: 12 }}>
                     <div style={{ borderRadius: 18, overflow: 'hidden', position: 'relative' }}>
+                      <PhotoPlaceholder ratio="4/5" radius={18} photoId={p.id} photoKey={i === 0 ? ymd(new Date()) : undefined} noBorder />
                       <div className="liquid-glass" onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('share'); }} style={{
                         position: 'absolute', bottom: 12, right: 12,
                         width: 32, height: 32, borderRadius: 16,
