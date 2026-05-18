@@ -139,6 +139,25 @@ export default function ScreenToday() {
     return () => window.removeEventListener('archive:likeschanged', refresh);
   }, [todayKey]);
 
+  // ── TODAY date selector + month-calendar dropdown ─────────────────────
+  const [calOpen, setCalOpen] = React.useState(false);
+  const [calCursor, setCalCursor] = React.useState(() => {
+    const d = new Date();
+    return { year: d.getFullYear(), month: d.getMonth() };
+  });
+  const goPrevDay = () => {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    if (typeof window !== 'undefined') window.__archiveDetailKey = ymd(d);
+    window.__archiveGo && window.__archiveGo('detail');
+  };
+  const stepMonth = (dir) => setCalCursor(({ year, month }) => {
+    let m = month + dir, y = year;
+    if (m < 0)  { m = 11; y -= 1; }
+    if (m > 11) { m = 0;  y += 1; }
+    return { year: y, month: m };
+  });
+
   // ── Today's fit carousel — scroll-driven active dot ──
   const [picksIdx, setPicksIdx] = React.useState(0);
   const picksRowRef = React.useRef(null);
@@ -277,6 +296,177 @@ export default function ScreenToday() {
       <StatusBar />
 
       <div style={{ position: 'relative', zIndex: 2, padding: 'calc(12px + var(--archive-safe-top, 54px)) 28px calc(120px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
+        {/* ── TODAY date selector — Whoop-style, right below the notch ── */}
+        <div style={{
+          position: 'relative',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          marginBottom: 18,
+        }}>
+          {/* Prev — yesterday */}
+          <div onClick={goPrevDay} className="archive-pressable" style={{
+            width: 32, height: 32, borderRadius: 16,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(255,255,255,0.06)', cursor: 'pointer',
+          }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 6l-6 6 6 6"/>
+            </svg>
+          </div>
+
+          {/* TODAY pill — tap to toggle calendar */}
+          <div onClick={() => setCalOpen(o => !o)} className="archive-pressable" style={{
+            padding: '8px 22px', borderRadius: 100,
+            background: 'rgba(255,255,255,0.10)',
+            boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.18)',
+            fontSize: 12, fontWeight: 600, letterSpacing: 2.2, color: '#fff',
+            cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}>
+            TODAY
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
+              style={{ transform: calOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform .25s ease' }}>
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </div>
+
+          {/* Next — disabled (can't go to tomorrow) */}
+          <div style={{
+            width: 32, height: 32, borderRadius: 16,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(255,255,255,0.03)',
+            opacity: 0.35, cursor: 'default',
+          }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 6l6 6-6 6"/>
+            </svg>
+          </div>
+
+          {/* Calendar dropdown — slides in below the pill */}
+          {calOpen && (
+            <div onClick={() => setCalOpen(false)} style={{
+              position: 'fixed', inset: 0, zIndex: 40, background: 'transparent',
+            }} />
+          )}
+          <div className="lg-sheet" style={{
+            position: 'absolute', top: 'calc(100% + 10px)', left: -4, right: -4,
+            zIndex: 41,
+            borderRadius: 22, padding: 16,
+            transformOrigin: 'top center',
+            transform: calOpen ? 'translateY(0) scaleY(1)' : 'translateY(-12px) scaleY(0.96)',
+            opacity: calOpen ? 1 : 0,
+            pointerEvents: calOpen ? 'auto' : 'none',
+            transition:
+              'transform .42s cubic-bezier(.16,1,.3,1), ' +
+              'opacity .25s ease',
+            boxShadow: '0 24px 60px -10px rgba(0,0,0,0.55)',
+          }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {(() => {
+              const { year, month } = calCursor;
+              const monthName = ['January','February','March','April','May','June','July','August','September','October','November','December'][month];
+              const today = new Date();
+              const todayY = today.getFullYear(), todayM = today.getMonth(), todayD = today.getDate();
+              // First day of month + day-of-week offset (Monday = 0)
+              const first = new Date(year, month, 1);
+              const dow = (first.getDay() + 6) % 7;
+              const daysInMonth = new Date(year, month + 1, 0).getDate();
+              const cells = [];
+              for (let i = 0; i < dow; i++) cells.push(null);
+              for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+              // pad to multiple of 7
+              while (cells.length % 7 !== 0) cells.push(null);
+              const logged = new Set(readLoggedDays());
+
+              return (
+                <>
+                  {/* Month header with prev / next */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                    <div onClick={() => stepMonth(-1)} className="archive-pressable" style={{
+                      width: 30, height: 30, borderRadius: 15,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: 'rgba(255,255,255,0.06)', cursor: 'pointer',
+                    }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M15 6l-6 6 6 6"/>
+                      </svg>
+                    </div>
+                    <div style={{ fontSize: 15, fontWeight: 500, color: '#fff', letterSpacing: -0.2 }}>
+                      {monthName} {year}
+                    </div>
+                    <div onClick={() => stepMonth(1)} className="archive-pressable" style={{
+                      width: 30, height: 30, borderRadius: 15,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: 'rgba(255,255,255,0.06)', cursor: 'pointer',
+                    }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 6l6 6-6 6"/>
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Day-of-week header */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', marginBottom: 6 }}>
+                    {['M','T','W','T','F','S','S'].map((l, i) => (
+                      <div key={i} style={{
+                        textAlign: 'center', fontSize: 10, fontWeight: 500,
+                        color: 'rgba(255,255,255,0.4)', letterSpacing: 0.5,
+                      }}>{l}</div>
+                    ))}
+                  </div>
+
+                  {/* Date grid */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
+                    {cells.map((d, i) => {
+                      if (d == null) return <div key={i} />;
+                      const cellDate = new Date(year, month, d);
+                      const dateKey = ymd(cellDate);
+                      const isToday = year === todayY && month === todayM && d === todayD;
+                      const isFuture = cellDate > today && !isToday;
+                      const hasFit = logged.has(dateKey);
+                      const tappable = !isToday && !isFuture;
+                      const onTap = () => {
+                        if (!tappable) return;
+                        setCalOpen(false);
+                        if (typeof window !== 'undefined') window.__archiveDetailKey = dateKey;
+                        window.__archiveGo && window.__archiveGo('detail');
+                      };
+                      return (
+                        <div key={i}
+                          onClick={onTap}
+                          className={tappable ? 'archive-pressable' : ''}
+                          style={{
+                            aspectRatio: '1/1',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            borderRadius: 10,
+                            cursor: tappable ? 'pointer' : 'default',
+                            background: isToday
+                              ? `rgba(${accentRgba}, 0.22)`
+                              : (hasFit ? 'rgba(255,255,255,0.06)' : 'transparent'),
+                            boxShadow: isToday ? `inset 0 0 0 1px rgba(${accentRgba}, 0.55)` : 'none',
+                            color: isFuture ? 'rgba(255,255,255,0.25)' : (isToday ? accent : '#fff'),
+                            fontSize: 13,
+                            fontWeight: isToday ? 600 : 400,
+                            position: 'relative',
+                          }}>
+                          {d}
+                          {hasFit && !isToday && (
+                            <div style={{
+                              position: 'absolute', bottom: 4, left: '50%', transform: 'translateX(-50%)',
+                              width: 3, height: 3, borderRadius: 1.5,
+                              background: accent,
+                            }} />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+
         {(() => {
           const streak = computeStreak();
           const weekDays = getThisWeekDays();
@@ -314,17 +504,17 @@ export default function ScreenToday() {
                     <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: 'var(--text-primary)' }} />
                     <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: 'var(--text-primary)' }} />
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <WeatherIcon type={weather.icon} size={22} color="#F5F0E8" />
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <WeatherIcon type={weather.icon} size={18} color="#F5F0E8" />
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
                       <span style={{
-                        fontSize: 32, color: 'var(--text-primary)',
+                        fontSize: 22, color: 'var(--text-primary)',
                         letterSpacing: '-0.05em', lineHeight: 1,
                       }}>
                         {weather.temp}°
                       </span>
                       <span style={{
-                        fontSize: 16, color: 'var(--text-secondary)',
+                        fontSize: 13, color: 'var(--text-secondary)',
                         letterSpacing: '-0.02em',
                       }}>
                         {weather.condition}
@@ -364,17 +554,8 @@ export default function ScreenToday() {
                 </div>
               </div>
 
-              {/* Week strip — compact glass card */}
-              <div style={{
-                borderRadius: 14,
-                padding: '6px 14px',
-                margin: '10px 0 18px',
-                background: 'rgba(255,240,220,0.04)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255,240,220,0.07)',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
-              }}>
+              {/* (week strip removed — replaced by the TODAY date selector + calendar dropdown at the top of the screen) */}
+              <div style={{ display: 'none' }}>
                 <div style={{
                   display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)',
                 }}>
