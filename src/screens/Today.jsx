@@ -130,6 +130,13 @@ export default function ScreenToday() {
       window.removeEventListener('archive:scorechanged', refresh);
     };
   }, []);
+  // Animated arc/dot — start at 0 on first paint so the on-load draw plays.
+  const [gaugeProgress, setGaugeProgress] = React.useState(0);
+  React.useEffect(() => {
+    const target = Math.max(0, Math.min(1, fitScore.score / 100));
+    const r = requestAnimationFrame(() => setGaugeProgress(target));
+    return () => cancelAnimationFrame(r);
+  }, [fitScore.score]);
 
   // Per-PHOTO like state. The set holds composite keys like "2026-05-18#0"
   // so multiple photos on the same day can be liked individually (a bare
@@ -831,6 +838,108 @@ export default function ScreenToday() {
           </div>
         }
 
+        {/* ── Fit Score gauge — Whoop-style speedometer above the photo ── */}
+        {(() => {
+          const score = fitScore.score;
+          const R = 96, STROKE = 18;
+          const PAD = STROKE / 2 + 4;
+          const cx = R + PAD;
+          const cy = R + PAD;
+          const vbW = cx * 2;
+          const vbH = cy + STROKE / 2 + 4;
+          const fullLen = Math.PI * R;
+          const p = gaugeProgress;
+          const angle = Math.PI * (1 - p);
+          const dotX = cx + R * Math.cos(angle);
+          const dotY = cy - R * Math.sin(angle);
+          const arcD = `M ${cx - R} ${cy} A ${R} ${R} 0 0 1 ${cx + R} ${cy}`;
+          const ease = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
+          return (
+            <div
+              onClick={() => window.__archiveGo && window.__archiveGo('streak')}
+              className="archive-pressable"
+              style={{
+                marginTop: 14, marginBottom: 12,
+                padding: '22px 18px 16px', borderRadius: 22,
+                background: 'rgba(255,240,220,0.04)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,240,220,0.07)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
+                cursor: 'pointer',
+              }}>
+              <div style={{ position: 'relative', width: '100%', maxWidth: 300, margin: '0 auto' }}>
+                <svg viewBox={`0 0 ${vbW} ${vbH}`} style={{ width: '100%', display: 'block', overflow: 'visible' }}>
+                  <defs>
+                    <linearGradient id="fit-gauge-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%"  stopColor="rgba(255,255,255,0.22)" />
+                      <stop offset="55%" stopColor={accent} stopOpacity="0.85" />
+                      <stop offset="100%" stopColor={accent} />
+                    </linearGradient>
+                  </defs>
+                  {/* Background track */}
+                  <path
+                    d={arcD}
+                    stroke="rgba(255,255,255,0.10)"
+                    strokeWidth={STROKE}
+                    strokeLinecap="round"
+                    fill="none"
+                  />
+                  {/* Filled arc — animates by dashoffset on mount and score change */}
+                  <path
+                    d={arcD}
+                    stroke="url(#fit-gauge-grad)"
+                    strokeWidth={STROKE}
+                    strokeLinecap="round"
+                    fill="none"
+                    strokeDasharray={fullLen}
+                    strokeDashoffset={fullLen - fullLen * p}
+                    style={{
+                      filter: `drop-shadow(0 0 6px ${accent})`,
+                      transition: `stroke-dashoffset 1200ms ${ease}`,
+                    }}
+                  />
+                  {/* White needle dot at the tip of the filled portion */}
+                  <circle
+                    cx={dotX}
+                    cy={dotY}
+                    r={STROKE / 2 - 2}
+                    fill="#fff"
+                    style={{
+                      filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.35))',
+                      transition: `cx 1200ms ${ease}, cy 1200ms ${ease}`,
+                    }}
+                  />
+                </svg>
+                {/* Score number + label, centered inside the arc */}
+                <div style={{
+                  position: 'absolute',
+                  left: 0, right: 0,
+                  top: `${(cy - 14) / vbH * 100}%`,
+                  transform: 'translateY(-50%)',
+                  textAlign: 'center',
+                  pointerEvents: 'none',
+                }}>
+                  <div style={{
+                    fontSize: 48, fontWeight: 700, color: '#fff',
+                    letterSpacing: -1.8, lineHeight: 1,
+                    fontFamily: '"DM Sans", -apple-system, system-ui, sans-serif',
+                  }}>
+                    {score}
+                  </div>
+                  <div style={{
+                    fontSize: 10, color: 'rgba(255,255,255,0.55)',
+                    letterSpacing: 2.4, fontWeight: 500, marginTop: 6,
+                    fontFamily: '"DM Sans", sans-serif',
+                  }}>
+                    FIT SCORE
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
         <div style={{
           marginTop: 22, marginBottom: 8,
           display: 'flex', alignItems: 'center', justifyContent: 'center'
@@ -1050,87 +1159,9 @@ export default function ScreenToday() {
           })();
 
           return (
-            <>
-            {/* ── Fit Score card — sits above the 2×2 stat grid ── */}
-            {(() => {
-              const score = fitScore.score;
-              const tier = scoreTier(score);
-              const label = scoreLabel(score);
-              const numberColor = tier === 'muted' ? 'rgba(255,255,255,0.45)' : accent;
-              const glow = tier === 'glow'
-                ? `0 0 24px rgba(${accentRgba},0.55), 0 0 6px rgba(${accentRgba},0.85)`
-                : 'none';
-              return (
-                <div
-                  onClick={() => window.__archiveGo && window.__archiveGo('streak')}
-                  className="archive-pressable"
-                  style={{
-                    marginTop: 20, padding: '18px 20px',
-                    borderRadius: 18,
-                    background: 'rgba(255,240,220,0.04)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255,240,220,0.07)',
-                    boxShadow: tier === 'glow'
-                      ? `0 4px 16px rgba(0,0,0,0.22), 0 0 32px -4px rgba(${accentRgba},0.35)`
-                      : '0 4px 16px rgba(0,0,0,0.22)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
-                    cursor: 'pointer',
-                  }}>
-                  <div>
-                    <div style={{
-                      fontSize: 9.5, color: 'var(--text-secondary)', letterSpacing: 1.6,
-                      fontFamily: '"DM Sans", sans-serif', marginBottom: 6,
-                    }}>FIT SCORE · THIS WEEK</div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                      <span style={{
-                        fontFamily: 'Cormorant Garamond, serif',
-                        fontWeight: 300, fontSize: 56, lineHeight: 0.9,
-                        letterSpacing: -1.5,
-                        color: numberColor,
-                        textShadow: glow,
-                      }}>{score}</span>
-                      <span style={{
-                        fontSize: 16, color: 'rgba(255,255,255,0.4)', letterSpacing: -0.3,
-                      }}>/100</span>
-                    </div>
-                    <div style={{
-                      marginTop: 6, fontSize: 13, fontWeight: 500,
-                      color: tier === 'muted' ? 'var(--text-secondary)' : accent,
-                      letterSpacing: -0.1,
-                    }}>{label}</div>
-                    <div style={{
-                      marginTop: 2, fontSize: 11.5, color: 'var(--text-secondary)',
-                    }}>your style score</div>
-                  </div>
-
-                  {/* Circular score ring on the right */}
-                  {(() => {
-                    const size = 76, stroke = 5;
-                    const r = (size - stroke) / 2;
-                    const c = 2 * Math.PI * r;
-                    const dash = Math.max(0, Math.min(1, score / 100)) * c;
-                    return (
-                      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-                        <circle cx={size/2} cy={size/2} r={r}
-                          stroke="rgba(255,255,255,0.10)" strokeWidth={stroke} fill="none" />
-                        <circle cx={size/2} cy={size/2} r={r}
-                          stroke={tier === 'muted' ? 'rgba(255,255,255,0.45)' : accent}
-                          strokeWidth={stroke} fill="none" strokeLinecap="round"
-                          strokeDasharray={`${dash} ${c}`}
-                          transform={`rotate(-90 ${size/2} ${size/2})`}
-                          style={{ filter: tier === 'glow' ? `drop-shadow(0 0 6px rgba(${accentRgba},0.6))` : 'none' }}
-                        />
-                      </svg>
-                    );
-                  })()}
-                </div>
-              );
-            })()}
-
             <div
               ref={statsGridRef}
-              style={{ marginTop: 12, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: STAT_GAP, position: 'relative' }}>
+              style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: STAT_GAP, position: 'relative' }}>
               {STAT_DOM_ORDER.map((id) => {
                 const stat = statsById[id];
                 const isDragging = draggingStatId === id;
@@ -1196,7 +1227,6 @@ export default function ScreenToday() {
                 );
               })}
             </div>
-            </>
           );
         })()}
 
