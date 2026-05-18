@@ -28,6 +28,19 @@ export default function ScreenRating() {
   const [photo, setPhoto] = React.useState(() => getSavedFitPhoto(todayKey));
   const fileRef = React.useRef(null);
 
+  // Personal note about the outfit — fed to future AI insight features.
+  // Persisted per-day in localStorage under aevum_fit_note_<dateKey>.
+  const NOTE_KEY = `aevum_fit_note_${todayKey}`;
+  const [note, setNote] = React.useState(() => {
+    try { return localStorage.getItem(NOTE_KEY) || ''; } catch (e) { return ''; }
+  });
+  React.useEffect(() => {
+    try {
+      if (note) localStorage.setItem(NOTE_KEY, note);
+      else localStorage.removeItem(NOTE_KEY);
+    } catch (e) {}
+  }, [note, NOTE_KEY]);
+
   // ── Slide-up sheet state (mirrors the hamburger drawer pattern) ──
   const [open, setOpen] = React.useState(false);
   const [dragOffset, setDragOffset] = React.useState(0);
@@ -375,6 +388,36 @@ export default function ScreenRating() {
                 );
               })}
             </div>
+          </div>
+
+          {/* NOTE — short free-form text for AI insights to draw from later */}
+          <div style={{ padding: '10px 24px 0' }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              marginBottom: 5,
+            }}>
+              <div style={{ fontSize: 9.5, color: 'var(--text-secondary)', letterSpacing: 1.4, fontFamily: '"DM Sans", sans-serif' }}>
+                NOTE
+              </div>
+              <div style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.35)', fontFamily: '"DM Sans", sans-serif' }}>
+                {note.length}/140
+              </div>
+            </div>
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value.slice(0, 140))}
+              placeholder="Anything to remember about this fit?"
+              rows={2}
+              style={{
+                width: '100%', boxSizing: 'border-box',
+                padding: '8px 11px', borderRadius: 10,
+                background: 'rgba(255,255,255,0.05)',
+                border: 'none', outline: 'none', resize: 'none',
+                boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.10)',
+                fontFamily: 'inherit', fontSize: 12.5, lineHeight: 1.35,
+                color: '#fff',
+              }}
+            />
           </div>
 
           {/* Save footer — anchored to bottom via marginTop:auto */}
