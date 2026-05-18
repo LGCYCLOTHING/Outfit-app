@@ -378,44 +378,57 @@ export default function ScreenToday() {
                 <div style={{
                   display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)',
                 }}>
-                  {weekDays.map((d, i) => (
-                    <div key={i} style={{
-                      display: 'flex', flexDirection: 'column',
-                      alignItems: 'center', gap: 2,
-                    }}>
-                      {/* Compact pill — letter + date stacked tight */}
-                      <div style={{
-                        background: d.isToday ? `rgba(${accentRgba}, 0.22)` : 'transparent',
-                        borderRadius: 11,
-                        padding: '3px 0',
-                        width: 26,
-                        display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', gap: 0,
-                      }}>
-                        <span style={{
-                          fontSize: 10,
-                          color: d.isToday ? accent : '#B5A89A',
-                          letterSpacing: '0.05em',
-                          lineHeight: 1.1,
+                  {weekDays.map((d, i) => {
+                    const onTap = () => {
+                      if (d.isFuture) return;
+                      if (d.isToday && !d.hasFit) {
+                        window.__archiveGo && window.__archiveGo('rating');
+                        return;
+                      }
+                      // Past day OR today with a logged fit → open detail for that day
+                      if (typeof window !== 'undefined') window.__archiveDetailKey = d.dateKey;
+                      window.__archiveGo && window.__archiveGo('detail');
+                    };
+                    return (
+                      <div key={i}
+                        onClick={onTap}
+                        className={d.isFuture ? '' : 'archive-pressable'}
+                        style={{
+                          display: 'flex', flexDirection: 'column',
+                          alignItems: 'center',
+                          cursor: d.isFuture ? 'default' : 'pointer',
+                          opacity: d.isFuture ? 0.4 : 1,
+                          padding: '4px 0',
                         }}>
-                          {d.letter}
-                        </span>
-                        <span style={{
-                          fontSize: 13,
-                          color: d.isToday ? accent : '#D4C8B8',
-                          letterSpacing: '-0.02em',
-                          lineHeight: 1.1,
+                        {/* Compact pill — letter + date stacked tight */}
+                        <div style={{
+                          background: d.isToday ? `rgba(${accentRgba}, 0.22)` : 'transparent',
+                          borderRadius: 11,
+                          padding: '3px 0',
+                          width: 26,
+                          display: 'flex', flexDirection: 'column',
+                          alignItems: 'center', gap: 0,
                         }}>
-                          {d.dateNum}
-                        </span>
+                          <span style={{
+                            fontSize: 10,
+                            color: d.isToday ? accent : '#B5A89A',
+                            letterSpacing: '0.05em',
+                            lineHeight: 1.1,
+                          }}>
+                            {d.letter}
+                          </span>
+                          <span style={{
+                            fontSize: 13,
+                            color: d.isToday ? accent : '#D4C8B8',
+                            letterSpacing: '-0.02em',
+                            lineHeight: 1.1,
+                          }}>
+                            {d.dateNum}
+                          </span>
+                        </div>
                       </div>
-                      {/* Logged fit indicator */}
-                      <div style={{
-                        width: 3, height: 3, borderRadius: 1.5,
-                        background: d.hasFit ? accent : 'transparent',
-                      }} />
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </React.Fragment>
