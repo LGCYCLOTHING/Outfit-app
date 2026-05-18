@@ -402,6 +402,17 @@ export default function ScreenRating() {
             </div>
           </div>
 
+          {/* Middle section: stars / mood / context / pieces / note.
+              Scrolls if it exceeds available space so Save stays anchored. */}
+          <div style={{
+            flex: 1, minHeight: 0,
+            overflowY: 'auto', overflowX: 'hidden',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
+          }}>
+            <style>{`.rating-mid::-webkit-scrollbar{display:none}`}</style>
+            <div className="rating-mid">
+
           {/* Stars + label — compact, inline */}
           <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 10 }}>
             <div style={{ display: 'flex', gap: 10 }}>
@@ -631,10 +642,13 @@ export default function ScreenRating() {
             />
           </div>
 
-          {/* Save footer — anchored to bottom via marginTop:auto */}
+            </div>
+          </div>
+
+          {/* Save footer — pinned at bottom; middle area scrolls if needed */}
           <div style={{
-            marginTop: 'auto',
-            padding: '12px 24px calc(16px + var(--archive-safe-bottom, 0px))',
+            flexShrink: 0,
+            padding: '10px 24px calc(14px + var(--archive-safe-bottom, 0px))',
             pointerEvents: 'auto',
           }}>
             <button onClick={saveFit}
