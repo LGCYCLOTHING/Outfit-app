@@ -316,45 +316,52 @@ export default function ScreenToday() {
             <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: 'var(--text-primary)' }} />
           </div>
 
-          {/* TODAY pill — absolutely centered so hamburger/streak widths don't shift it */}
+          {/* TODAY pill — rounded-rectangle outer with a raised inner button.
+              Absolute-centered so hamburger/streak widths don't shift it. */}
           <div style={{
             position: 'absolute', left: '50%', top: '50%',
             transform: 'translate(-50%, -50%)',
             display: 'flex', alignItems: 'center',
-            padding: 4, borderRadius: 100,
-            background: 'rgba(20,18,16,0.62)',
-            border: '0.5px solid rgba(255,255,255,0.10)',
+            padding: '4px 6px', borderRadius: 14,
+            background: 'rgba(18,16,14,0.72)',
+            border: '0.5px solid rgba(255,255,255,0.08)',
+            boxShadow:
+              'inset 0 1px 0 rgba(255,255,255,0.06), ' +
+              '0 2px 6px rgba(0,0,0,0.30)',
             backdropFilter: 'blur(14px)',
             WebkitBackdropFilter: 'blur(14px)',
           }}>
             {/* Prev — yesterday */}
             <div onClick={goPrevDay} className="archive-pressable" style={{
-              width: 18, height: 26,
+              width: 20, height: 28,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
             }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M15 6l-6 6 6 6"/>
               </svg>
             </div>
-            {/* TODAY — raised glass pill in the middle */}
+            {/* TODAY — raised, slightly-rounded button */}
             <div onClick={() => setCalOpen(o => !o)} className="archive-pressable" style={{
-              padding: '6px 12px', borderRadius: 100,
-              margin: '0 2px',
-              background: 'rgba(255,255,255,0.10)',
-              boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.16), 0 1px 2px rgba(0,0,0,0.25)',
-              fontSize: 11, fontWeight: 600, letterSpacing: 1.6, color: '#fff',
+              padding: '7px 14px', borderRadius: 10,
+              margin: '0 4px',
+              background: 'linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.06) 100%)',
+              boxShadow:
+                'inset 0 0.5px 0 rgba(255,255,255,0.30), ' +
+                'inset 0 -0.5px 0 rgba(0,0,0,0.20), ' +
+                '0 1px 2px rgba(0,0,0,0.35)',
+              fontSize: 11, fontWeight: 700, letterSpacing: 1.4, color: '#fff',
               cursor: 'pointer',
             }}>
               TODAY
             </div>
             {/* Next — disabled */}
             <div style={{
-              width: 18, height: 26,
+              width: 20, height: 28,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               opacity: 0.4, cursor: 'default',
             }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 6l6 6-6 6"/>
               </svg>
             </div>
