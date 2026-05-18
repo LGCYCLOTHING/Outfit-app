@@ -118,26 +118,43 @@ export default function ScreenToday() {
     return () => window.removeEventListener('archive:fitschanged', onFitsChanged);
   }, []);
 
-  // Like state for today's fit — date string sits in aevum_liked_fits alongside
-  // the legacy numeric archive ids, so the Archive LIKED section can pick it up.
+  // Per-PHOTO like state. The set holds composite keys like "2026-05-18#0"
+  // so multiple photos on the same day can be liked individually (a bare
+  // "2026-05-18" is treated as legacy = the first photo).
   const todayKey = ymd(new Date());
-  const readLiked = () => {
+  const readLikedSet = () => {
     try { return new Set(JSON.parse(localStorage.getItem('aevum_liked_fits') || '[]')); }
     catch (e) { return new Set(); }
   };
-  const [todayLiked, setTodayLiked] = React.useState(() => readLiked().has(todayKey));
-  const toggleTodayLike = () => {
-    const set = readLiked();
-    if (set.has(todayKey)) set.delete(todayKey); else set.add(todayKey);
-    try { localStorage.setItem('aevum_liked_fits', JSON.stringify(Array.from(set))); } catch (e) {}
-    setTodayLiked(set.has(todayKey));
-    try { window.dispatchEvent(new CustomEvent('archive:likeschanged')); } catch (e) {}
-  };
+  const [likedSet, setLikedSet] = React.useState(readLikedSet);
   React.useEffect(() => {
-    const refresh = () => setTodayLiked(readLiked().has(todayKey));
+    const refresh = () => setLikedSet(readLikedSet());
     window.addEventListener('archive:likeschanged', refresh);
     return () => window.removeEventListener('archive:likeschanged', refresh);
-  }, [todayKey]);
+  }, []);
+  const isPhotoLiked = (photoIdx) => {
+    if (photoIdx == null) return false;
+    if (likedSet.has(`${todayKey}#${photoIdx}`)) return true;
+    if (photoIdx === 0 && likedSet.has(todayKey)) return true; // legacy bare date key
+    return false;
+  };
+  const togglePhotoLike = (photoIdx) => {
+    if (photoIdx == null) return; // can't like the empty placeholder
+    const composite = `${todayKey}#${photoIdx}`;
+    setLikedSet(prev => {
+      const next = new Set(prev);
+      const wasLiked = next.has(composite) || (photoIdx === 0 && next.has(todayKey));
+      if (wasLiked) {
+        next.delete(composite);
+        if (photoIdx === 0) next.delete(todayKey); // also strip legacy entry
+      } else {
+        next.add(composite);
+      }
+      try { localStorage.setItem('aevum_liked_fits', JSON.stringify(Array.from(next))); } catch (e) {}
+      try { window.dispatchEvent(new CustomEvent('archive:likeschanged')); } catch (e) {}
+      return next;
+    });
+  };
 
   // ── TODAY date selector + month-calendar dropdown ─────────────────────
   const [calOpen, setCalOpen] = React.useState(false);
@@ -873,21 +890,28 @@ export default function ScreenToday() {
                       ) : (
                         <PhotoPlaceholder ratio="4/5" radius={18} photoId={3} noBorder />
                       )}
-                      {/* Heart — top-left. Adds today's photo to Archive's LIKED. */}
-                      <div className="archive-pressable" onClick={(e) => { e.stopPropagation(); toggleTodayLike(); }} style={{
-                        position: 'absolute', top: 12, left: 12,
-                        width: 32, height: 32,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer',
-                        filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))',
-                      }}>
-                        <svg width="20" height="20" viewBox="0 0 24 24"
-                          fill={todayLiked ? '#F08AB0' : 'none'}
-                          stroke={todayLiked ? '#F08AB0' : '#fff'}
-                          strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                        </svg>
-                      </div>
+                      {/* Heart — top-left. Like is tied to THIS photo, not the day. */}
+                      {p.index != null && (
+                        <div className="archive-pressable"
+                          onPointerDown={(e) => e.stopPropagation()}
+                          onClick={(e) => { e.stopPropagation(); togglePhotoLike(p.index); }}
+                          style={{
+                            position: 'absolute', top: 14, left: 14,
+                            width: 40, height: 40,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            cursor: 'pointer',
+                            filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))',
+                          }}>
+                          {(() => { const liked = isPhotoLiked(p.index); return (
+                          <svg width="22" height="22" viewBox="0 0 24 24"
+                            fill={liked ? '#F08AB0' : 'none'}
+                            stroke={liked ? '#F08AB0' : '#fff'}
+                            strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                          </svg>
+                          ); })()}
+                        </div>
+                      )}
                       <div className="liquid-glass archive-pressable" onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('share'); }} style={{
                         position: 'absolute', bottom: 12, right: 12,
                         width: 32, height: 32, borderRadius: 16,

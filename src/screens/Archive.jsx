@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   useTheme, bgColor, fgColor,
-  ArchiveBurger, StatusBar, TabBar, fitGradient, fitBorder, getSavedFitPhoto,
+  ArchiveBurger, StatusBar, TabBar, fitGradient, fitBorder, getSavedFitPhoto, getSavedFitPhotos,
 } from '../lib/shared.jsx';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
 
@@ -124,21 +124,49 @@ export default function ScreenArchive() {
     return { ...m, fits: sortFits(filtered), count: String(filtered.length).padStart(2, '0') };
   }).filter(m => m.fits.length > 0);
 
-  // Collect all liked fits across months for the LIKED section.
-  // The liked set is a mix of numeric archive ids and date strings (daily fits
-  // liked from the Today screen). Daily ones show the user's actual saved photo.
-  const isDateKey = (v) => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+  // Liked set is a mix of:
+  //   - numeric archive ids (legacy demo fits)
+  //   - "YYYY-MM-DD" — legacy day-level like (photo idx 0)
+  //   - "YYYY-MM-DD#N" — composite per-photo like (photo idx N)
+  // Daily entries render with the user's actual saved photo for that slot.
+  const parseLiked = (v) => {
+    if (typeof v === 'number') return { kind: 'archive', id: v };
+    if (typeof v === 'string') {
+      if (v.includes('#')) {
+        const [d, i] = v.split('#');
+        if (/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+          return { kind: 'daily', dateKey: d, photoIdx: parseInt(i, 10) || 0, raw: v };
+        }
+      } else if (/^\d{4}-\d{2}-\d{2}$/.test(v)) {
+        return { kind: 'daily', dateKey: v, photoIdx: 0, raw: v };
+      }
+    }
+    return null;
+  };
   const allFits = months.flatMap(m => m.fits);
   const likedArchiveFits = allFits.filter(f => favorited.has(f.id));
   const likedDailyFits = Array.from(favorited)
-    .filter(isDateKey)
-    .sort((a, b) => b.localeCompare(a))
-    .map(dateStr => {
-      const d = new Date(dateStr);
+    .map(parseLiked)
+    .filter(p => p && p.kind === 'daily')
+    .sort((a, b) => (b.dateKey === a.dateKey ? b.photoIdx - a.photoIdx : b.dateKey.localeCompare(a.dateKey)))
+    .map(({ dateKey, photoIdx, raw }) => {
+      const photos = getSavedFitPhotos(dateKey);
+      const photo = photos[photoIdx] || null;
+      // Skip if the user deleted the underlying photo
+      if (!photo && photos.length === 0) return null;
+      const d = new Date(dateKey);
       const mm = String(d.getMonth() + 1).padStart(2, '0');
       const dd = String(d.getDate()).padStart(2, '0');
-      return { isDaily: true, id: dateStr, dateStr, n: `${mm}/${dd}` };
-    });
+      return {
+        isDaily: true,
+        id: raw,
+        dateStr: dateKey,
+        photoIdx,
+        photo,
+        n: `${mm}/${dd}`,
+      };
+    })
+    .filter(Boolean);
   const likedFits = [...likedDailyFits, ...likedArchiveFits];
 
   return (
@@ -378,7 +406,7 @@ export default function ScreenArchive() {
               padding: '0 24px 4px', display: 'flex', gap: 10, overflowX: 'auto',
             }}>
               {likedFits.map(f => {
-                const photo = f.isDaily ? getSavedFitPhoto(f.dateStr) : null;
+                const photo = f.isDaily ? f.photo : null;
                 const seed = typeof f.id === 'number' ? f.id : 7;
                 return (
                   <div key={String(f.id)} onClick={(e) => {
