@@ -42,6 +42,18 @@ export async function initSupabaseSync() {
   supabase.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session && session.user) {
       currentUserId = session.user.id;
+      // Strip the magic-link / OAuth tokens off the URL so the address bar is
+      // clean and refreshes don't try to re-process the callback.
+      try { window.history.replaceState({}, document.title, window.location.pathname); } catch (e) {}
+      // Take the user to Today. If React hasn't wired __archiveGo yet (very
+      // early callback), retry once on the next tick.
+      const goToToday = () => {
+        if (typeof window !== 'undefined' && window.__archiveGo) {
+          try { window.__archiveGo('today'); } catch (e) {}
+        }
+      };
+      goToToday();
+      setTimeout(goToToday, 50);
       await onSignIn(session.user);
       emitAuth();
     } else if (event === 'SIGNED_OUT') {
@@ -354,7 +366,7 @@ export async function signInWithGoogle() {
 export async function signInWithEmail(email) {
   return supabase.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : undefined },
+    options: { emailRedirectTo: window.location.origin },
   });
 }
 export async function signOut() {
