@@ -85,13 +85,48 @@ export default function ScreenRating() {
   };
 
   const onPickFile = (e) => {
-    const f = e.target.files && e.target.files[0];
+    const input = e.target;
+    const f = input.files && input.files[0];
     if (!f) return;
     const reader = new FileReader();
     reader.onload = () => {
-      const dataUrl = reader.result;
-      saveFitPhoto(todayKey, dataUrl);
-      setPhoto(dataUrl);
+      const img = new Image();
+      img.onload = () => {
+        // Downscale to max 1400px on longest side + JPEG 0.85 so a 12MP iPhone
+        // photo stays well inside the localStorage quota (~5–10MB total).
+        const MAX = 1400;
+        let { width, height } = img;
+        const scale = Math.min(1, MAX / Math.max(width, height));
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        let dataUrl;
+        try { dataUrl = canvas.toDataURL('image/jpeg', 0.85); }
+        catch (err) { dataUrl = reader.result; }
+        try {
+          saveFitPhoto(todayKey, dataUrl);
+          setPhoto(dataUrl);
+        } catch (err) {
+          // localStorage quota — try a smaller version
+          try {
+            const c2 = document.createElement('canvas');
+            const s2 = Math.min(1, 900 / Math.max(width, height));
+            c2.width = Math.round(width * s2);
+            c2.height = Math.round(height * s2);
+            c2.getContext('2d').drawImage(canvas, 0, 0, c2.width, c2.height);
+            const smaller = c2.toDataURL('image/jpeg', 0.78);
+            saveFitPhoto(todayKey, smaller);
+            setPhoto(smaller);
+          } catch (e2) {}
+        }
+        // Reset so picking the same file again still fires onChange
+        try { input.value = ''; } catch (e) {}
+      };
+      img.onerror = () => { try { input.value = ''; } catch (e) {} };
+      img.src = reader.result;
     };
     reader.readAsDataURL(f);
   };
@@ -138,18 +173,9 @@ export default function ScreenRating() {
       {/* Modal mode: no LiquidMesh here. The underlying screen (Today, Archive,
           etc.) is kept visible by App.jsx so we show through it. */}
 
-      {/* Transparent backdrop — tap-to-close only, no dim overlay (matches the
-          hamburger drawer behavior: underlying screen stays fully visible) */}
-      <div
-        onClick={close}
-        style={{
-          position: 'absolute', inset: 0,
-          background: 'transparent',
-          opacity: open ? 1 : 0,
-          pointerEvents: open ? 'auto' : 'none',
-          transition: 'opacity .28s ease-out',
-        }}
-      />
+      {/* Backdrop is intentionally non-interactive: only the drag handle or
+          Save closes the modal, so an accidental tap on the small visible
+          slice above the sheet doesn't dismiss it. */}
 
       {/* StatusBar already on underlying screen — don't duplicate */}
 
@@ -229,24 +255,30 @@ export default function ScreenRating() {
             ) : (
               <FitPhoto id={24} radius={0} ratio="4/5" photoKey={todayKey} style={{ width: '100%', height: '100%' }} />
             )}
-            <input
-              ref={fileRef} type="file" accept="image/*"
-              onChange={onPickFile} style={{ display: 'none' }}
-            />
-            <div
-              onClick={() => fileRef.current && fileRef.current.click()}
+            {/* Camera button — native <label>+<input> so iOS opens the picker
+                reliably (programmatic .click() on a hidden input is flaky). */}
+            <label
               className="liquid-glass archive-pressable"
               style={{
                 position: 'absolute', bottom: 8, right: 8,
-                width: 32, height: 32, borderRadius: 16,
+                width: 36, height: 36, borderRadius: 18,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 cursor: 'pointer',
               }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+              <input
+                ref={fileRef} type="file" accept="image/*"
+                onChange={onPickFile}
+                style={{
+                  position: 'absolute', inset: 0,
+                  opacity: 0, cursor: 'pointer',
+                  fontSize: 0,
+                }}
+              />
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ pointerEvents: 'none' }}>
                 <path d="M3 7h3l2-2.5h8L18 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
                 <circle cx="12" cy="13" r="3.5"/>
               </svg>
-            </div>
+            </label>
           </div>
 
           {/* Stars + label — compact, inline */}

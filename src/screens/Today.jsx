@@ -524,9 +524,7 @@ export default function ScreenToday() {
 
         {(() => {
           const picks = [
-            { id: 3,  num: '023', tag: 'Recycled',  title: 'Rust suede + cream knit',     sub: 'Last worn Mar 14 · matches 61° clear', pct: '94%' },
-            { id: 7,  num: '019', tag: 'AI Pick',   title: 'Charcoal layered',            sub: 'Built from 4 pieces you own',          pct: '89%' },
-            { id: 11, num: '014', tag: 'Comfort',   title: 'Olive denim + tee',           sub: 'Light, breathable for 60s+ weather',   pct: '86%' },
+            { id: 3, num: '023', tag: 'Today', title: "Today's fit", sub: 'Tap to log or edit your photo', pct: '94%' },
           ];
           return (
             <>
