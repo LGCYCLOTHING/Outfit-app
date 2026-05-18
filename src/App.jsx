@@ -286,6 +286,11 @@ export default function App() {
     }
     setScreen(id);
     if (typeof window !== 'undefined') {
+      // Track previous screen so close buttons can return where the user came from.
+      // Don't overwrite when re-navigating to the same screen (avoids prev=self).
+      if (window.__archiveScreen && window.__archiveScreen !== id) {
+        window.__archivePrevScreen = window.__archiveScreen;
+      }
       window.__archiveScreen = id;
       window.dispatchEvent(new CustomEvent('archive:navigate', { detail: id }));
     }

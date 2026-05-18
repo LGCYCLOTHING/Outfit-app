@@ -296,49 +296,49 @@ export default function ScreenToday() {
       <StatusBar />
 
       <div style={{ position: 'relative', zIndex: 2, padding: 'calc(12px + var(--archive-safe-top, 54px)) 28px calc(120px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
-        {/* ── TODAY date selector — Whoop-style, right below the notch ── */}
+        {/* ── TODAY date selector — Whoop-style single pill ── */}
         <div style={{
           position: 'relative',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          display: 'flex', justifyContent: 'center',
           marginBottom: 18,
         }}>
-          {/* Prev — yesterday */}
-          <div onClick={goPrevDay} className="archive-pressable" style={{
-            width: 32, height: 32, borderRadius: 16,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'rgba(255,255,255,0.06)', cursor: 'pointer',
-          }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 6l-6 6 6 6"/>
-            </svg>
-          </div>
-
-          {/* TODAY pill — tap to toggle calendar */}
-          <div onClick={() => setCalOpen(o => !o)} className="archive-pressable" style={{
-            padding: '8px 22px', borderRadius: 100,
+          <div style={{
+            display: 'flex', alignItems: 'stretch',
+            padding: 4, borderRadius: 100,
             background: 'rgba(255,255,255,0.10)',
             boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.18)',
-            fontSize: 12, fontWeight: 600, letterSpacing: 2.2, color: '#fff',
-            cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 6,
           }}>
-            TODAY
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
-              style={{ transform: calOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform .25s ease' }}>
-              <path d="M6 9l6 6 6-6"/>
-            </svg>
-          </div>
+            {/* Prev — yesterday */}
+            <div onClick={goPrevDay} className="archive-pressable" style={{
+              width: 32, height: 32, borderRadius: 16,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer',
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 6l-6 6 6 6"/>
+              </svg>
+            </div>
 
-          {/* Next — disabled (can't go to tomorrow) */}
-          <div style={{
-            width: 32, height: 32, borderRadius: 16,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'rgba(255,255,255,0.03)',
-            opacity: 0.35, cursor: 'default',
-          }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 6l6 6-6 6"/>
-            </svg>
+            {/* TODAY — tap to toggle calendar */}
+            <div onClick={() => setCalOpen(o => !o)} className="archive-pressable" style={{
+              padding: '0 18px',
+              display: 'flex', alignItems: 'center',
+              fontSize: 12, fontWeight: 600, letterSpacing: 2.2, color: '#fff',
+              cursor: 'pointer',
+            }}>
+              TODAY
+            </div>
+
+            {/* Next — disabled (can't go to tomorrow) */}
+            <div style={{
+              width: 32, height: 32, borderRadius: 16,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              opacity: 0.35, cursor: 'default',
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 6l6 6-6 6"/>
+              </svg>
+            </div>
           </div>
 
           {/* Calendar dropdown — slides in below the pill */}

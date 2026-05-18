@@ -123,7 +123,10 @@ export default function ScreenDetail() {
         height: '100%', overflow: 'auto', boxSizing: 'border-box',
       }}>
         <div style={{ padding: '0 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-          <div onClick={() => window.__archiveGo && window.__archiveGo('archive')} style={{
+          <div onClick={() => {
+            const prev = (typeof window !== 'undefined' && window.__archivePrevScreen) || 'today';
+            window.__archiveGo && window.__archiveGo(prev);
+          }} style={{
             width: 38, height: 38, borderRadius: 19,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer',
@@ -388,11 +391,15 @@ function DetailNavBar({ accent, accentHot, accentRgba }) {
     try { window.dispatchEvent(new CustomEvent('archive:likeschanged')); } catch (e) {}
   };
 
+  const goBack = () => {
+    const prev = (typeof window !== 'undefined' && window.__archivePrevScreen) || 'today';
+    window.__archiveGo && window.__archiveGo(prev);
+  };
   const items = [
     { id: 'archive', icon: <path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/>, onClick: () => window.__archiveGo && window.__archiveGo('archive') },
     { id: 'heart',   icon: <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>, accent: true, onClick: toggle },
     { id: 'share',   icon: <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v14"/>, onClick: () => window.__archiveGo && window.__archiveGo('share') },
-    { id: 'close',   icon: <path d="M18 6L6 18M6 6l12 12"/>, onClick: () => window.__archiveGo && window.__archiveGo('archive') },
+    { id: 'close',   icon: <path d="M18 6L6 18M6 6l12 12"/>, onClick: goBack },
   ];
 
   return (
