@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTheme, FitPhoto, getSavedFitPhoto, saveFitPhoto } from '../lib/shared.jsx';
+import { useTheme, FitPhoto, getSavedFitPhotos, appendFitPhoto, replaceFitPhoto } from '../lib/shared.jsx';
 
 function ymd(d) {
   const y = d.getFullYear();
@@ -25,7 +25,18 @@ export default function ScreenRating() {
   const pickMood  = (m) => { setMood(m);  setMoodTick(t => t + 1); };
   const pickCtx   = (c) => { setCtx(c);   setCtxTick(t => t + 1); };
   const todayKey = ymd(new Date());
-  const [photo, setPhoto] = React.useState(() => getSavedFitPhoto(todayKey));
+  // editIndex = number → editing an existing photo at that index;
+  // null = adding a brand-new fit (each save creates a new card).
+  const [editIndex, setEditIndex] = React.useState(() => {
+    if (typeof window === 'undefined') return null;
+    const v = window.__archiveRatingIndex;
+    return (typeof v === 'number') ? v : null;
+  });
+  const [photo, setPhoto] = React.useState(() => {
+    const arr = getSavedFitPhotos(todayKey);
+    if (editIndex != null && arr[editIndex]) return arr[editIndex];
+    return null; // fresh log starts empty
+  });
   const fileRef = React.useRef(null);
 
   // Personal note about the outfit — fed to future AI insight features.
@@ -55,9 +66,15 @@ export default function ScreenRating() {
 
   // Re-animate the sheet up whenever the user navigates to 'rating' again
   // (App.jsx keeps screens mounted so the on-mount useEffect won't re-fire).
+  // Also refresh edit/add mode and the starting photo from window.__archiveRatingIndex.
   React.useEffect(() => {
     const handler = (e) => {
       if (e && e.detail === 'rating') {
+        const v = (typeof window !== 'undefined') ? window.__archiveRatingIndex : null;
+        const newIndex = (typeof v === 'number') ? v : null;
+        setEditIndex(newIndex);
+        const arr = getSavedFitPhotos(todayKey);
+        setPhoto(newIndex != null && arr[newIndex] ? arr[newIndex] : null);
         setOpen(false);
         setDragOffset(0);
         // next frame → open=true → CSS transition animates from translateY(100%) → 0
@@ -66,7 +83,7 @@ export default function ScreenRating() {
     };
     window.addEventListener('archive:navigate', handler);
     return () => window.removeEventListener('archive:navigate', handler);
-  }, []);
+  }, [todayKey]);
 
   const close = () => {
     setOpen(false);
@@ -106,7 +123,7 @@ export default function ScreenRating() {
       const img = new Image();
       img.onload = () => {
         // Downscale to max 1400px on longest side + JPEG 0.85 so a 12MP iPhone
-        // photo stays well inside the localStorage quota (~5–10MB total).
+        // photo stays well inside the localStorage quota.
         const MAX = 1400;
         let { width, height } = img;
         const scale = Math.min(1, MAX / Math.max(width, height));
@@ -114,29 +131,14 @@ export default function ScreenRating() {
         height = Math.round(height * scale);
         const canvas = document.createElement('canvas');
         canvas.width = width; canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
         let dataUrl;
         try { dataUrl = canvas.toDataURL('image/jpeg', 0.85); }
         catch (err) { dataUrl = reader.result; }
-        try {
-          saveFitPhoto(todayKey, dataUrl);
-          setPhoto(dataUrl);
-        } catch (err) {
-          // localStorage quota — try a smaller version
-          try {
-            const c2 = document.createElement('canvas');
-            const s2 = Math.min(1, 900 / Math.max(width, height));
-            c2.width = Math.round(width * s2);
-            c2.height = Math.round(height * s2);
-            c2.getContext('2d').drawImage(canvas, 0, 0, c2.width, c2.height);
-            const smaller = c2.toDataURL('image/jpeg', 0.78);
-            saveFitPhoto(todayKey, smaller);
-            setPhoto(smaller);
-          } catch (e2) {}
-        }
-        // Reset so picking the same file again still fires onChange
-        try { input.value = ''; } catch (e) {}
+        // Only updates the draft — the photo gets committed to storage when
+        // the user taps "Save fit" (so each save creates a new card).
+        setPhoto(dataUrl);
+        try { input.value = ''; } catch (err) {}
       };
       img.onerror = () => { try { input.value = ''; } catch (e) {} };
       img.src = reader.result;
@@ -146,6 +148,11 @@ export default function ScreenRating() {
 
   const saveFit = () => {
     try {
+      // Persist the draft photo: append (new card) or replace at the edit index.
+      if (photo) {
+        if (editIndex == null) appendFitPhoto(todayKey, photo);
+        else                   replaceFitPhoto(todayKey, editIndex, photo);
+      }
       const logged = JSON.parse(localStorage.getItem('aevum_fits_logged') || '[]');
       if (!logged.includes(todayKey)) {
         logged.push(todayKey);

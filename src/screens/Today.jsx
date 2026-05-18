@@ -2,7 +2,7 @@ import React from 'react';
 import {
   useTheme, bgColor, fgColor,
   ArchiveBurger, StatusBar, GlowCard, Glass, TabBar, PhotoPlaceholder, fitGradient, fitBorder,
-  getSavedFitPhoto,
+  getSavedFitPhoto, getSavedFitPhotos,
 } from '../lib/shared.jsx';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
 import { useWeather, WeatherIcon } from '../lib/weather.jsx';
@@ -706,10 +706,13 @@ export default function ScreenToday() {
             );
           }
 
-          // Full-width single-bar treatment: stacked photo previews on the
-          // left, week stats on the right, whole bar taps into story mode.
-          const loggedDays = days.filter(d => d.hasFit);
-          const previewDays = loggedDays.slice(-3); // up to 3 most recent
+          // Flatten ALL fits this week (multiple per day) into one list,
+          // most recent at the end, then preview the last 3 in the stack.
+          const weekPhotos = days.flatMap(d =>
+            getSavedFitPhotos(d.dateKey).map(p => ({ photo: p, dateKey: d.dateKey }))
+          );
+          const totalFits = weekPhotos.length;
+          const previewItems = weekPhotos.slice(-3);
           return (
             <div
               onClick={() => window.__archiveGo && window.__archiveGo('story')}
@@ -724,18 +727,17 @@ export default function ScreenToday() {
                 boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
                 display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer',
               }}>
-              {/* Stacked photo previews — most recent first */}
+              {/* Stacked photo previews — every fit, most recent on top */}
               <div style={{
                 position: 'relative',
-                width: 18 + previewDays.length * 22,
+                width: 18 + previewItems.length * 22,
                 height: 50, flexShrink: 0,
               }}>
-                {previewDays.map((d, i) => {
-                  const photo = getSavedFitPhoto(d.dateKey);
+                {previewItems.map((item, i) => {
                   const left = i * 22;
-                  const z = previewDays.length - i;
+                  const z = previewItems.length - i;
                   return (
-                    <div key={d.dateKey} style={{
+                    <div key={i} style={{
                       position: 'absolute', left, top: 0,
                       width: 40, height: 50, borderRadius: 10,
                       overflow: 'hidden',
@@ -745,16 +747,9 @@ export default function ScreenToday() {
                         'inset 0 0 0 2.5px rgba(255,255,255,0.16)',
                       zIndex: z,
                     }}>
-                      {photo ? (
-                        <img src={photo} alt="" style={{
-                          width: '100%', height: '100%', objectFit: 'cover', display: 'block',
-                        }} />
-                      ) : (
-                        <div style={{
-                          width: '100%', height: '100%',
-                          background: `linear-gradient(160deg, ${accentDeep || '#1a1612'}, #0a0708)`,
-                        }} />
-                      )}
+                      <img src={item.photo} alt="" style={{
+                        width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                      }} />
                     </div>
                   );
                 })}
@@ -769,7 +764,7 @@ export default function ScreenToday() {
                   This week
                 </div>
                 <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', letterSpacing: 0.2 }}>
-                  {loggedCount} {loggedCount === 1 ? 'fit' : 'fits'} · {days.length} {days.length === 1 ? 'day' : 'days'} so far
+                  {totalFits} {totalFits === 1 ? 'fit' : 'fits'} · {days.length} {days.length === 1 ? 'day' : 'days'} so far
                 </div>
               </div>
 
@@ -826,9 +821,12 @@ export default function ScreenToday() {
         </div>
 
         {(() => {
-          const picks = [
-            { id: 3, num: '023', tag: 'Today', title: "Today's fit", sub: 'Tap to log or edit your photo', pct: '94%' },
-          ];
+          // One card per saved photo today. If nothing logged yet, show one
+          // placeholder so the carousel still has a visible "today" tile.
+          const todayPhotos = getSavedFitPhotos(todayKey);
+          const picks = todayPhotos.length
+            ? todayPhotos.map((p, i) => ({ photo: p, index: i }))
+            : [{ photo: null, index: null }];
           return (
             <>
             <div className="picks-row"
@@ -851,17 +849,30 @@ export default function ScreenToday() {
               {/* Leading spacer — keeps first card centered when scrollLeft=0 */}
               <div aria-hidden="true" style={{ flex: '0 0 8%' }} />
               {picks.map((p, i) => (
-                <div key={p.id}
+                <div key={`pick-${i}-${p.photo ? p.photo.slice(-12) : 'placeholder'}`}
                   data-pick-idx={i}
                   style={{
                     flex: '0 0 84%',
                     scrollSnapAlign: 'center',
                     borderRadius: 24, position: 'relative',
                   }}>
-                  <div onClick={() => window.__archiveGo && window.__archiveGo('rating')}
+                  <div onClick={() => {
+                    // Tap an existing card → edit that index. Empty placeholder → add new.
+                    if (typeof window !== 'undefined') {
+                      window.__archiveRatingIndex = p.index;
+                    }
+                    window.__archiveGo && window.__archiveGo('rating');
+                  }}
                     style={{ position: 'relative', padding: 0, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', cursor: 'pointer', gap: 12 }}>
                     <div style={{ borderRadius: 18, overflow: 'hidden', position: 'relative' }}>
-                      <PhotoPlaceholder ratio="4/5" radius={18} photoId={p.id} photoKey={i === 0 ? ymd(new Date()) : undefined} noBorder />
+                      {p.photo ? (
+                        <img src={p.photo} alt="" style={{
+                          display: 'block', width: '100%', height: 'auto',
+                          borderRadius: 18,
+                        }} />
+                      ) : (
+                        <PhotoPlaceholder ratio="4/5" radius={18} photoId={3} noBorder />
+                      )}
                       {/* Heart — top-left. Adds today's photo to Archive's LIKED. */}
                       <div className="archive-pressable" onClick={(e) => { e.stopPropagation(); toggleTodayLike(); }} style={{
                         position: 'absolute', top: 12, left: 12,
@@ -891,9 +902,12 @@ export default function ScreenToday() {
                   </div>
                 </div>
               ))}
-              {/* + Add fit — trailing card */}
+              {/* + Add fit — trailing card; opens Rating in "add new" mode */}
               <div
-                onClick={() => window.__archiveGo && window.__archiveGo('rating')}
+                onClick={() => {
+                  if (typeof window !== 'undefined') window.__archiveRatingIndex = null;
+                  window.__archiveGo && window.__archiveGo('rating');
+                }}
                 className="archive-pressable"
                 data-pick-idx={picks.length}
                 style={{

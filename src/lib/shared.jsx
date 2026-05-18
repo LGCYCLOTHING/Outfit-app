@@ -74,14 +74,80 @@ export function fitBorder(id) {
   return FIT_BORDERS[Math.abs(n) % FIT_BORDERS.length];
 }
 
-export function getSavedFitPhoto(key) {
-  if (typeof window === 'undefined' || key == null) return null;
-  try { return localStorage.getItem('aevum_fit_photo_' + key); } catch (e) { return null; }
+// Multi-fit-per-day storage. The list lives under aevum_fit_photos_<key>.
+// We keep the legacy singular key (aevum_fit_photo_<key>) readable for
+// backward compatibility — if a singular value exists and the list doesn't,
+// it's treated as a 1-item list and gets migrated on the next write.
+export function getSavedFitPhotos(key) {
+  if (typeof window === 'undefined' || key == null) return [];
+  try {
+    const raw = localStorage.getItem('aevum_fit_photos_' + key);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) return arr.filter(Boolean);
+    }
+    const single = localStorage.getItem('aevum_fit_photo_' + key);
+    return single ? [single] : [];
+  } catch (e) { return []; }
 }
-export function saveFitPhoto(key, dataUrl) {
-  if (typeof window === 'undefined' || key == null) return;
-  try { localStorage.setItem('aevum_fit_photo_' + key, dataUrl); } catch (e) {}
+
+// Returns the FIRST photo. Kept for back-compat with Share/Detail/Archive/etc.
+export function getSavedFitPhoto(key) {
+  const arr = getSavedFitPhotos(key);
+  return arr.length ? arr[0] : null;
+}
+
+function writeFitPhotos(key, arr) {
+  try {
+    if (arr && arr.length) {
+      localStorage.setItem('aevum_fit_photos_' + key, JSON.stringify(arr));
+    } else {
+      localStorage.removeItem('aevum_fit_photos_' + key);
+    }
+    // Migration: clear the legacy singular key once the list is canonical.
+    localStorage.removeItem('aevum_fit_photo_' + key);
+  } catch (e) {}
   try { window.dispatchEvent(new CustomEvent('archive:fitschanged', { detail: { key } })); } catch (e) {}
+}
+
+// Append a NEW photo entry to the day's list (used when logging a fresh fit).
+export function appendFitPhoto(key, dataUrl) {
+  if (typeof window === 'undefined' || key == null || !dataUrl) return;
+  const arr = getSavedFitPhotos(key);
+  arr.push(dataUrl);
+  writeFitPhotos(key, arr);
+}
+
+// Replace an existing photo at a specific index (used when editing).
+export function replaceFitPhoto(key, index, dataUrl) {
+  if (typeof window === 'undefined' || key == null || !dataUrl) return;
+  const arr = getSavedFitPhotos(key);
+  if (index < 0 || index >= arr.length) {
+    arr.push(dataUrl);
+  } else {
+    arr[index] = dataUrl;
+  }
+  writeFitPhotos(key, arr);
+}
+
+// Delete a photo by index.
+export function removeFitPhoto(key, index) {
+  if (typeof window === 'undefined' || key == null) return;
+  const arr = getSavedFitPhotos(key);
+  if (index >= 0 && index < arr.length) {
+    arr.splice(index, 1);
+    writeFitPhotos(key, arr);
+  }
+}
+
+// Legacy single-photo save — replaces the FIRST photo (or appends if list is empty).
+// Kept so existing call sites (Detail edit, Rating photo pick draft) keep working.
+export function saveFitPhoto(key, dataUrl) {
+  if (typeof window === 'undefined' || key == null || !dataUrl) return;
+  const arr = getSavedFitPhotos(key);
+  if (arr.length) arr[0] = dataUrl;
+  else arr.push(dataUrl);
+  writeFitPhotos(key, arr);
 }
 
 export function FitPhoto({ id = 1, label, date, ratio = '3/4', radius = 18, showNumber = true, placeholder = false, onAdd, photoKey, noBorder = false, style = {} }) {
