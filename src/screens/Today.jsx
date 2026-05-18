@@ -296,49 +296,81 @@ export default function ScreenToday() {
       <StatusBar />
 
       <div style={{ position: 'relative', zIndex: 2, padding: 'calc(12px + var(--archive-safe-top, 54px)) 28px calc(120px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
-        {/* ── TODAY date selector — Whoop-style single pill ── */}
+        {/* ── Top bar — hamburger · TODAY pill · streak (one row) ── */}
         <div style={{
           position: 'relative',
-          display: 'flex', justifyContent: 'center',
-          marginBottom: 18,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          marginBottom: 14,
         }}>
+          {/* Hamburger */}
+          <div
+            onClick={() => window.__archiveToggleNav && window.__archiveToggleNav()}
+            className="archive-pressable"
+            style={{
+              width: 24, height: 22,
+              display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 5,
+              cursor: 'pointer', flexShrink: 0,
+            }}>
+            <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: 'var(--text-primary)' }} />
+            <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: 'var(--text-primary)' }} />
+            <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: 'var(--text-primary)' }} />
+          </div>
+
+          {/* TODAY pill — compact, chevrons hugging the label */}
           <div style={{
             display: 'flex', alignItems: 'stretch',
-            padding: 4, borderRadius: 100,
+            padding: 2, borderRadius: 100,
             background: 'rgba(255,255,255,0.10)',
             boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.18)',
           }}>
-            {/* Prev — yesterday */}
             <div onClick={goPrevDay} className="archive-pressable" style={{
-              width: 32, height: 32, borderRadius: 16,
+              width: 24, height: 24, borderRadius: 12,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
             }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M15 6l-6 6 6 6"/>
               </svg>
             </div>
-
-            {/* TODAY — tap to toggle calendar */}
             <div onClick={() => setCalOpen(o => !o)} className="archive-pressable" style={{
-              padding: '0 18px',
+              padding: '0 10px',
               display: 'flex', alignItems: 'center',
-              fontSize: 12, fontWeight: 600, letterSpacing: 2.2, color: '#fff',
+              fontSize: 10.5, fontWeight: 600, letterSpacing: 1.8, color: '#fff',
               cursor: 'pointer',
             }}>
               TODAY
             </div>
-
-            {/* Next — disabled (can't go to tomorrow) */}
             <div style={{
-              width: 32, height: 32, borderRadius: 16,
+              width: 24, height: 24, borderRadius: 12,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               opacity: 0.35, cursor: 'default',
             }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 6l6 6-6 6"/>
               </svg>
             </div>
+          </div>
+
+          {/* Streak — flame + count, compact */}
+          <div
+            onClick={() => window.__archiveGo && window.__archiveGo('streak')}
+            className="archive-pressable"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 4,
+              padding: '3px 9px 3px 7px', borderRadius: 999,
+              background: 'rgba(0,0,0,0.35)',
+              border: '1px solid rgba(255,255,255,0.10)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              cursor: 'pointer', flexShrink: 0,
+            }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFFFFF"
+              style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.35))' }}>
+              <path d="M12 2c1 4-3 6-3 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-2 3 0-3-1-5-3-8z"/>
+            </svg>
+            <span style={{ fontSize: 14, color: '#FFFFFF', letterSpacing: '-0.04em', lineHeight: 1, fontWeight: 500 }}>
+              {computeStreak()}
+            </span>
           </div>
 
           {/* Calendar dropdown — slides in below the pill */}
@@ -485,71 +517,21 @@ export default function ScreenToday() {
 
           return (
             <React.Fragment>
-              {/* Header — hamburger + "12 Tuesday" clustered LEFT, streak RIGHT */}
-              <div style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                marginTop: 8, marginBottom: 12,
-              }}>
-                {/* LEFT GROUP — hamburger menu, then weather right next to it */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <div
-                    onClick={() => window.__archiveToggleNav && window.__archiveToggleNav()}
-                    className="archive-pressable"
-                    style={{
-                      width: 24, height: 22,
-                      display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 6,
-                      cursor: 'pointer',
-                    }}>
-                    <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: 'var(--text-primary)' }} />
-                    <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: 'var(--text-primary)' }} />
-                    <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: 'var(--text-primary)' }} />
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <WeatherIcon type={weather.icon} size={18} color="#F5F0E8" />
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-                      <span style={{
-                        fontSize: 22, color: 'var(--text-primary)',
-                        letterSpacing: '-0.05em', lineHeight: 1,
-                      }}>
-                        {weather.temp}°
-                      </span>
-                      <span style={{
-                        fontSize: 13, color: 'var(--text-secondary)',
-                        letterSpacing: '-0.02em',
-                      }}>
-                        {weather.condition}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* RIGHT — flame + streak number inside a darkened pill */}
-                <div
-                  onClick={() => window.__archiveGo && window.__archiveGo('streak')}
-                  className="archive-pressable"
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 6,
-                    padding: '6px 12px 6px 10px',
-                    borderRadius: 999,
-                    background: 'rgba(0,0,0,0.35)',
-                    border: '1px solid rgba(255,255,255,0.10)',
-                    backdropFilter: 'blur(8px)',
-                    WebkitBackdropFilter: 'blur(8px)',
-                    cursor: 'pointer',
-                  }}>
-                  <div className="archive-flame" style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))',
-                  }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFFFFF">
-                      <path d="M12 2c1 4-3 6-3 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-2 3 0-3-1-5-3-8z"/>
-                    </svg>
-                  </div>
+              {/* Weather strip — hamburger + streak now live in the top bar above */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14 }}>
+                <WeatherIcon type={weather.icon} size={18} color="#F5F0E8" />
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
                   <span style={{
-                    fontSize: 22, color: '#FFFFFF',
+                    fontSize: 22, color: 'var(--text-primary)',
                     letterSpacing: '-0.05em', lineHeight: 1,
                   }}>
-                    {streak}
+                    {weather.temp}°
+                  </span>
+                  <span style={{
+                    fontSize: 13, color: 'var(--text-secondary)',
+                    letterSpacing: '-0.02em',
+                  }}>
+                    {weather.condition}
                   </span>
                 </div>
               </div>
