@@ -1,9 +1,58 @@
 import React from 'react';
 import {
   useTheme, bgColor, fgColor,
-  ArchiveBurger, StatusBar, GlowCard, TabBar, PhotoPlaceholder,
+  ArchiveBurger, StatusBar, TabBar,
 } from '../lib/shared.jsx';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
+
+// Per-combo image + description persistence
+function comboPhotoKey(idx, slot)  { return `aevum_combo_${idx}_photo_${slot}`; }
+function comboReasonKey(idx)       { return `aevum_combo_${idx}_reason`; }
+function readPhoto(idx, slot) {
+  try { return localStorage.getItem(comboPhotoKey(idx, slot)) || ''; }
+  catch (e) { return ''; }
+}
+function readReason(idx) {
+  try { return localStorage.getItem(comboReasonKey(idx)); }
+  catch (e) { return null; }
+}
+function writePhoto(idx, slot, dataUrl) {
+  try { localStorage.setItem(comboPhotoKey(idx, slot), dataUrl); } catch (e) {}
+}
+function writeReason(idx, text) {
+  try {
+    if (!text) localStorage.removeItem(comboReasonKey(idx));
+    else localStorage.setItem(comboReasonKey(idx), text);
+  } catch (e) {}
+}
+
+// Shrink a picked image down to ~1400px JPEG so 12MP iPhone photos fit
+// comfortably inside the localStorage quota across 9 combo slots.
+async function fileToDataUrl(file, maxDim = 1400, quality = 0.85) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(reader.error || new Error('read failed'));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => resolve(reader.result); // fall back to raw data url
+      img.onload = () => {
+        try {
+          const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+          const w = Math.round(img.width * scale);
+          const h = Math.round(img.height * scale);
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        } catch (e) {
+          resolve(reader.result);
+        }
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 export default function ScreenMix() {
   const t = useTheme();
@@ -11,26 +60,58 @@ export default function ScreenMix() {
   const accentHot = t.hot;
   const accentRgba = t.softRgba;
 
-  const combos = [
+  const combos = React.useMemo(() => ([
     {
       title: 'Soft tailoring × denim',
-      ids: [6, 11, 4],
-      reason: 'Your cream knit (#006) hasn\'t met those vintage Levi\'s. Pair with the espresso loafer for a 60/40 contrast you tend to favor at brunch.',
+      defaultReason: "Your cream knit (#006) hasn't met those vintage Levi's. Pair with the espresso loafer for a 60/40 contrast you tend to favor at brunch.",
       conf: 92, locked: false, pieces: '3 pieces · brunch',
     },
     {
       title: 'Rust + olive monochrome',
-      ids: [3, 7, 8],
-      reason: 'Earth-tone study. The suede jacket grounds the olive trousers; brick scarf adds tension. Echoes a fit from Oct \'25 that you saved twice.',
+      defaultReason: "Earth-tone study. The suede jacket grounds the olive trousers; brick scarf adds tension. Echoes a fit from Oct '25 that you saved twice.",
       conf: 88, locked: false, pieces: '3 pieces · evening',
     },
     {
       title: 'High-contrast layering',
-      ids: [2, 12, 5],
-      reason: 'Charcoal trench over dusty rose, leather boots. AI flagged this as a stretch — bold but harmonious.',
+      defaultReason: 'Charcoal trench over dusty rose, leather boots. AI flagged this as a stretch — bold but harmonious.',
       conf: 81, locked: true, pieces: '3 pieces · night out',
     },
-  ];
+  ]), []);
+
+  // Per-combo state — photos[0..2] + reason (null = use default)
+  const [comboState, setComboState] = React.useState(() => combos.map((c, idx) => ({
+    photos: [readPhoto(idx, 0), readPhoto(idx, 1), readPhoto(idx, 2)],
+    reason: readReason(idx),
+  })));
+
+  const setPhoto = (idx, slot, dataUrl) => {
+    setComboState(prev => {
+      const next = prev.map((s, i) => {
+        if (i !== idx) return s;
+        const photos = [...s.photos];
+        photos[slot] = dataUrl;
+        return { ...s, photos };
+      });
+      return next;
+    });
+    writePhoto(idx, slot, dataUrl);
+  };
+
+  const setReason = (idx, text) => {
+    setComboState(prev => prev.map((s, i) => i === idx ? { ...s, reason: text } : s));
+    writeReason(idx, text);
+  };
+
+  const onPickFile = async (idx, slot, e) => {
+    const input = e.target;
+    const f = input.files && input.files[0];
+    if (!f) return;
+    try {
+      const dataUrl = await fileToDataUrl(f);
+      setPhoto(idx, slot, dataUrl);
+    } catch (err) { /* swallow */ }
+    try { input.value = ''; } catch (err) {}
+  };
 
   return (
     <div style={{
@@ -71,10 +152,12 @@ export default function ScreenMix() {
           Pulled from 312 logged fits · refreshed daily
         </div>
 
-        {combos.map((c, idx) => (
+        {combos.map((c, idx) => {
+          const state = comboState[idx];
+          const reason = state.reason != null ? state.reason : c.defaultReason;
+          return (
           <div key={idx} style={{
             marginBottom: 18, position: 'relative',
-            /* Match the Streak / Today stat card treatment — soft cream-tinted glass */
             background: 'rgba(255,240,220,0.04)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
@@ -113,18 +196,62 @@ export default function ScreenMix() {
                 )}
               </div>
 
+              {/* 3 photo slots — tap to pick an image (label wraps an invisible file input) */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, marginBottom: 14, position: 'relative' }}>
-                {c.ids.map((id, i) => (
-                  <div key={i} onClick={() => !c.locked && window.__archiveGo && window.__archiveGo('detail')} style={{ position: 'relative', filter: c.locked ? 'blur(8px) brightness(0.6)' : 'none', cursor: c.locked ? 'default' : 'pointer' }}>
-                    <PhotoPlaceholder ratio="3/4" radius={12} photoId={id} />
-                    {i < 2 && (
-                      <div style={{
-                        position: 'absolute', top: '50%', right: -6, width: 12, height: 1,
-                        background: `rgba(${accentRgba},0.4)`, zIndex: 2,
-                      }} />
-                    )}
-                  </div>
-                ))}
+                {[0, 1, 2].map((slot) => {
+                  const photo = state.photos[slot];
+                  const disabled = c.locked;
+                  return (
+                    <label key={slot}
+                      className={disabled ? '' : 'archive-pressable'}
+                      style={{
+                        position: 'relative',
+                        aspectRatio: '3/4',
+                        borderRadius: 12,
+                        overflow: 'hidden',
+                        background: '#0a0a0a',
+                        boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.10)',
+                        cursor: disabled ? 'default' : 'pointer',
+                        filter: c.locked ? 'blur(8px) brightness(0.6)' : 'none',
+                        display: 'block',
+                      }}>
+                      {!disabled && (
+                        <input
+                          type="file" accept="image/*"
+                          onChange={(e) => onPickFile(idx, slot, e)}
+                          style={{
+                            position: 'absolute', inset: 0,
+                            opacity: 0, cursor: 'pointer',
+                            fontSize: 0,
+                          }}
+                        />
+                      )}
+                      {photo ? (
+                        <img src={photo} alt="" style={{
+                          width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                        }} />
+                      ) : (
+                        <div style={{
+                          width: '100%', height: '100%',
+                          background: `linear-gradient(160deg, rgba(${accentRgba},0.18), rgba(0,0,0,0.5))`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: 'rgba(255,255,255,0.55)',
+                        }}>
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M3 7h3l2-2.5h8L18 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
+                            <circle cx="12" cy="13" r="3.5"/>
+                          </svg>
+                        </div>
+                      )}
+                      {slot < 2 && (
+                        <div style={{
+                          position: 'absolute', top: '50%', right: -6, width: 12, height: 1,
+                          background: `rgba(${accentRgba},0.4)`, zIndex: 2,
+                        }} />
+                      )}
+                    </label>
+                  );
+                })}
                 {c.locked && (
                   <div style={{
                     position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -148,13 +275,29 @@ export default function ScreenMix() {
               <div style={{ fontSize: 17, fontWeight: 500, letterSpacing: -0.2, marginBottom: 6 }}>
                 {c.title}
               </div>
+
+              {/* Editable description — tap to type */}
               <div style={{
-                fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.5,
                 marginBottom: 12, paddingLeft: 10,
                 borderLeft: `2px solid ${c.locked ? `rgba(${accentRgba},0.3)` : accent}`,
               }}>
-                {c.reason}
+                <textarea
+                  value={reason}
+                  onChange={(e) => setReason(idx, e.target.value)}
+                  disabled={c.locked}
+                  rows={3}
+                  placeholder="Why this combo? Add your own note…"
+                  style={{
+                    width: '100%', boxSizing: 'border-box',
+                    background: 'transparent', border: 'none', outline: 'none', resize: 'none',
+                    color: 'var(--text-primary)', fontFamily: 'inherit',
+                    fontSize: 14, lineHeight: 1.5,
+                    padding: 0,
+                    opacity: c.locked ? 0.6 : 1,
+                  }}
+                />
               </div>
+
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: 13, color: 'var(--text-primary)', fontFamily: '"DM Sans", sans-serif', letterSpacing: -0.15 }}>
                   {c.pieces}
@@ -173,7 +316,8 @@ export default function ScreenMix() {
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       <TabBar active="mix" />
