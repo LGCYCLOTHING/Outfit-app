@@ -173,7 +173,7 @@ export default function ScreenRating() {
           }}>
           <div style={{
             width: 40, height: 4, borderRadius: 2,
-            background: 'rgba(255,255,255,0.45)',
+            background: `rgba(${accentRgba}, 0.55)`,
           }} />
         </div>
 
@@ -192,7 +192,7 @@ export default function ScreenRating() {
           boxSizing: 'border-box',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: 14 }}>
-            <div style={{ fontSize: 13, color: 'var(--text-primary)', letterSpacing: -0.40, fontFamily: '"DM Sans", sans-serif' }}>
+            <div style={{ fontSize: 13, color: accent, letterSpacing: -0.40, fontFamily: '"DM Sans", sans-serif' }}>
               FIT 024 · LOGGED 09:14
             </div>
           </div>
@@ -226,7 +226,7 @@ export default function ScreenRating() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 cursor: 'pointer',
               }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F5F0E8" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 7h3l2-2.5h8L18 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
                 <circle cx="12" cy="13" r="3.5"/>
               </svg>
