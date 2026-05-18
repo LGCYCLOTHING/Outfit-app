@@ -565,7 +565,7 @@ export default function ScreenToday() {
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         cursor: 'pointer'
                       }}>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v14" />
                         </svg>
                       </div>

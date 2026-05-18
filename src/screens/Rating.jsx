@@ -253,7 +253,7 @@ export default function ScreenRating() {
                 objectFit: 'contain', display: 'block',
               }} />
             ) : (
-              <FitPhoto id={24} radius={0} ratio="4/5" photoKey={todayKey} style={{ width: '100%', height: '100%' }} />
+              <FitPhoto id={24} radius={0} ratio="4/5" photoKey={todayKey} noBorder style={{ width: '100%', height: '100%' }} />
             )}
             {/* Camera button — native <label>+<input> so iOS opens the picker
                 reliably (programmatic .click() on a hidden input is flaky). */}

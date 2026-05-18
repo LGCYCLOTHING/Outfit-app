@@ -84,9 +84,9 @@ export function saveFitPhoto(key, dataUrl) {
   try { window.dispatchEvent(new CustomEvent('archive:fitschanged', { detail: { key } })); } catch (e) {}
 }
 
-export function FitPhoto({ id = 1, label, date, ratio = '3/4', radius = 18, showNumber = true, placeholder = false, onAdd, photoKey, style = {} }) {
+export function FitPhoto({ id = 1, label, date, ratio = '3/4', radius = 18, showNumber = true, placeholder = false, onAdd, photoKey, noBorder = false, style = {} }) {
   if (placeholder) {
-    return <PhotoPlaceholder ratio={ratio} radius={radius} onAdd={onAdd} style={style} />;
+    return <PhotoPlaceholder ratio={ratio} radius={radius} onAdd={onAdd} noBorder={noBorder} style={style} />;
   }
   const saved = getSavedFitPhoto(photoKey != null ? photoKey : id);
   if (saved) {
@@ -95,10 +95,10 @@ export function FitPhoto({ id = 1, label, date, ratio = '3/4', radius = 18, show
         position: 'relative', width: '100%', aspectRatio: ratio,
         borderRadius: radius, overflow: 'hidden',
         background: '#000',
-        boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)',
+        ...(noBorder ? {} : { boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)' }),
         ...style,
       }}>
-        <img src={saved} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        <img src={saved} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
       </div>
     );
   }
@@ -107,7 +107,9 @@ export function FitPhoto({ id = 1, label, date, ratio = '3/4', radius = 18, show
       position: 'relative', width: '100%', aspectRatio: ratio,
       borderRadius: radius, overflow: 'hidden',
       background: fitGradient(id),
-      boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06), inset 0 -40px 60px rgba(0,0,0,0.35)',
+      boxShadow: noBorder
+        ? 'inset 0 -40px 60px rgba(0,0,0,0.35)'
+        : 'inset 0 0 0 0.5px rgba(255,255,255,0.06), inset 0 -40px 60px rgba(0,0,0,0.35)',
       ...style,
     }}>
       <div style={{
@@ -259,10 +261,10 @@ export function PhotoPlaceholder({ ratio = '3/4', radius = 18, onAdd, photoId, p
         position: 'relative', width: '100%', aspectRatio: ratio,
         borderRadius: radius, overflow: 'hidden',
         background: '#000',
-        boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)',
+        ...(noBorder ? {} : { boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)' }),
         ...style,
       }}>
-        <img src={saved} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        <img src={saved} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
       </div>
     );
   }
