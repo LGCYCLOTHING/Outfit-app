@@ -774,29 +774,95 @@ export default function ScreenToday() {
           );
         })()}
 
-        <div style={{ marginTop: 28, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 }}>
-          <span style={{ fontSize: 16, color: 'var(--text-primary)', fontWeight: 500, letterSpacing: -0.1 }}>
-            Recent
-          </span>
-          <span onClick={() => window.__archiveGo && window.__archiveGo('archive')} style={{ fontSize: 15, color: accent, fontWeight: 500, cursor: 'pointer' }}>See all</span>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-          {[0, 1, 2, 3, 4, 5].map((idx) => {
-            const d = new Date();
-            d.setDate(d.getDate() - (idx + 1));
+        {(() => {
+          const todayStr = ymd(new Date());
+          const recent = readLoggedDays()
+            .filter(d => d !== todayStr)
+            .sort((a, b) => b.localeCompare(a))
+            .slice(0, 6);
+
+          // Empty (first-load) state — one inviting prompt instead of six
+          // rainbow-bordered placeholders.
+          if (recent.length === 0) {
             return (
-              <div key={idx} onClick={() => window.__archiveGo && window.__archiveGo('detail')} style={{ cursor: 'pointer', position: 'relative' }}>
-                <PhotoPlaceholder ratio="3/4" radius={12} photoId={idx + 5} photoKey={ymd(d)} />
-                <div style={{
-                  position: 'absolute', bottom: 7, left: 9,
-                  fontSize: 14, color: 'var(--text-primary)',
-                  fontWeight: 500, letterSpacing: -0.1,
-                  textShadow: '0 1px 4px rgba(0,0,0,0.6)'
-                }}>{['Yesterday', 'Sat', 'Fri', 'Thu', 'Wed', 'Tue'][idx]}</div>
-              </div>
+              <>
+                <div style={{ marginTop: 28, display: 'flex', alignItems: 'baseline', marginBottom: 14 }}>
+                  <span style={{ fontSize: 16, color: 'var(--text-primary)', fontWeight: 500, letterSpacing: -0.1 }}>
+                    Recent
+                  </span>
+                </div>
+                <div
+                  onClick={() => window.__archiveGo && window.__archiveGo('rating')}
+                  className="archive-pressable"
+                  style={{
+                    padding: '20px 18px', borderRadius: 18,
+                    background: 'rgba(255,240,220,0.04)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255,240,220,0.07)',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
+                    display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer',
+                  }}>
+                  <div style={{
+                    width: 46, height: 46, borderRadius: 14,
+                    background: `linear-gradient(135deg, ${accent} 0%, ${accentHot} 100%)`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                    boxShadow: `0 6px 16px -2px rgba(${accentRgba},0.5)`,
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" strokeWidth="2.4" strokeLinecap="round">
+                      <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 15, fontWeight: 500, color: '#fff', letterSpacing: -0.2, marginBottom: 2 }}>
+                      Start your archive
+                    </div>
+                    <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                      Log a fit and the last six days fill in here.
+                    </div>
+                  </div>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.45)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 6l6 6-6 6"/>
+                  </svg>
+                </div>
+              </>
             );
-          })}
-        </div>
+          }
+
+          // Has logged days — show real photos only, no rainbow placeholders.
+          function relativeLabel(dateStr) {
+            const d = new Date(dateStr);
+            const today = new Date();
+            const diff = Math.round((today - d) / 86400000);
+            if (diff === 1) return 'Yesterday';
+            if (diff < 7) return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
+            return `${d.getMonth() + 1}/${d.getDate()}`;
+          }
+          return (
+            <>
+              <div style={{ marginTop: 28, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 }}>
+                <span style={{ fontSize: 16, color: 'var(--text-primary)', fontWeight: 500, letterSpacing: -0.1 }}>
+                  Recent
+                </span>
+                <span onClick={() => window.__archiveGo && window.__archiveGo('archive')} style={{ fontSize: 15, color: accent, fontWeight: 500, cursor: 'pointer' }}>See all</span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                {recent.map((dateStr, idx) => (
+                  <div key={dateStr} onClick={() => window.__archiveGo && window.__archiveGo('detail')} style={{ cursor: 'pointer', position: 'relative' }}>
+                    <PhotoPlaceholder ratio="3/4" radius={12} photoId={idx + 5} photoKey={dateStr} noBorder />
+                    <div style={{
+                      position: 'absolute', bottom: 7, left: 9,
+                      fontSize: 14, color: 'var(--text-primary)',
+                      fontWeight: 500, letterSpacing: -0.1,
+                      textShadow: '0 1px 4px rgba(0,0,0,0.6)'
+                    }}>{relativeLabel(dateStr)}</div>
+                  </div>
+                ))}
+              </div>
+            </>
+          );
+        })()}
 
         <div style={{ marginTop: 32, display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
           <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />

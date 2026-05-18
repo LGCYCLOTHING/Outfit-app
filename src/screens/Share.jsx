@@ -178,7 +178,7 @@ export default function ScreenShare() {
         }}>
           {photoData ? (
             <img src={photoData} alt="" style={{
-              width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+              width: '100%', height: '100%', objectFit: 'contain', display: 'block',
             }} />
           ) : (
             <div style={{
