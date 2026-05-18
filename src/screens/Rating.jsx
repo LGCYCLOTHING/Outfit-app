@@ -104,6 +104,7 @@ export default function ScreenRating() {
         localStorage.setItem('aevum_fits_logged', JSON.stringify(logged));
       }
       if (typeof window !== 'undefined') window.__archiveEmpty = false;
+      try { window.dispatchEvent(new CustomEvent('archive:fitschanged', { detail: { key: todayKey } })); } catch (e) {}
     } catch (e) {}
     close();
   };

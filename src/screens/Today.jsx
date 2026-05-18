@@ -105,6 +105,15 @@ export default function ScreenToday() {
   const accentRgba = t.softRgba;
   const weather = useWeather();
 
+  // Force re-render when a fit is saved (Rating modal dispatches this) so the
+  // photo + logged state on the Today screen refresh without a manual reload.
+  const [, setFitsRev] = React.useState(0);
+  React.useEffect(() => {
+    const onFitsChanged = () => setFitsRev(r => r + 1);
+    window.addEventListener('archive:fitschanged', onFitsChanged);
+    return () => window.removeEventListener('archive:fitschanged', onFitsChanged);
+  }, []);
+
   // ── Today's fit carousel — scroll-driven active dot ──
   const [picksIdx, setPicksIdx] = React.useState(0);
   const picksRowRef = React.useRef(null);

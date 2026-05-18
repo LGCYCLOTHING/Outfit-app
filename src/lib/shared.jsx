@@ -81,6 +81,7 @@ export function getSavedFitPhoto(key) {
 export function saveFitPhoto(key, dataUrl) {
   if (typeof window === 'undefined' || key == null) return;
   try { localStorage.setItem('aevum_fit_photo_' + key, dataUrl); } catch (e) {}
+  try { window.dispatchEvent(new CustomEvent('archive:fitschanged', { detail: { key } })); } catch (e) {}
 }
 
 export function FitPhoto({ id = 1, label, date, ratio = '3/4', radius = 18, showNumber = true, placeholder = false, onAdd, photoKey, style = {} }) {
