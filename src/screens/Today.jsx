@@ -296,11 +296,11 @@ export default function ScreenToday() {
       <StatusBar />
 
       <div style={{ position: 'relative', zIndex: 2, padding: 'calc(12px + var(--archive-safe-top, 54px)) 28px calc(120px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
-        {/* ── Top bar — hamburger · TODAY pill · streak (one row) ── */}
+        {/* ── Top bar — hamburger (left) · TODAY pill (absolute-centered) · streak (right) ── */}
         <div style={{
           position: 'relative',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          marginBottom: 14,
+          marginBottom: 14, minHeight: 36,
         }}>
           {/* Hamburger */}
           <div
@@ -316,36 +316,44 @@ export default function ScreenToday() {
             <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: 'var(--text-primary)' }} />
           </div>
 
-          {/* TODAY pill — compact, chevrons hugging the label */}
+          {/* TODAY pill — absolutely centered so hamburger/streak widths don't shift it */}
           <div style={{
-            display: 'flex', alignItems: 'stretch',
-            padding: 2, borderRadius: 100,
-            background: 'rgba(255,255,255,0.10)',
-            boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.18)',
+            position: 'absolute', left: '50%', top: '50%',
+            transform: 'translate(-50%, -50%)',
+            display: 'flex', alignItems: 'center',
+            padding: 4, borderRadius: 100,
+            background: 'rgba(20,18,16,0.62)',
+            border: '0.5px solid rgba(255,255,255,0.10)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
           }}>
+            {/* Prev — yesterday */}
             <div onClick={goPrevDay} className="archive-pressable" style={{
-              width: 24, height: 24, borderRadius: 12,
+              width: 26, height: 26,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
             }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.78)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M15 6l-6 6 6 6"/>
               </svg>
             </div>
+            {/* TODAY — raised glass pill in the middle */}
             <div onClick={() => setCalOpen(o => !o)} className="archive-pressable" style={{
-              padding: '0 10px',
-              display: 'flex', alignItems: 'center',
-              fontSize: 10.5, fontWeight: 600, letterSpacing: 1.8, color: '#fff',
+              padding: '6px 14px', borderRadius: 100,
+              background: 'rgba(255,255,255,0.10)',
+              boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.16), 0 1px 2px rgba(0,0,0,0.25)',
+              fontSize: 11, fontWeight: 600, letterSpacing: 1.6, color: '#fff',
               cursor: 'pointer',
             }}>
               TODAY
             </div>
+            {/* Next — disabled */}
             <div style={{
-              width: 24, height: 24, borderRadius: 12,
+              width: 26, height: 26,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              opacity: 0.35, cursor: 'default',
+              opacity: 0.4, cursor: 'default',
             }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.78)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 6l6 6-6 6"/>
               </svg>
             </div>
