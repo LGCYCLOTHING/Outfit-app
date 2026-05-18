@@ -699,55 +699,45 @@ export default function ScreenToday() {
             );
           }
 
+          // Full-width single-bar treatment: stacked photo previews on the
+          // left, week stats on the right, whole bar taps into story mode.
+          const loggedDays = days.filter(d => d.hasFit);
+          const previewDays = loggedDays.slice(-3); // up to 3 most recent
           return (
-            <div style={{ marginTop: 22, marginBottom: 22 }}>
+            <div
+              onClick={() => window.__archiveGo && window.__archiveGo('story')}
+              className="archive-pressable"
+              style={{
+                marginTop: 22, marginBottom: 22,
+                padding: '12px 16px 12px 14px', borderRadius: 18,
+                background: 'rgba(255,240,220,0.04)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,240,220,0.07)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
+                display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer',
+              }}>
+              {/* Stacked photo previews — most recent first */}
               <div style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                marginBottom: 12, padding: '0 2px',
+                position: 'relative',
+                width: 18 + previewDays.length * 22,
+                height: 50, flexShrink: 0,
               }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                  <span style={{ fontSize: 16, color: '#fff', fontWeight: 500, letterSpacing: -0.1 }}>
-                    This week
-                  </span>
-                  <span style={{ fontSize: 12, color: 'var(--text-secondary)', letterSpacing: 0.3 }}>
-                    {String(loggedCount).padStart(2, '0')} · {String(days.length).padStart(2, '0')}
-                  </span>
-                </div>
-                <span
-                  onClick={() => window.__archiveGo && window.__archiveGo('story')}
-                  className="archive-pressable"
-                  style={{
-                    fontSize: 13, color: accent, fontWeight: 500, cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', gap: 4,
-                  }}>
-                  Play all
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M9 6l6 6-6 6"/>
-                  </svg>
-                </span>
-              </div>
-              <div className="chip-row" style={{
-                display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 4,
-              }}>
-                {days.map((d) => {
+                {previewDays.map((d, i) => {
                   const photo = getSavedFitPhoto(d.dateKey);
+                  const left = i * 22;
+                  const z = previewDays.length - i;
                   return (
-                    <div key={d.dateKey}
-                      onClick={() => d.hasFit && window.__archiveGo && window.__archiveGo('story')}
-                      className={d.hasFit ? 'archive-pressable' : ''}
-                      style={{
-                        flexShrink: 0,
-                        position: 'relative',
-                        width: 64, height: 84, borderRadius: 12,
-                        overflow: 'hidden',
-                        background: '#0a0a0a',
-                        cursor: d.hasFit ? 'pointer' : 'default',
-                        boxShadow: d.isToday
-                          ? `0 0 0 1.5px ${accent}, 0 6px 16px -4px rgba(${accentRgba},0.5)`
-                          : d.hasFit
-                            ? 'inset 0 0 0 1px rgba(255,255,255,0.16)'
-                            : 'inset 0 0 0 1px rgba(255,255,255,0.06)',
-                      }}>
+                    <div key={d.dateKey} style={{
+                      position: 'absolute', left, top: 0,
+                      width: 40, height: 50, borderRadius: 10,
+                      overflow: 'hidden',
+                      background: '#0a0a0a',
+                      boxShadow:
+                        'inset 0 0 0 1.5px rgba(0,0,0,0.6), ' +
+                        'inset 0 0 0 2.5px rgba(255,255,255,0.16)',
+                      zIndex: z,
+                    }}>
                       {photo ? (
                         <img src={photo} alt="" style={{
                           width: '100%', height: '100%', objectFit: 'cover', display: 'block',
@@ -755,33 +745,30 @@ export default function ScreenToday() {
                       ) : (
                         <div style={{
                           width: '100%', height: '100%',
-                          background: d.hasFit
-                            ? `linear-gradient(160deg, ${accentDeep || '#1a1612'}, #0a0708)`
-                            : 'rgba(255,255,255,0.03)',
+                          background: `linear-gradient(160deg, ${accentDeep || '#1a1612'}, #0a0708)`,
                         }} />
                       )}
-                      <div style={{
-                        position: 'absolute', inset: 0,
-                        background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 55%)',
-                        pointerEvents: 'none',
-                      }} />
-                      <div style={{
-                        position: 'absolute', bottom: 6, left: 8, right: 8,
-                        display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
-                        color: '#fff',
-                      }}>
-                        <span style={{ fontSize: 10, letterSpacing: 0.6, fontWeight: 500, opacity: 0.78 }}>
-                          {d.letter}
-                        </span>
-                        <span style={{
-                          fontSize: 14, fontWeight: d.isToday ? 600 : 500,
-                          color: d.isToday ? accent : '#fff', letterSpacing: -0.3,
-                        }}>{d.dateNum}</span>
-                      </div>
                     </div>
                   );
                 })}
               </div>
+
+              {/* Right side: title + count */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontSize: 15, fontWeight: 500, color: '#fff',
+                  letterSpacing: -0.2, marginBottom: 2,
+                }}>
+                  This week
+                </div>
+                <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', letterSpacing: 0.2 }}>
+                  {loggedCount} {loggedCount === 1 ? 'fit' : 'fits'} · {days.length} {days.length === 1 ? 'day' : 'days'} so far
+                </div>
+              </div>
+
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.45)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 6l6 6-6 6"/>
+              </svg>
             </div>
           );
         })()}
