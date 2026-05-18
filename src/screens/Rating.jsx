@@ -196,171 +196,164 @@ export default function ScreenRating() {
           position: 'relative', zIndex: 2,
           height: '100%', display: 'flex', flexDirection: 'column',
           boxSizing: 'border-box',
-          paddingTop: 32,
+          paddingTop: 28,
         }}>
-          {/* Scrollable content body */}
+          {/* Compact header strip */}
+          <div style={{ padding: '0 24px 10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{
+              fontSize: 10, color: accent, letterSpacing: 1.8,
+              fontFamily: '"DM Sans", sans-serif', fontWeight: 600,
+            }}>
+              FIT 024 · LOGGED 09:14
+            </div>
+          </div>
+
+          {/* Photo — fixed height, fits within remaining space without scroll */}
           <div style={{
-            flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden',
-            padding: '0 24px 16px',
-            WebkitOverflowScrolling: 'touch',
-            scrollbarWidth: 'none',
+            position: 'relative',
+            margin: '0 24px 14px',
+            height: 'min(34vh, 280px)',
+            background: 'rgba(0,0,0,0.35)',
+            boxShadow: `0 14px 40px -10px rgba(${accentRgba},0.30), 0 24px 50px -20px rgba(0,0,0,0.7)`,
+            overflow: 'visible',
           }}>
-            <style>{`.rating-scroll::-webkit-scrollbar{display:none}`}</style>
-            <div className="rating-scroll">
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: 14 }}>
-                <div style={{
-                  fontSize: 11, color: accent, letterSpacing: 1.6,
-                  fontFamily: '"DM Sans", sans-serif', fontWeight: 600,
-                }}>
-                  FIT 024 · LOGGED 09:14
-                </div>
+            {photo ? (
+              <img src={photo} alt="" style={{
+                width: '100%', height: '100%',
+                objectFit: 'contain', display: 'block',
+              }} />
+            ) : (
+              <div style={{ width: '100%', height: '100%' }}>
+                <FitPhoto id={24} radius={0} ratio="4/5" photoKey={todayKey} style={{ height: '100%', aspectRatio: 'auto' }} />
               </div>
-
-              {/* Photo — full bleed within content area, no rounded corners, contain */}
-              <div style={{
-                position: 'relative', width: '100%',
-                margin: '0 auto 18px',
-                background: 'rgba(0,0,0,0.35)',
-                boxShadow: `0 20px 50px -10px rgba(${accentRgba},0.30), 0 30px 60px -20px rgba(0,0,0,0.7)`,
-                aspectRatio: '4/5',
-                overflow: 'visible',
+            )}
+            <input
+              ref={fileRef} type="file" accept="image/*"
+              onChange={onPickFile} style={{ display: 'none' }}
+            />
+            <div
+              onClick={() => fileRef.current && fileRef.current.click()}
+              className="liquid-glass archive-pressable"
+              style={{
+                position: 'absolute', bottom: 8, right: 8,
+                width: 32, height: 32, borderRadius: 16,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer',
               }}>
-                {photo ? (
-                  <img src={photo} alt="" style={{
-                    width: '100%', height: '100%',
-                    objectFit: 'contain', display: 'block',
-                  }} />
-                ) : (
-                  <FitPhoto id={24} radius={0} ratio="4/5" photoKey={todayKey} />
-                )}
-                <input
-                  ref={fileRef} type="file" accept="image/*"
-                  onChange={onPickFile} style={{ display: 'none' }}
-                />
-                <div
-                  onClick={() => fileRef.current && fileRef.current.click()}
-                  className="liquid-glass archive-pressable"
-                  style={{
-                    position: 'absolute', bottom: 10, right: 10,
-                    width: 36, height: 36, borderRadius: 18,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    cursor: 'pointer',
-                  }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 7h3l2-2.5h8L18 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
-                    <circle cx="12" cy="13" r="3.5"/>
-                  </svg>
-                </div>
-              </div>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 7h3l2-2.5h8L18 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
+                <circle cx="12" cy="13" r="3.5"/>
+              </svg>
+            </div>
+          </div>
 
-              <div style={{ textAlign: 'center', marginBottom: 12 }}>
-                <div style={{ fontSize: 22, fontWeight: 300, letterSpacing: -0.4, lineHeight: 1.2 }}>
-                  How did it feel?
-                </div>
-              </div>
+          {/* Stars + label inline */}
+          <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, marginBottom: 14 }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 10 }}>
+              {[1,2,3,4,5].map(n => {
+                const active = n <= stars;
+                return (
+                  <div key={n} onClick={() => pickStars(n)}
+                    className="archive-pressable"
+                    style={{
+                      width: 32, height: 32, borderRadius: 8,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                    <svg key={`${n}-${starsTick}`} width="24" height="24" viewBox="0 0 24 24"
+                         fill={active ? accent : 'transparent'}
+                         stroke={active ? accent : 'rgba(255,255,255,0.35)'}
+                         strokeWidth="1.4" strokeLinejoin="round"
+                         style={{
+                           animation: active ? `star-pop .42s cubic-bezier(.34,1.56,.64,1) ${(n - 1) * 0.04}s` : 'none',
+                           transformOrigin: 'center',
+                         }}>
+                      <path d="M12 2.5l3 6.4 7 .9-5.2 4.7L18 21l-6-3.5L6 21l1.2-6.5L2 9.8l7-.9z"/>
+                    </svg>
+                  </div>
+                );
+              })}
+            </div>
+            <div key={`label-${starsTick}`} style={{
+              color: accent, fontWeight: 500,
+              letterSpacing: 0.3,
+              fontStyle: 'italic',
+              fontFamily: 'Cormorant Garamond, serif',
+              fontSize: 14,
+              animation: 'star-pop .35s ease',
+              transformOrigin: 'center',
+            }}>
+              {ratingLabels[stars]}
+            </div>
+          </div>
 
-              {/* Stars — staggered pop animation when rating changes */}
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 6 }}>
-                {[1,2,3,4,5].map(n => {
-                  const active = n <= stars;
+          {/* MOOD — horizontal scroll row, no wrap */}
+          <div style={{ padding: '0 24px 8px' }}>
+            <div style={{ fontSize: 9.5, color: 'var(--text-secondary)', letterSpacing: 1.4, marginBottom: 5, fontFamily: '"DM Sans", sans-serif' }}>
+              MOOD
+            </div>
+            <div style={{ display: 'flex', gap: 6, overflowX: 'auto', overflowY: 'hidden', scrollbarWidth: 'none' }}>
+              <style>{`.rating-row::-webkit-scrollbar{display:none}`}</style>
+              <div className="rating-row" style={{ display: 'contents' }}>
+                {moods.map(m => {
+                  const active = m === mood;
                   return (
-                    <div key={n} onClick={() => pickStars(n)}
+                    <div key={`${m}-${active ? moodTick : 0}`}
+                      onClick={() => pickMood(m)}
                       className="archive-pressable"
                       style={{
-                        width: 36, height: 36, borderRadius: 8,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      }}>
-                      <svg key={`${n}-${starsTick}`} width="26" height="26" viewBox="0 0 24 24"
-                           fill={active ? accent : 'transparent'}
-                           stroke={active ? accent : 'rgba(255,255,255,0.35)'}
-                           strokeWidth="1.4" strokeLinejoin="round"
-                           style={{
-                             animation: active ? `star-pop .42s cubic-bezier(.34,1.56,.64,1) ${(n - 1) * 0.04}s` : 'none',
-                             transformOrigin: 'center',
-                           }}>
-                        <path d="M12 2.5l3 6.4 7 .9-5.2 4.7L18 21l-6-3.5L6 21l1.2-6.5L2 9.8l7-.9z"/>
-                      </svg>
-                    </div>
+                        flexShrink: 0,
+                        padding: '6px 12px', borderRadius: 100,
+                        fontSize: 12, fontWeight: 500,
+                        background: active ? `rgba(${accentRgba},0.22)` : 'rgba(255,255,255,0.06)',
+                        color: active ? accent : 'rgba(255,255,255,0.78)',
+                        boxShadow: active
+                          ? `inset 0 0 0 0.5px rgba(${accentRgba},0.55)`
+                          : 'inset 0 0 0 0.5px rgba(255,255,255,0.08)',
+                        animation: active ? 'pill-pop .25s ease' : 'none',
+                      }}>{m}</div>
                   );
                 })}
-              </div>
-              <div key={`label-${starsTick}`} style={{
-                textAlign: 'center', color: accent, fontWeight: 500,
-                letterSpacing: 0.3, marginBottom: 18,
-                fontStyle: 'italic',
-                fontFamily: 'Cormorant Garamond, serif',
-                fontSize: 16,
-                animation: 'star-pop .35s ease',
-                transformOrigin: 'center',
-              }}>
-                {ratingLabels[stars]}
-              </div>
-
-              <div style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 10, color: 'var(--text-secondary)', letterSpacing: 1.2, marginBottom: 8, fontFamily: '"DM Sans", sans-serif' }}>
-                  MOOD
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  {moods.map(m => {
-                    const active = m === mood;
-                    return (
-                      <div key={`${m}-${active ? moodTick : 0}`}
-                        onClick={() => pickMood(m)}
-                        className="archive-pressable"
-                        style={{
-                          padding: '7px 13px', borderRadius: 100,
-                          fontSize: 12.5, fontWeight: 500,
-                          background: active ? `rgba(${accentRgba},0.22)` : 'rgba(255,255,255,0.06)',
-                          color: active ? accent : 'rgba(255,255,255,0.78)',
-                          boxShadow: active
-                            ? `inset 0 0 0 0.5px rgba(${accentRgba},0.55)`
-                            : 'inset 0 0 0 0.5px rgba(255,255,255,0.08)',
-                          animation: active ? 'pill-pop .25s ease' : 'none',
-                        }}>{m}</div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div style={{ marginBottom: 4 }}>
-                <div style={{ fontSize: 10, color: 'var(--text-secondary)', letterSpacing: 1.2, marginBottom: 8, fontFamily: '"DM Sans", sans-serif' }}>
-                  CONTEXT
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  {contexts.map(c => {
-                    const active = c === ctx;
-                    return (
-                      <div key={`${c}-${active ? ctxTick : 0}`}
-                        onClick={() => pickCtx(c)}
-                        className="archive-pressable"
-                        style={{
-                          padding: '7px 13px', borderRadius: 100,
-                          fontSize: 12.5, fontWeight: 500,
-                          background: active ? `rgba(${accentRgba},0.22)` : 'rgba(255,255,255,0.06)',
-                          color: active ? accent : 'rgba(255,255,255,0.78)',
-                          boxShadow: active
-                            ? `inset 0 0 0 0.5px rgba(${accentRgba},0.55)`
-                            : 'inset 0 0 0 0.5px rgba(255,255,255,0.08)',
-                          animation: active ? 'pill-pop .25s ease' : 'none',
-                        }}>{c}</div>
-                    );
-                  })}
-                </div>
               </div>
             </div>
           </div>
 
-          {/* Sticky Save footer — full-width centered button */}
+          {/* CONTEXT — horizontal scroll row */}
+          <div style={{ padding: '0 24px 12px' }}>
+            <div style={{ fontSize: 9.5, color: 'var(--text-secondary)', letterSpacing: 1.4, marginBottom: 5, fontFamily: '"DM Sans", sans-serif' }}>
+              CONTEXT
+            </div>
+            <div className="rating-row" style={{ display: 'flex', gap: 6, overflowX: 'auto', overflowY: 'hidden', scrollbarWidth: 'none' }}>
+              {contexts.map(c => {
+                const active = c === ctx;
+                return (
+                  <div key={`${c}-${active ? ctxTick : 0}`}
+                    onClick={() => pickCtx(c)}
+                    className="archive-pressable"
+                    style={{
+                      flexShrink: 0,
+                      padding: '6px 12px', borderRadius: 100,
+                      fontSize: 12, fontWeight: 500,
+                      background: active ? `rgba(${accentRgba},0.22)` : 'rgba(255,255,255,0.06)',
+                      color: active ? accent : 'rgba(255,255,255,0.78)',
+                      boxShadow: active
+                        ? `inset 0 0 0 0.5px rgba(${accentRgba},0.55)`
+                        : 'inset 0 0 0 0.5px rgba(255,255,255,0.08)',
+                      animation: active ? 'pill-pop .25s ease' : 'none',
+                    }}>{c}</div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Save footer — full-width centered button */}
           <div style={{
-            flexShrink: 0,
-            padding: '14px 24px calc(20px + var(--archive-safe-bottom, 0px))',
-            background: 'linear-gradient(to top, rgba(20,18,16,0.95) 0%, rgba(20,18,16,0.0) 100%)',
-            pointerEvents: 'auto',
+            marginTop: 'auto',
+            padding: '10px 24px calc(18px + var(--archive-safe-bottom, 0px))',
           }}>
             <button onClick={saveFit}
               className="archive-pressable"
               style={{
-                width: '100%', height: 52, borderRadius: 26, border: 'none', cursor: 'pointer',
+                width: '100%', height: 50, borderRadius: 25, border: 'none', cursor: 'pointer',
                 background: `linear-gradient(135deg, ${accent} 0%, ${accentHot} 100%)`,
                 color: '#0a0a0a', fontSize: 15, fontWeight: 600,
                 letterSpacing: '-0.01em', fontFamily: 'inherit',
