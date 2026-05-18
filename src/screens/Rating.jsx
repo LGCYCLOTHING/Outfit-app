@@ -53,6 +53,31 @@ export default function ScreenRating() {
     } catch (e) {}
   }, [note, NOTE_KEY]);
 
+  // Pieces — catalog + per-date selection state. Persisted on save under
+  // aevum_fit_pieces_<dateKey> so Most Worn / Style DNA / wardrobe analytics
+  // can read it.
+  const PIECES_KEY = `aevum_fit_pieces_${todayKey}`;
+  const readPiecesCatalog = () => {
+    try { return JSON.parse(localStorage.getItem('aevum_pieces') || '[]'); }
+    catch (e) { return []; }
+  };
+  const readSelectedPieces = () => {
+    try {
+      const arr = JSON.parse(localStorage.getItem(PIECES_KEY) || '[]');
+      return new Set(Array.isArray(arr) ? arr : []);
+    } catch (e) { return new Set(); }
+  };
+  const [piecesCatalog, setPiecesCatalog] = React.useState(readPiecesCatalog);
+  const [selectedPieces, setSelectedPieces] = React.useState(readSelectedPieces);
+  const togglePiece = (id) => {
+    setSelectedPieces(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
   // ── Slide-up sheet state (mirrors the hamburger drawer pattern) ──
   const [open, setOpen] = React.useState(false);
   const [dragOffset, setDragOffset] = React.useState(0);
@@ -76,6 +101,10 @@ export default function ScreenRating() {
         setEditIndex(newIndex);
         const arr = getSavedFitPhotos(todayKey);
         setPhoto(newIndex != null && arr[newIndex] ? arr[newIndex] : null);
+        // Refresh pieces catalog + already-selected pieces in case they changed
+        // while the user was on the Pieces screen.
+        setPiecesCatalog(readPiecesCatalog());
+        setSelectedPieces(readSelectedPieces());
         setOpen(false);
         setDragOffset(0);
         // next frame → open=true → CSS transition animates from translateY(100%) → 0
@@ -86,14 +115,14 @@ export default function ScreenRating() {
     return () => window.removeEventListener('archive:navigate', handler);
   }, [todayKey]);
 
-  const close = () => {
+  const closeTo = (dest) => {
     setOpen(false);
-    // Bring the nav back IMMEDIATELY (don't wait for the slow slide-down to finish)
     if (typeof document !== 'undefined') document.body.classList.remove('aevum-modal-open');
     setTimeout(() => {
-      if (typeof window !== 'undefined' && window.__archiveGo) window.__archiveGo('today');
+      if (typeof window !== 'undefined' && window.__archiveGo) window.__archiveGo(dest);
     }, 1100);
   };
+  const close = () => closeTo('today');
 
   const onHandleDown = (e) => {
     try { e.target.setPointerCapture(e.pointerId); } catch (err) {}
@@ -169,6 +198,12 @@ export default function ScreenRating() {
         localStorage.setItem('aevum_fits_logged', JSON.stringify(logged));
       }
       if (typeof window !== 'undefined') window.__archiveEmpty = false;
+      // Persist the set of pieces worn for this date.
+      try {
+        const arr = Array.from(selectedPieces);
+        if (arr.length) localStorage.setItem(PIECES_KEY, JSON.stringify(arr));
+        else localStorage.removeItem(PIECES_KEY);
+      } catch (e) {}
       // Recompute the weekly score and persist + broadcast.
       try { refreshWeeklyScore(); } catch (e) {}
       try { window.dispatchEvent(new CustomEvent('archive:fitschanged', { detail: { key: todayKey } })); } catch (e) {}
@@ -408,6 +443,115 @@ export default function ScreenRating() {
                 );
               })}
             </div>
+          </div>
+
+          {/* PIECES WORN TODAY — tappable cards from the user's catalog */}
+          <div style={{ padding: '10px 24px 0' }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              marginBottom: 6,
+            }}>
+              <div style={{
+                fontSize: 9.5, color: 'var(--text-secondary)', letterSpacing: 1.4,
+                fontFamily: '"DM Sans", sans-serif',
+              }}>PIECES WORN TODAY</div>
+              {piecesCatalog.length > 0 && (
+                <div style={{
+                  fontSize: 9.5, color: selectedPieces.size > 0 ? accent : 'rgba(255,255,255,0.35)',
+                  fontFamily: '"DM Sans", sans-serif', fontWeight: 500,
+                }}>
+                  {selectedPieces.size} selected
+                </div>
+              )}
+            </div>
+            {piecesCatalog.length === 0 ? (
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                gap: 8, padding: '9px 12px', borderRadius: 10,
+                background: 'rgba(255,255,255,0.04)',
+                boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.08)',
+              }}>
+                <span style={{
+                  fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.35,
+                }}>Add pieces to your catalog to track what you wear</span>
+                <span onClick={() => closeTo('pieces')}
+                  className="archive-pressable"
+                  style={{
+                    fontSize: 11.5, color: accent, fontWeight: 500, cursor: 'pointer',
+                    whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 3,
+                  }}>
+                  Go to Pieces →
+                </span>
+              </div>
+            ) : (
+              <>
+                <div className="no-scroll" style={{
+                  display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4,
+                }}>
+                  <style>{`.no-scroll::-webkit-scrollbar{display:none}`}</style>
+                  {piecesCatalog.map(p => {
+                    const selected = selectedPieces.has(p.id);
+                    return (
+                      <div key={p.id}
+                        onClick={() => togglePiece(p.id)}
+                        className="archive-pressable"
+                        style={{
+                          flex: '0 0 auto', width: 52,
+                          cursor: 'pointer',
+                        }}>
+                        <div style={{
+                          position: 'relative',
+                          width: 52, height: 52, borderRadius: 10,
+                          overflow: 'hidden',
+                          background: p.photo
+                            ? '#000'
+                            : `linear-gradient(150deg, rgba(${accentRgba},0.30), rgba(0,0,0,0.55))`,
+                          boxShadow: selected
+                            ? `0 0 0 2px ${accent}, 0 0 12px -2px rgba(${accentRgba},0.55)`
+                            : 'inset 0 0 0 0.5px rgba(255,255,255,0.10)',
+                          transition: 'box-shadow .15s ease',
+                        }}>
+                          {p.photo && (
+                            <img src={p.photo} alt="" style={{
+                              width: '100%', height: '100%',
+                              objectFit: 'cover', display: 'block',
+                            }} />
+                          )}
+                          {selected && (
+                            <div style={{
+                              position: 'absolute', top: 3, right: 3,
+                              width: 15, height: 15, borderRadius: 8,
+                              background: accent,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              boxShadow: `0 0 6px rgba(${accentRgba},0.55)`,
+                            }}>
+                              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M5 12l5 5L20 7"/>
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        <div style={{
+                          fontSize: 9, color: selected ? accent : 'var(--text-secondary)',
+                          marginTop: 3, lineHeight: 1.1, textAlign: 'center',
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                          fontWeight: selected ? 500 : 400,
+                        }}>{p.name}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div onClick={() => closeTo('pieces')}
+                  className="archive-pressable"
+                  style={{
+                    display: 'inline-block', marginTop: 4,
+                    fontSize: 11, color: accent, fontWeight: 500,
+                    cursor: 'pointer',
+                  }}>
+                  + Add a new piece
+                </div>
+              </>
+            )}
           </div>
 
           {/* NOTE — short free-form text for AI insights to draw from later */}
