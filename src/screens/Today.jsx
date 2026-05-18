@@ -329,17 +329,18 @@ export default function ScreenToday() {
           }}>
             {/* Prev — yesterday */}
             <div onClick={goPrevDay} className="archive-pressable" style={{
-              width: 26, height: 26,
+              width: 18, height: 26,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
             }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.78)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M15 6l-6 6 6 6"/>
               </svg>
             </div>
             {/* TODAY — raised glass pill in the middle */}
             <div onClick={() => setCalOpen(o => !o)} className="archive-pressable" style={{
-              padding: '6px 14px', borderRadius: 100,
+              padding: '6px 12px', borderRadius: 100,
+              margin: '0 2px',
               background: 'rgba(255,255,255,0.10)',
               boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.16), 0 1px 2px rgba(0,0,0,0.25)',
               fontSize: 11, fontWeight: 600, letterSpacing: 1.6, color: '#fff',
@@ -349,34 +350,34 @@ export default function ScreenToday() {
             </div>
             {/* Next — disabled */}
             <div style={{
-              width: 26, height: 26,
+              width: 18, height: 26,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               opacity: 0.4, cursor: 'default',
             }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.78)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 6l6 6-6 6"/>
               </svg>
             </div>
           </div>
 
-          {/* Streak — flame + count, compact */}
+          {/* Streak — flame + count */}
           <div
             onClick={() => window.__archiveGo && window.__archiveGo('streak')}
             className="archive-pressable"
             style={{
-              display: 'flex', alignItems: 'center', gap: 4,
-              padding: '3px 9px 3px 7px', borderRadius: 999,
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '5px 14px 5px 11px', borderRadius: 999,
               background: 'rgba(0,0,0,0.35)',
               border: '1px solid rgba(255,255,255,0.10)',
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
               cursor: 'pointer', flexShrink: 0,
             }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFFFFF"
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFFFFF"
               style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.35))' }}>
               <path d="M12 2c1 4-3 6-3 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-2 3 0-3-1-5-3-8z"/>
             </svg>
-            <span style={{ fontSize: 14, color: '#FFFFFF', letterSpacing: '-0.04em', lineHeight: 1, fontWeight: 500 }}>
+            <span style={{ fontSize: 18, color: '#FFFFFF', letterSpacing: '-0.04em', lineHeight: 1, fontWeight: 600 }}>
               {computeStreak()}
             </span>
           </div>
