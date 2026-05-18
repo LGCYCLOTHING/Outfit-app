@@ -533,18 +533,18 @@ export default function ScreenToday() {
               scrollSnapType: 'x mandatory',
               WebkitOverflowScrolling: 'touch',
               scrollbarWidth: 'none',
-              margin: '0 -28px',
-              paddingLeft: '6%',
-              paddingRight: '6%',
+              margin: '0 -24px',
               paddingBottom: 6,
               cursor: 'grab',
             }}>
               <style>{`.picks-row::-webkit-scrollbar{display:none}`}</style>
+              {/* Leading spacer — keeps first card centered when scrollLeft=0 */}
+              <div aria-hidden="true" style={{ flex: '0 0 8%' }} />
               {picks.map((p, i) => (
                 <div key={p.id}
                   data-pick-idx={i}
                   style={{
-                    flex: '0 0 calc(100% - 12%)',
+                    flex: '0 0 84%',
                     scrollSnapAlign: 'center',
                     borderRadius: 24, position: 'relative',
                   }}>
@@ -607,7 +607,7 @@ export default function ScreenToday() {
                 className="archive-pressable"
                 data-pick-idx={picks.length}
                 style={{
-                  flex: '0 0 calc(100% - 12%)',
+                  flex: '0 0 84%',
                   scrollSnapAlign: 'center',
                   borderRadius: 24,
                   display: 'flex', flexDirection: 'column',
@@ -633,6 +633,8 @@ export default function ScreenToday() {
                   Log today's outfit
                 </div>
               </div>
+              {/* Trailing spacer — keeps the last card centered when scrolled to end */}
+              <div aria-hidden="true" style={{ flex: '0 0 8%' }} />
             </div>
             {/* Page indicator dots — tracks the actual scroll position */}
             <div style={{ display: 'flex', justifyContent: 'center', gap: 5, marginTop: 10, marginBottom: 4 }}>
