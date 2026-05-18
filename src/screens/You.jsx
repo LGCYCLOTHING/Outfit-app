@@ -7,7 +7,7 @@ import LiquidMesh from '../lib/liquid-mesh.jsx';
 import { calculateWeeklyScore } from '../lib/fitScore.js';
 import { getWardrobeCompletion } from '../lib/wardrobe.js';
 import { UNLOCK_THRESHOLD, getTotalFitCount, computeStyleDNA } from '../lib/styleDNA.js';
-import { pushProfile } from '../lib/sync.js';
+import { pushProfile, useAuthUser } from '../lib/sync.js';
 
 export default function ScreenYou() {
   const t = useTheme();
@@ -16,6 +16,9 @@ export default function ScreenYou() {
   const accentHot = t.hot;
   const accentDeep = t.deep;
   const activeId = t.id;
+
+  // Live Supabase auth state (null when signed out).
+  const authUser = useAuthUser();
 
   // Weekly Fit Score for the profile stats row (refreshes on save).
   const [fitScore, setFitScore] = React.useState(() => calculateWeeklyScore().score);
@@ -117,6 +120,31 @@ export default function ScreenYou() {
           <div>
             <div className="h-display" style={{ fontSize: 26 }}>Your <em>archive</em></div>
             <div style={{ fontSize: 14, color: 'var(--text-primary)', marginTop: 4, letterSpacing: -0.35, fontFamily: '"DM Sans", sans-serif' }}>312 FITS · 47 DAY STREAK · {fitScore} THIS WEEK · {wardrobePct}% CATALOGED</div>
+            {authUser ? (
+              <div style={{
+                fontSize: 11, color: '#5C5248', marginTop: 4,
+                fontFamily: '"DM Sans", sans-serif', letterSpacing: -0.05,
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                maxWidth: 220,
+              }}>
+                {authUser.email || authUser.user_metadata?.email || '—'}
+              </div>
+            ) : (
+              <div
+                onClick={() => window.__archiveGo && window.__archiveGo('auth')}
+                className="archive-pressable liquid-glass"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  marginTop: 8, padding: '5px 11px', borderRadius: 999,
+                  fontSize: 11.5, fontWeight: 500, color: '#fff',
+                  cursor: 'pointer', letterSpacing: -0.1,
+                }}>
+                Sign in to sync your data
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 6l6 6-6 6"/>
+                </svg>
+              </div>
+            )}
           </div>
         </div>
 

@@ -7,6 +7,7 @@
 // Anonymous users get the same UX as before — purely local — and their data
 // is migrated on first login.
 
+import React from 'react';
 import { supabase } from './supabase.js';
 
 const FIT_PHOTO_BUCKET   = 'fit-photos';
@@ -358,4 +359,24 @@ export async function signInWithEmail(email) {
 }
 export async function signOut() {
   try { await supabase.auth.signOut(); } catch (e) {}
+}
+
+// React hook — returns the current Supabase user (or null when signed out).
+// Initial value seeded from getUser(); kept fresh via onAuthStateChange.
+export function useAuthUser() {
+  const [user, setUser] = React.useState(null);
+  React.useEffect(() => {
+    let cancelled = false;
+    supabase.auth.getUser().then(({ data }) => {
+      if (!cancelled) setUser(data && data.user ? data.user : null);
+    }).catch(() => {});
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session && session.user ? session.user : null);
+    });
+    return () => {
+      cancelled = true;
+      try { sub && sub.subscription && sub.subscription.unsubscribe(); } catch (e) {}
+    };
+  }, []);
+  return user;
 }

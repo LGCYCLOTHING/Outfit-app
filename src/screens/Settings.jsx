@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTheme, bgColor, fgColor, StatusBar, THEMES } from '../lib/shared.jsx';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
-import { pushProfile, pushNotificationSetting } from '../lib/sync.js';
+import { pushProfile, pushNotificationSetting, useAuthUser, signOut } from '../lib/sync.js';
 
 // iOS-style toggle switch
 function Toggle({ on, onChange, accent }) {
@@ -185,6 +185,9 @@ export default function ScreenSettings() {
   const accent = '#C8956C';
   const themeAccent = t.light;
 
+  // Live Supabase auth state.
+  const authUser = useAuthUser();
+
   // Toggle states (persisted via localStorage)
   const [dailyPick, setDailyPick] = useLocalToggle('aevum_set_daily_pick', true);
   const [streakReminder, setStreakReminder] = useLocalToggle('aevum_set_streak_reminder', true);
@@ -284,8 +287,11 @@ export default function ScreenSettings() {
         <SectionLabel>Account</SectionLabel>
         <SettingsRow icon={I.star}   title="Archive Pro"     subtitle="Manage subscription"
           onClick={() => window.__archiveGo && window.__archiveGo('paywall')} />
-        <SettingsRow icon={I.person} title="Profile"         subtitle="absolutebeta786@gmail.com"
-          onClick={() => alert('Profile')} />
+        <SettingsRow icon={I.person} title="Profile"
+          subtitle={authUser ? (authUser.email || 'Signed in') : 'Guest'}
+          onClick={() => {
+            if (!authUser) window.__archiveGo && window.__archiveGo('auth');
+          }} />
         <SettingsRow icon={I.share}  title="Share AĒVUM"     subtitle="Invite friends"
           onClick={() => window.__archiveGo && window.__archiveGo('share')} />
         <SettingsRow icon={I.info}   title="About"           subtitle="Version 1.0.0"
@@ -300,13 +306,22 @@ export default function ScreenSettings() {
           dangerText
           onClick={() => setConfirmReset(true)}
         />
-        <SettingsRow
-          icon={I.exit}
-          title="Sign out"
-          subtitle=" "
-          dangerText
-          onClick={() => alert('Signed out')}
-        />
+        {authUser ? (
+          <SettingsRow
+            icon={I.exit}
+            title="Sign out"
+            subtitle={authUser.email || ' '}
+            dangerText
+            onClick={async () => { await signOut(); window.__archiveGo && window.__archiveGo('today'); }}
+          />
+        ) : (
+          <SettingsRow
+            icon={I.exit}
+            title="Sign in"
+            subtitle="Sync your data across devices"
+            onClick={() => window.__archiveGo && window.__archiveGo('auth')}
+          />
+        )}
       </div>
 
       {/* Reset confirm sheet */}
