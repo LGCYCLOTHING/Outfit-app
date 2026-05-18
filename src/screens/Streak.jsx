@@ -77,6 +77,7 @@ const MILESTONES = [
 export default function ScreenStreak() {
   const t = useTheme();
   const accent = t.light;
+  const accentHot = t.hot;
   const accentRgba = t.softRgba;
 
   const streak = computeStreak();
