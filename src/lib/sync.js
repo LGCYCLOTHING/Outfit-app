@@ -364,6 +364,7 @@ export async function signInWithGoogle() {
   });
 }
 export async function signInWithEmail(email) {
+  console.log('Sending magic link with redirect to:', window.location.origin);
   return supabase.auth.signInWithOtp({
     email,
     options: { emailRedirectTo: window.location.origin },
