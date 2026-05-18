@@ -1,27 +1,81 @@
 import React from 'react';
-import { useTheme, fitGradient } from '../lib/shared.jsx';
+import { useTheme, fitGradient, getSavedFitPhoto } from '../lib/shared.jsx';
+
+function ymd(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function getThisWeekFits() {
+  try {
+    const today = new Date();
+    const dow = (today.getDay() + 6) % 7; // Monday = 0
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - dow);
+    const logged = new Set(JSON.parse(localStorage.getItem('aevum_fits_logged') || '[]'));
+    const monthShort = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    const fits = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      const key = ymd(d);
+      const photo = getSavedFitPhoto(key);
+      if (logged.has(key) || photo) {
+        fits.push({
+          id: key,
+          dateKey: key,
+          photo,
+          date: `${monthShort[d.getMonth()]} ${String(d.getDate()).padStart(2, '0')}`,
+          name: d.toDateString() === today.toDateString() ? "Today's fit" : 'Logged fit',
+          // Stable fallback gradient seed derived from date
+          gradientId: ((d.getDate() * 31) + d.getMonth() * 7) % 12,
+        });
+      }
+    }
+    return fits;
+  } catch (e) {
+    return [];
+  }
+}
+
+function readLikedSet() {
+  try { return new Set(JSON.parse(localStorage.getItem('aevum_liked_fits') || '[]')); }
+  catch (e) { return new Set(); }
+}
+function writeLikedSet(set) {
+  try { localStorage.setItem('aevum_liked_fits', JSON.stringify(Array.from(set))); } catch (e) {}
+}
 
 export default function ScreenStory() {
   const t = useTheme();
   const accent = t.light;
   const accentRgba = t.softRgba;
-  const SEGMENTS = 5;
   const DURATION = 5000;
 
-  const fits = [
-    { id: 23, name: 'Rust suede + cream knit',  date: 'MAR 14', mood: 'Confident', weather: '61° clear' },
-    { id: 11, name: 'Espresso wool + ivory',    date: 'FEB 28', mood: 'Sharp',     weather: '48° wind'  },
-    { id: 5,  name: 'Black leather + amber',    date: 'JAN 19', mood: 'Bold',      weather: '52° rain'  },
-    { id: 8,  name: 'Brick crew + olive cargo', date: 'JAN 04', mood: 'Easy',      weather: '64° sun'   },
-    { id: 4,  name: 'Cool stone + ivory linen', date: 'DEC 21', mood: 'Soft',      weather: '38° clear' },
-  ];
+  const fits = React.useMemo(() => getThisWeekFits(), []);
 
+  // If there's nothing to play, send the user back so they don't see a black screen.
+  React.useEffect(() => {
+    if (fits.length === 0) {
+      const id = setTimeout(() => {
+        window.__archiveGo && window.__archiveGo('today');
+      }, 50);
+      return () => clearTimeout(id);
+    }
+  }, [fits.length]);
+
+  const SEGMENTS = Math.max(1, fits.length);
   const [idx, setIdx] = React.useState(0);
   const [progress, setProgress] = React.useState(0);
   const [paused, setPaused] = React.useState(false);
   const startRef = React.useRef(performance.now());
   const elapsedRef = React.useRef(0);
   const rafRef = React.useRef(0);
+
+  // Reactive liked state — flips immediately on tap and writes through to storage.
+  const [liked, setLiked] = React.useState(readLikedSet);
 
   React.useEffect(() => {
     elapsedRef.current = 0;
@@ -30,6 +84,7 @@ export default function ScreenStory() {
   }, [idx]);
 
   React.useEffect(() => {
+    if (fits.length === 0) return; // nothing to advance through
     let last = performance.now();
     const tick = (now) => {
       const dt = now - last;
@@ -51,7 +106,7 @@ export default function ScreenStory() {
     };
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [idx, paused]);
+  }, [idx, paused, fits.length, SEGMENTS]);
 
   const goPrev = () => {
     if (idx > 0) setIdx(i => i - 1);
@@ -62,7 +117,33 @@ export default function ScreenStory() {
     else window.__archiveGo && window.__archiveGo('today');
   };
 
-  const fit = fits[idx];
+  const fit = fits[idx] || null;
+  const isLiked = fit ? liked.has(fit.dateKey) : false;
+
+  const toggleLike = () => {
+    if (!fit) return;
+    setLiked(prev => {
+      const next = new Set(prev);
+      if (next.has(fit.dateKey)) next.delete(fit.dateKey);
+      else next.add(fit.dateKey);
+      writeLikedSet(next);
+      try { window.dispatchEvent(new CustomEvent('archive:likeschanged')); } catch (e) {}
+      return next;
+    });
+  };
+
+  // Empty state — short black flash while the effect navigates away
+  if (!fit) {
+    return (
+      <div style={{
+        width: '100%', height: '100%', background: '#000',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: 'rgba(255,255,255,0.5)', fontFamily: 'DM Sans, sans-serif', fontSize: 13,
+      }}>
+        Nothing to play this week — log a fit first.
+      </div>
+    );
+  }
 
   return (
     <div style={{
@@ -71,28 +152,39 @@ export default function ScreenStory() {
       fontFamily: 'DM Sans, -apple-system, system-ui, sans-serif',
       color: '#fff',
     }}>
+      {/* Background — real saved photo if it exists, otherwise stable gradient */}
       <div style={{
         position: 'absolute', inset: 0,
-        background: fitGradient(fit.id),
+        background: fit.photo ? '#000' : fitGradient(fit.gradientId),
         transition: 'background .4s ease',
       }}>
-        <div style={{
-          position: 'absolute', inset: 0,
-          backgroundImage: 'url("data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence baseFrequency=%220.9%22 numOctaves=%222%22 stitchTiles=%22stitch%22/><feColorMatrix values=%220 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.45 0%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>")',
-          mixBlendMode: 'overlay', opacity: 0.4, pointerEvents: 'none',
-        }} />
+        {fit.photo && (
+          <img src={fit.photo} alt="" style={{
+            position: 'absolute', inset: 0,
+            width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+          }} />
+        )}
+        {/* Soft grain — only over the gradient fallback */}
+        {!fit.photo && (
+          <div style={{
+            position: 'absolute', inset: 0,
+            backgroundImage: 'url("data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence baseFrequency=%220.9%22 numOctaves=%222%22 stitchTiles=%22stitch%22/><feColorMatrix values=%220 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.45 0%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>")',
+            mixBlendMode: 'overlay', opacity: 0.4, pointerEvents: 'none',
+          }} />
+        )}
         <div style={{
           position: 'absolute', top: 0, left: 0, right: 0, height: 240,
           background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 100%)',
           pointerEvents: 'none',
         }} />
         <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0, height: 280,
-          background: 'linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%)',
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: 320,
+          background: 'linear-gradient(0deg, rgba(0,0,0,0.78) 0%, transparent 100%)',
           pointerEvents: 'none',
         }} />
       </div>
 
+      {/* Tap zones for prev/next (lower z than controls below) */}
       <div
         onClick={(e) => {
           const rect = e.currentTarget.getBoundingClientRect();
@@ -105,6 +197,7 @@ export default function ScreenStory() {
         style={{ position: 'absolute', inset: 0, zIndex: 10, cursor: 'pointer' }}
       />
 
+      {/* Progress segments */}
       <div style={{
         position: 'absolute', top: 'calc(14px + var(--archive-safe-top, 54px))', left: 14, right: 14,
         display: 'flex', gap: 4, zIndex: 20,
@@ -125,75 +218,113 @@ export default function ScreenStory() {
         ))}
       </div>
 
+      {/* Top bar — fit code + close */}
       <div style={{
         position: 'absolute', top: 'calc(30px + var(--archive-safe-top, 54px))', left: 18, right: 18,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         zIndex: 20, pointerEvents: 'none',
       }}>
-        <div style={{ pointerEvents: 'auto' }}>
-          <div style={{
-            fontSize: 12, color: 'var(--text-secondary)',
-            fontFamily: '"DM Sans", sans-serif', letterSpacing: -0.40,
-          }}>FIT #{String(fit.id).padStart(3, '0')} · {fit.date}</div>
-        </div>
-        <div className="liquid-glass" onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('today'); }} style={{
-          width: 32, height: 32, borderRadius: 16,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer', pointerEvents: 'auto',
+        <div style={{
+          fontSize: 12, color: 'rgba(255,255,255,0.78)',
+          fontFamily: '"DM Sans", sans-serif', letterSpacing: 0.4,
+          textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+          pointerEvents: 'auto',
         }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1" strokeLinecap="round">
+          {fit.date}
+        </div>
+        <div className="liquid-glass archive-pressable"
+          onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('today'); }}
+          style={{
+            width: 34, height: 34, borderRadius: 17,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', pointerEvents: 'auto',
+          }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round">
             <path d="M6 6l12 12M18 6L6 18"/>
           </svg>
         </div>
       </div>
 
+      {/* Bottom caption + actions */}
       <div style={{
         position: 'absolute', bottom: 'calc(28px + var(--archive-safe-bottom, 0px))',
         left: 16, right: 16, zIndex: 20,
-        padding: 20, borderRadius: 24,
+        padding: 18, borderRadius: 24,
         background: 'rgba(20,15,12,0.55)',
         backdropFilter: 'blur(28px) saturate(140%)',
         WebkitBackdropFilter: 'blur(28px) saturate(140%)',
         boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.12), 0 20px 50px rgba(0,0,0,0.5)',
-        pointerEvents: 'none',
       }}>
         <div style={{
-          textAlign: 'center', fontSize: 12, color: 'var(--text-primary)',
-          fontFamily: '"DM Sans", sans-serif', letterSpacing: -0.45, marginBottom: 6,
-        }}>{fit.mood.toUpperCase()} · {fit.weather.toUpperCase()}</div>
-        <div className="h-display" style={{ fontSize: 30, textAlign: 'center', lineHeight: 1.05 }}>
+          textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.78)',
+          fontFamily: '"DM Sans", sans-serif', letterSpacing: 1.4, marginBottom: 4,
+        }}>{fit.date}</div>
+        <div className="h-display" style={{ fontSize: 26, textAlign: 'center', lineHeight: 1.1, marginBottom: 4 }}>
           {fit.name}
         </div>
 
         <div style={{
-          marginTop: 16, padding: 6,
+          marginTop: 14, padding: 6,
           borderRadius: 100, background: 'rgba(0,0,0,0.4)',
           display: 'flex', justifyContent: 'space-around', alignItems: 'center',
-          pointerEvents: 'auto',
           boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.1)',
         }}>
-          {[
-            { key: 'share', svg: <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v14"/>, action: 'share' },
-            { key: 'heart', svg: <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>, action: null },
-            { key: 'open',  svg: <><circle cx="12" cy="12" r="3"/><path d="M12 5c-7 0-9 7-9 7s2 7 9 7 9-7 9-7-2-7-9-7z"/></>, action: 'detail' },
-            { key: 'next',  svg: <path d="M5 12h14M13 5l7 7-7 7"/>, action: null, label: true },
-          ].map(item => (
-            <div key={item.key}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (item.key === 'next') goNext();
-                else if (item.action) window.__archiveGo && window.__archiveGo(item.action);
-              }}
-              style={{
-                width: 38, height: 38, borderRadius: 19,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer',
-              }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-                {item.svg}
-              </svg>
-            </div>
-          ))}
+          {/* Share */}
+          <div
+            onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('share'); }}
+            className="archive-pressable"
+            style={{
+              width: 40, height: 40, borderRadius: 20,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer',
+            }}>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v14"/>
+            </svg>
+          </div>
+          {/* Heart (functional) */}
+          <div
+            onClick={(e) => { e.stopPropagation(); toggleLike(); }}
+            className="archive-pressable"
+            style={{
+              width: 40, height: 40, borderRadius: 20,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer',
+            }}>
+            <svg width="17" height="17" viewBox="0 0 24 24"
+              fill={isLiked ? '#9BB89F' : 'none'}
+              stroke={isLiked ? '#9BB89F' : '#fff'}
+              strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </div>
+          {/* Open detail */}
+          <div
+            onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('detail'); }}
+            className="archive-pressable"
+            style={{
+              width: 40, height: 40, borderRadius: 20,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer',
+            }}>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 5c-7 0-9 7-9 7s2 7 9 7 9-7 9-7-2-7-9-7z"/>
+            </svg>
+          </div>
+          {/* Next */}
+          <div
+            onClick={(e) => { e.stopPropagation(); goNext(); }}
+            className="archive-pressable"
+            style={{
+              width: 40, height: 40, borderRadius: 20,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer',
+            }}>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14M13 5l7 7-7 7"/>
+            </svg>
+          </div>
         </div>
       </div>
     </div>
