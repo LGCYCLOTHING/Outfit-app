@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTheme, bgColor, fgColor, StatusBar, getSavedFitPhoto } from '../lib/shared.jsx';
+import { useTheme, bgColor, fgColor, StatusBar, getSavedFitPhoto, getActiveIconId } from '../lib/shared.jsx';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
 
 function ymd(d) {
@@ -34,6 +34,20 @@ export default function ScreenShare() {
     window.addEventListener('archive:fitschanged', refresh);
     return () => window.removeEventListener('archive:fitschanged', refresh);
   }, [todayKey]);
+
+  // Branded mark — uses whichever app icon the user picked (theme-tied),
+  // refreshes when they change theme/icon.
+  const [iconId, setIconId] = React.useState(() => getActiveIconId());
+  React.useEffect(() => {
+    const refresh = () => setIconId(getActiveIconId());
+    window.addEventListener('archive:themechange', refresh);
+    window.addEventListener('archive:iconchange', refresh);
+    return () => {
+      window.removeEventListener('archive:themechange', refresh);
+      window.removeEventListener('archive:iconchange', refresh);
+    };
+  }, []);
+  const iconSrc = `/icons/icon-${iconId}.png`;
   const dateLabel = prettyDate(today);
   const fitNumber = '023';
   const fitTotal = '312';
@@ -67,7 +81,7 @@ export default function ScreenShare() {
           }}>
             {photoData ? (
               <img src={photoData} alt="" style={{
-                width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                width: '100%', height: '100%', objectFit: 'contain', display: 'block',
               }} />
             ) : (
               <div style={{
@@ -96,11 +110,21 @@ export default function ScreenShare() {
             }}>{dateLabel.split(',')[0]}</div>
             <div style={{
               marginTop: px(6),
-              fontSize: px(11),
-              letterSpacing: px(2.4),
-              fontFamily: '"DM Sans", sans-serif', color: 'rgba(26,22,18,0.62)',
-              textTransform: 'uppercase',
-            }}>{`AĒVUM · #${fitNumber}`}</div>
+              display: 'flex', alignItems: 'center', gap: px(7),
+            }}>
+              <img src={iconSrc} alt="" style={{
+                width: px(18), height: px(18),
+                borderRadius: px(4),
+                objectFit: 'cover',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.18)',
+              }} />
+              <span style={{
+                fontSize: px(11),
+                letterSpacing: px(2.4),
+                fontFamily: '"DM Sans", sans-serif', color: 'rgba(26,22,18,0.62)',
+                textTransform: 'uppercase',
+              }}>{`AĒVUM · #${fitNumber}`}</span>
+            </div>
           </div>
         </div>
       );
@@ -117,13 +141,23 @@ export default function ScreenShare() {
           ? `0 30px 60px -15px rgba(0,0,0,0.7), 0 0 40px rgba(${accentRgba},0.28)`
           : '0 8px 20px -6px rgba(0,0,0,0.6)',
       }}>
-        {/* Top-left wordmark */}
+        {/* Top-left wordmark + app icon */}
         <div style={{
-          position: 'absolute', top: px(28), left: px(30),
-          fontSize: px(14), fontWeight: 600,
-          letterSpacing: px(4),
-          fontFamily: '"DM Sans", sans-serif', color: '#fff',
-        }}>AĒVUM</div>
+          position: 'absolute', top: px(26), left: px(30),
+          display: 'flex', alignItems: 'center', gap: px(9),
+        }}>
+          <img src={iconSrc} alt="" style={{
+            width: px(22), height: px(22),
+            borderRadius: px(5),
+            objectFit: 'cover',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.35)',
+          }} />
+          <span style={{
+            fontSize: px(14), fontWeight: 600,
+            letterSpacing: px(4),
+            fontFamily: '"DM Sans", sans-serif', color: '#fff',
+          }}>AĒVUM</span>
+        </div>
 
         {/* Top-right fit code */}
         <div style={{
@@ -241,6 +275,38 @@ export default function ScreenShare() {
       ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
     }
 
+    function roundedRectPath(x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    // Brand icon — current themed app icon
+    const iconImg = await new Promise((res) => {
+      const i = new Image();
+      i.onload = () => res(i);
+      i.onerror = () => res(null);
+      i.src = iconSrc;
+    });
+    function drawIcon(x, y, size, radius) {
+      if (!iconImg) return;
+      ctx.save();
+      roundedRectPath(x, y, size, size, radius);
+      ctx.clip();
+      const r = Math.max(size / iconImg.width, size / iconImg.height);
+      const dw = iconImg.width * r, dh = iconImg.height * r;
+      ctx.drawImage(iconImg, x + (size - dw) / 2, y + (size - dh) / 2, dw, dh);
+      ctx.restore();
+    }
+
     if (v === 'polaroid') {
       // Cream paper
       ctx.fillStyle = '#f6f0e2';
@@ -249,15 +315,23 @@ export default function ScreenShare() {
       const m = 76;
       const ps = W - m * 2;
       drawContain(photoImg, m, m, ps, ps);
-      // Caption block
+      // Caption block — date on top
       ctx.fillStyle = '#1a1612';
       ctx.textAlign = 'center';
       ctx.font = 'italic 72px "Cormorant Garamond", Georgia, serif';
       ctx.fillText(dateLabel.split(',')[0], W / 2, m + ps + 130);
-      ctx.fillStyle = 'rgba(26,22,18,0.62)';
+      // Icon + AĒVUM caption inline
+      const subText = `AĒVUM · #${fitNumber}`;
       ctx.font = '500 28px "DM Sans", Helvetica, sans-serif';
-      const sub = `AĒVUM · #${fitNumber}`;
-      ctx.fillText(sub, W / 2, m + ps + 180);
+      const subWidth = ctx.measureText(subText).width;
+      const iconSize = 36, gap = 14;
+      const rowWidth = iconSize + gap + subWidth;
+      const rowX = (W - rowWidth) / 2;
+      const rowY = m + ps + 158;
+      drawIcon(rowX, rowY, iconSize, 9);
+      ctx.fillStyle = 'rgba(26,22,18,0.62)';
+      ctx.textAlign = 'left';
+      ctx.fillText(subText, rowX + iconSize + gap, rowY + iconSize - 11);
     } else {
       // Editorial — dark accent gradient
       const grad = ctx.createLinearGradient(0, 0, W, H);
@@ -266,11 +340,12 @@ export default function ScreenShare() {
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, W, H);
 
-      // Wordmark
+      // Icon + wordmark — branded mark in the corner
+      drawIcon(80, 56, 56, 14);
       ctx.fillStyle = '#fff';
       ctx.textAlign = 'left';
       ctx.font = '600 36px "DM Sans", Helvetica, sans-serif';
-      ctx.fillText('AĒVUM', 80, 92);
+      ctx.fillText('AĒVUM', 80 + 56 + 18, 96);
 
       ctx.textAlign = 'right';
       ctx.fillStyle = 'rgba(255,255,255,0.55)';
