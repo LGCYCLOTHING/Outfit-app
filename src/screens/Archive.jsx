@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   useTheme, bgColor, fgColor,
-  ArchiveBurger, StatusBar, TabBar, fitGradient,
+  ArchiveBurger, StatusBar, TabBar, fitGradient, getSavedFitPhoto,
 } from '../lib/shared.jsx';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
 
@@ -63,9 +63,17 @@ export default function ScreenArchive() {
       const n = new Set(prev);
       n.has(id) ? n.delete(id) : n.add(id);
       writeLikedFits(n);
+      try { window.dispatchEvent(new CustomEvent('archive:likeschanged')); } catch (e) {}
       return n;
     });
   };
+
+  // Stay in sync when Today (or any other screen) flips a like.
+  React.useEffect(() => {
+    const refresh = () => setFavorited(readLikedFits());
+    window.addEventListener('archive:likeschanged', refresh);
+    return () => window.removeEventListener('archive:likeschanged', refresh);
+  }, []);
 
   const cycleSort = () => {
     const i = SORT_MODES.indexOf(sortMode);
@@ -116,9 +124,22 @@ export default function ScreenArchive() {
     return { ...m, fits: sortFits(filtered), count: String(filtered.length).padStart(2, '0') };
   }).filter(m => m.fits.length > 0);
 
-  // Collect all liked fits across months for the LIKED section
+  // Collect all liked fits across months for the LIKED section.
+  // The liked set is a mix of numeric archive ids and date strings (daily fits
+  // liked from the Today screen). Daily ones show the user's actual saved photo.
+  const isDateKey = (v) => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
   const allFits = months.flatMap(m => m.fits);
-  const likedFits = allFits.filter(f => favorited.has(f.id));
+  const likedArchiveFits = allFits.filter(f => favorited.has(f.id));
+  const likedDailyFits = Array.from(favorited)
+    .filter(isDateKey)
+    .sort((a, b) => b.localeCompare(a))
+    .map(dateStr => {
+      const d = new Date(dateStr);
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return { isDaily: true, id: dateStr, dateStr, n: `${mm}/${dd}` };
+    });
+  const likedFits = [...likedDailyFits, ...likedArchiveFits];
 
   return (
     <div style={{
@@ -246,7 +267,7 @@ export default function ScreenArchive() {
 
         {/* NEW Sort row */}
         <div style={{ padding: '0 24px', marginBottom: 22, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: 1.2, fontWeight: 500 }}>
+          <div style={{ fontSize: 10, color: '#fff', letterSpacing: 1.2, fontWeight: 500 }}>
             SORTED BY
           </div>
           <div onClick={cycleSort} className="lg-pill archive-pressable" style={{
@@ -277,7 +298,7 @@ export default function ScreenArchive() {
             }} />
 
             <div style={{ position: 'relative', padding: '22px 22px 20px', zIndex: 1 }}>
-              <div style={{ fontSize: 10, letterSpacing: 1.6, color: 'var(--text-muted)', fontWeight: 500, marginBottom: 14 }}>
+              <div style={{ fontSize: 10, letterSpacing: 1.6, color: '#fff', fontWeight: 500, marginBottom: 14 }}>
                 FEATURED FIT
               </div>
               <div className="h-display" style={{ fontSize: 30, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 10 }}>
@@ -286,7 +307,7 @@ export default function ScreenArchive() {
               <div style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.4, maxWidth: 200, marginBottom: 28 }}>
                 Layered neutrals with<br/>textured contrast.
               </div>
-              <div style={{ fontSize: 10, letterSpacing: 1.4, color: 'var(--text-muted)', fontWeight: 500 }}>
+              <div style={{ fontSize: 10, letterSpacing: 1.4, color: '#fff', fontWeight: 500 }}>
                 APR 26, 2026
               </div>
             </div>
@@ -314,43 +335,60 @@ export default function ScreenArchive() {
         {/* NEW Liked section — appears when there are favorites */}
         {likedFits.length > 0 && (
           <div style={{ marginBottom: 32 }}>
-            <div style={{ padding: '0 24px', marginBottom: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <HeartIcon size={12} color={SAGE} filled />
-                <span style={{ fontSize: 11, color: SAGE, fontWeight: 500, letterSpacing: 1.5 }}>
-                  LIKED
-                </span>
-              </div>
-              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: 1 }}>
-                {String(likedFits.length).padStart(2, '0')}
+            <div style={{ padding: '0 24px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <HeartIcon size={12} color={SAGE} filled />
+              <span style={{ fontSize: 11, color: SAGE, fontWeight: 500, letterSpacing: 1.5 }}>
+                LIKED
+              </span>
+              <span style={{ fontSize: 11, color: '#fff', fontWeight: 500, letterSpacing: 1 }}>
+                · {String(likedFits.length).padStart(2, '0')}
               </span>
             </div>
             <div className="chip-row" style={{
               padding: '0 24px 4px', display: 'flex', gap: 10, overflowX: 'auto',
             }}>
-              {likedFits.map(f => (
-                <div key={f.id} onClick={() => window.__archiveGo && window.__archiveGo('detail')} style={{
-                  flex: '0 0 auto', width: 110, aspectRatio: '3/4',
-                  borderRadius: 12, overflow: 'hidden', position: 'relative',
-                  background: fitGradient(f.id), cursor: 'pointer',
-                  boxShadow: 'inset 0 0 0 0.5px rgba(255,240,220,0.08), inset 0 -30px 50px rgba(0,0,0,0.4)',
-                }}>
-                  <div style={{
-                    position: 'absolute', top: 6, right: 6,
-                    width: 22, height: 22, borderRadius: 11,
-                    background: SAGE_BG, boxShadow: `inset 0 0 0 1px ${SAGE_BORDER}`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+              {likedFits.map(f => {
+                const photo = f.isDaily ? getSavedFitPhoto(f.dateStr) : null;
+                return (
+                  <div key={String(f.id)} onClick={(e) => {
+                    e.stopPropagation();
+                    if (f.isDaily) window.__archiveGo && window.__archiveGo('today');
+                    else window.__archiveGo && window.__archiveGo('detail');
+                  }} style={{
+                    flex: '0 0 auto', width: 110, aspectRatio: '3/4',
+                    borderRadius: 12, overflow: 'hidden', position: 'relative',
+                    background: photo ? '#000' : fitGradient(typeof f.id === 'number' ? f.id : 7),
+                    cursor: 'pointer',
+                    boxShadow: 'inset 0 0 0 0.5px rgba(255,240,220,0.08), inset 0 -30px 50px rgba(0,0,0,0.4)',
                   }}>
-                    <HeartIcon size={10} color={SAGE} filled />
+                    {photo && (
+                      <img src={photo} alt="" style={{
+                        position: 'absolute', inset: 0,
+                        width: '100%', height: '100%',
+                        objectFit: 'cover', display: 'block',
+                      }} />
+                    )}
+                    <div onClick={(e) => { e.stopPropagation(); toggleFav(f.id); }}
+                      className="archive-pressable"
+                      style={{
+                        position: 'absolute', top: 6, right: 6,
+                        width: 22, height: 22, borderRadius: 11,
+                        background: SAGE_BG, boxShadow: `inset 0 0 0 1px ${SAGE_BORDER}`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer',
+                      }}>
+                      <HeartIcon size={10} color={SAGE} filled />
+                    </div>
+                    <div style={{
+                      position: 'absolute', bottom: 8, left: 10,
+                      fontSize: 10, color: '#fff', letterSpacing: 0.8, fontWeight: 500,
+                      textShadow: '0 1px 3px rgba(0,0,0,0.6)',
+                    }}>
+                      {f.isDaily ? f.n : `#${f.n}`}
+                    </div>
                   </div>
-                  <div style={{
-                    position: 'absolute', bottom: 8, left: 10,
-                    fontSize: 10, color: 'var(--text-primary)', letterSpacing: 0.8, fontWeight: 500,
-                  }}>
-                    #{f.n}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -369,13 +407,13 @@ export default function ScreenArchive() {
           <div key={m.label} style={{ marginBottom: 32 }}>
             <div style={{
               padding: '0 24px', marginBottom: 14,
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              display: 'flex', alignItems: 'center', gap: 10,
             }}>
-              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: 1.5 }}>
+              <span style={{ fontSize: 11, color: '#fff', fontWeight: 500, letterSpacing: 1.5 }}>
                 {m.label}
               </span>
-              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: 1 }}>
-                {m.count}
+              <span style={{ fontSize: 11, color: '#fff', fontWeight: 500, letterSpacing: 1 }}>
+                · {m.count}
               </span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, padding: '0 24px' }}>
