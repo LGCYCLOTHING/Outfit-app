@@ -1,16 +1,16 @@
 import React from 'react';
 import {
   useTheme, bgColor, fgColor,
-  ArchiveBurger, StatusBar, TabBar, fitGradient, getSavedFitPhoto,
+  ArchiveBurger, StatusBar, TabBar, fitGradient, fitBorder, getSavedFitPhoto,
 } from '../lib/shared.jsx';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
 
-// Sage green secondary accent — used for liked + active filter
-const SAGE = '#9BB89F';
-const SAGE_BG = 'rgba(122, 155, 126, 0.14)';
-const SAGE_BORDER = 'rgba(122, 155, 126, 0.40)';
-const SAGE_GLOW = 'rgba(122, 155, 126, 0.18)';
-const SAGE_RGBA = '122, 155, 126';
+// Pink secondary accent — used for liked + active filter
+const SAGE = '#F08AB0';
+const SAGE_BG = 'rgba(240, 138, 176, 0.16)';
+const SAGE_BORDER = 'rgba(240, 138, 176, 0.45)';
+const SAGE_GLOW = 'rgba(240, 138, 176, 0.22)';
+const SAGE_RGBA = '240, 138, 176';
 
 function HeartIcon({ size = 14, color = '#F5F0E8', filled = false }) {
   return (
@@ -349,18 +349,22 @@ export default function ScreenArchive() {
             }}>
               {likedFits.map(f => {
                 const photo = f.isDaily ? getSavedFitPhoto(f.dateStr) : null;
+                const seed = typeof f.id === 'number' ? f.id : 7;
                 return (
                   <div key={String(f.id)} onClick={(e) => {
                     e.stopPropagation();
                     if (f.isDaily) window.__archiveGo && window.__archiveGo('today');
                     else window.__archiveGo && window.__archiveGo('detail');
-                  }} style={{
-                    flex: '0 0 auto', width: 110, aspectRatio: '3/4',
-                    borderRadius: 12, overflow: 'hidden', position: 'relative',
-                    background: photo ? '#000' : fitGradient(typeof f.id === 'number' ? f.id : 7),
-                    cursor: 'pointer',
-                    boxShadow: 'inset 0 0 0 0.5px rgba(255,240,220,0.08), inset 0 -30px 50px rgba(0,0,0,0.4)',
-                  }}>
+                  }}
+                    className="lg-border-gradient"
+                    style={{
+                      flex: '0 0 auto', width: 110, aspectRatio: '3/4',
+                      borderRadius: 12, overflow: 'hidden', position: 'relative',
+                      background: photo ? '#000' : fitGradient(seed),
+                      cursor: 'pointer',
+                      boxShadow: 'inset 0 -30px 50px rgba(0,0,0,0.4)',
+                      '--grad-border': fitBorder(seed),
+                    }}>
                     {photo && (
                       <img src={photo} alt="" style={{
                         position: 'absolute', inset: 0,
@@ -420,11 +424,14 @@ export default function ScreenArchive() {
               {m.fits.map(f => {
                 const isFav = favorited.has(f.id);
                 return (
-                  <div key={f.id} onClick={() => window.__archiveGo && window.__archiveGo('detail')} style={{
-                    position: 'relative', aspectRatio: '4/3', borderRadius: 14, overflow: 'hidden',
-                    background: fitGradient(f.id), cursor: 'pointer',
-                    boxShadow: 'inset 0 0 0 0.5px rgba(255,240,220,0.06), inset 0 -40px 60px rgba(0,0,0,0.35)',
-                  }}>
+                  <div key={f.id} onClick={() => window.__archiveGo && window.__archiveGo('detail')}
+                    className="lg-border-gradient"
+                    style={{
+                      position: 'relative', aspectRatio: '4/3', borderRadius: 14, overflow: 'hidden',
+                      background: fitGradient(f.id), cursor: 'pointer',
+                      boxShadow: 'inset 0 -40px 60px rgba(0,0,0,0.35)',
+                      '--grad-border': fitBorder(f.id),
+                    }}>
                     <div style={{
                       position: 'absolute', inset: 0,
                       backgroundImage: 'url("data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence baseFrequency=%220.9%22 numOctaves=%222%22 stitchTiles=%22stitch%22/><feColorMatrix values=%220 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/></svg>")',
