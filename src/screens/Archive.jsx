@@ -179,23 +179,25 @@ export default function ScreenArchive() {
                 ARCHIVE
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div onClick={() => {}} className="archive-pressable" style={{
-                width: 34, height: 34, borderRadius: 10,
+                width: 42, height: 42, borderRadius: 12,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 background: SAGE_BG, boxShadow: `inset 0 0 0 1px ${SAGE_BORDER}`,
                 cursor: 'pointer',
               }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={SAGE} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={SAGE} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
                 </svg>
               </div>
               <div onClick={() => window.__archiveGo && window.__archiveGo('calendar')} className="archive-pressable" style={{
-                width: 34, height: 34, borderRadius: 10,
+                width: 42, height: 42, borderRadius: 12,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'rgba(255,255,255,0.05)',
+                boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.10)',
                 cursor: 'pointer',
               }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>
                 </svg>
               </div>
@@ -259,13 +261,12 @@ export default function ScreenArchive() {
           </div>
         </div>
 
-        {/* Filter labels — plain white text, no pill background, horizontally scrollable */}
-        <div className="chip-row" style={{
-          display: 'flex', gap: 22, padding: '0 24px 6px',
-          overflowX: 'auto', overflowY: 'hidden',
+        {/* Filter labels — fits all on one row (no overflow), evenly spaced */}
+        <div style={{
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          padding: '0 24px 6px',
           marginBottom: 24, marginTop: 18,
         }}>
-          <style>{`.chip-row::-webkit-scrollbar{display:none}`}</style>
           {tags.map((tag) => {
             const active = tag === activeTag;
             return (
@@ -275,8 +276,8 @@ export default function ScreenArchive() {
                 style={{
                   position: 'relative',
                   padding: '6px 0', whiteSpace: 'nowrap',
-                  fontSize: 15, fontWeight: active ? 600 : 400,
-                  cursor: 'pointer', flexShrink: 0,
+                  fontSize: 13, fontWeight: active ? 600 : 400,
+                  cursor: 'pointer',
                   color: '#fff',
                   opacity: active ? 1 : 0.55,
                   letterSpacing: -0.1,
@@ -285,7 +286,7 @@ export default function ScreenArchive() {
                 {tag}
                 {active && (
                   <div style={{
-                    position: 'absolute', bottom: 0, left: 0, right: 0,
+                    position: 'absolute', bottom: 0, left: -4, right: -4,
                     height: 2, borderRadius: 2,
                     background: SAGE,
                   }} />
