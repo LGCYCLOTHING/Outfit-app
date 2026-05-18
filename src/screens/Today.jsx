@@ -907,7 +907,10 @@ export default function ScreenToday() {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
                 {recent.map((dateStr, idx) => (
-                  <div key={dateStr} onClick={() => window.__archiveGo && window.__archiveGo('detail')} style={{ cursor: 'pointer', position: 'relative' }}>
+                  <div key={dateStr} onClick={() => {
+                    if (typeof window !== 'undefined') window.__archiveDetailKey = dateStr;
+                    window.__archiveGo && window.__archiveGo('detail');
+                  }} style={{ cursor: 'pointer', position: 'relative' }}>
                     <PhotoPlaceholder ratio="3/4" radius={12} photoId={idx + 5} photoKey={dateStr} noBorder />
                     <div style={{
                       position: 'absolute', bottom: 7, left: 9,

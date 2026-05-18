@@ -1,6 +1,25 @@
 import React from 'react';
 import { useTheme, StatusBar, FitPhoto, getSavedFitPhoto, saveFitPhoto } from '../lib/shared.jsx';
 
+function ymd(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+// Resolve which photo to show. Callers (Today, Archive, Story) can stash a key
+// on window.__archiveDetailKey before navigating; otherwise we fall back to
+// today's logged photo, then to the demo id 23.
+function resolveDetailPhotoKey() {
+  const stashed = typeof window !== 'undefined' ? window.__archiveDetailKey : null;
+  if (stashed != null && getSavedFitPhoto(stashed)) return stashed;
+  const todayKey = ymd(new Date());
+  if (getSavedFitPhoto(todayKey)) return todayKey;
+  if (stashed != null) return stashed; // keep the id even without a photo (for label etc.)
+  return 23;
+}
+
 export default function ScreenDetail() {
   const t = useTheme();
   const accent = t.light;
@@ -10,8 +29,18 @@ export default function ScreenDetail() {
   const [tab, setTab] = React.useState('Pieces');
   const tabs = ['Pieces', 'People', 'Notes'];
 
-  const photoKey = 23;
+  const [photoKey, setPhotoKey] = React.useState(() => resolveDetailPhotoKey());
   const [photo, setPhoto] = React.useState(() => getSavedFitPhoto(photoKey));
+  // If the user logs a new fit while looking at the detail screen, refresh.
+  React.useEffect(() => {
+    const refresh = () => {
+      const k = resolveDetailPhotoKey();
+      setPhotoKey(k);
+      setPhoto(getSavedFitPhoto(k));
+    };
+    window.addEventListener('archive:fitschanged', refresh);
+    return () => window.removeEventListener('archive:fitschanged', refresh);
+  }, []);
   const fileRef = React.useRef(null);
   const onPickFile = (e) => {
     const f = e.target.files && e.target.files[0];

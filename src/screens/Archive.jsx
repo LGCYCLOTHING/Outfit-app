@@ -364,8 +364,8 @@ export default function ScreenArchive() {
                   <div className="lg-border-gradient" style={{
                     position: 'relative', width: '100%', height: '100%',
                     borderRadius: 9, overflow: 'hidden',
-                    background: photo ? '#000' : fitGradient(seed),
-                    boxShadow: 'inset 0 -30px 50px rgba(0,0,0,0.4)',
+                    background: photo ? '#000' : fitBorder(seed),
+                    boxShadow: photo ? 'none' : 'inset 0 -40px 60px rgba(0,0,0,0.5), inset 0 20px 40px rgba(0,0,0,0.30)',
                     '--grad-border': fitBorder(seed),
                   }}>
                     {photo && (
@@ -435,8 +435,8 @@ export default function ScreenArchive() {
                   <div className="lg-border-gradient" style={{
                     position: 'relative', width: '100%', height: '100%',
                     borderRadius: 11, overflow: 'hidden',
-                    background: fitGradient(f.id),
-                    boxShadow: 'inset 0 -40px 60px rgba(0,0,0,0.35)',
+                    background: fitBorder(f.id),
+                    boxShadow: 'inset 0 -50px 70px rgba(0,0,0,0.55), inset 0 30px 60px rgba(0,0,0,0.30)',
                     '--grad-border': fitBorder(f.id),
                   }}>
                     <div style={{
