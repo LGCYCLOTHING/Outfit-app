@@ -5,6 +5,7 @@ import {
   getSavedFitPhoto, getSavedFitPhotos,
 } from '../lib/shared.jsx';
 import { calculateWeeklyScore, scoreLabel, scoreTier } from '../lib/fitScore.js';
+import { getWardrobeCompletion } from '../lib/wardrobe.js';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
 import { useWeather, WeatherIcon } from '../lib/weather.jsx';
 
@@ -1174,6 +1175,7 @@ export default function ScreenToday() {
           try { likedCount = JSON.parse(localStorage.getItem('aevum_liked_fits') || '[]').length; } catch (e) {}
           let piecesCount = 0;
           try { piecesCount = JSON.parse(localStorage.getItem('aevum_pieces') || '[]').length; } catch (e) {}
+          const wardrobe = getWardrobeCompletion();
           const now = new Date();
           const thisMonthCount = allLogged.filter(d => {
             const dd = new Date(d);
@@ -1186,7 +1188,9 @@ export default function ScreenToday() {
             best:   { value: String(bestStreak || 47),         unit: (bestStreak || 47) === 1 ? 'day' : 'days', label: 'BEST STREAK', nav: 'streak' },
             month:  { value: String(thisMonthCount || 23),     unit: '/ 30 days',                      label: 'THIS MONTH',  nav: 'calendar' },
             liked:  { value: String(likedCount || 8),          unit: (likedCount || 8) === 1 ? 'fit' : 'fits', label: 'LIKED',       nav: 'archive' },
-            pieces: { value: String(piecesCount || 0),         unit: piecesCount === 1 ? 'piece' : 'pieces', label: 'PIECES',      nav: 'pieces' },
+            pieces: { value: wardrobe.target ? `${wardrobe.percent}%` : String(piecesCount || 0),
+                      unit:  wardrobe.target ? 'cataloged' : (piecesCount === 1 ? 'piece' : 'pieces'),
+                      label: 'WARDROBE',    nav: 'pieces' },
           };
 
           // While dragging, compute each non-dragged card's "live" position as if

@@ -4,6 +4,7 @@
 
 import { getSavedFitPhotos, getSavedFitMeta } from './shared.jsx';
 import { calculateWeeklyScore } from './fitScore.js';
+import { getWardrobeCompletion } from './wardrobe.js';
 
 const STORAGE_KEY = 'aevum_achievements';
 
@@ -30,6 +31,11 @@ export const ACHIEVEMENTS = [
   { id: 'week-7',      group: 'style',   title: 'Perfect Week',    desc: 'Log all 7 days in a week', icon: '✓' },
   { id: 'ctx-night-5', group: 'style',   title: 'Night Out',       desc: 'Tag Night Out 5 times', icon: '✶' },
   { id: 'ctx-work-10', group: 'style',   title: 'Work Ready',      desc: 'Tag Work 10 times',     icon: '▣' },
+  // Wardrobe cataloging milestones
+  { id: 'wardrobe-25',  group: 'wardrobe', title: 'Quarter cataloged', desc: 'Catalog 25% of your wardrobe',  icon: '◔', threshold: 25 },
+  { id: 'wardrobe-50',  group: 'wardrobe', title: 'Halfway',           desc: 'Catalog 50% of your wardrobe',  icon: '◑', threshold: 50 },
+  { id: 'wardrobe-75',  group: 'wardrobe', title: 'Almost complete',   desc: 'Catalog 75% of your wardrobe',  icon: '◕', threshold: 75 },
+  { id: 'wardrobe-100', group: 'wardrobe', title: 'Wardrobe complete', desc: 'Catalog 100% of your wardrobe', icon: '●', threshold: 100 },
 ];
 
 function readLoggedDays() {
@@ -105,11 +111,13 @@ export function evaluateAchievements() {
     return false;
   })();
 
+  const wardrobePct = getWardrobeCompletion().percent;
   const unlocked = [];
   for (const a of ACHIEVEMENTS) {
     let isOn = false;
     if (a.group === 'logging') isOn = totalFits >= a.threshold;
     else if (a.group === 'streak') isOn = streak >= a.threshold;
+    else if (a.group === 'wardrobe') isOn = wardrobePct >= a.threshold;
     else if (a.id === 'rate-first')  isOn = ratedCount >= 1;
     else if (a.id === 'mood-10')     isOn = moodCount >= 10;
     else if (a.id === 'pieces-20')   isOn = piecesUnique >= 20;

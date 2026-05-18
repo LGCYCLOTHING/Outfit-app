@@ -17,8 +17,9 @@ import ScreenSettings from './screens/Settings.jsx';
 import ScreenStreak from './screens/Streak.jsx';
 import ScreenPieces from './screens/Pieces.jsx';
 import ScreenFitScore from './screens/FitScore.jsx';
+import ScreenStyleDNA from './screens/StyleDNA.jsx';
 
-const VALID_SCREENS = ['today','archive','mix','you','paywall','rating','detail','calendar','share','story','splash','onboarding','auth','settings','pieces','streak','fitscore'];
+const VALID_SCREENS = ['today','archive','mix','you','paywall','rating','detail','calendar','share','story','splash','onboarding','auth','settings','pieces','streak','fitscore','styledna'];
 
 const ONBOARDED_KEY = 'aevum_onboarded';
 function isOnboarded() {
@@ -319,6 +320,7 @@ export default function App() {
     pieces:   <ScreenPieces />,
     streak:   <ScreenStreak />,
     fitscore: <ScreenFitScore />,
+    styledna: <ScreenStyleDNA />,
     archive:  <ScreenArchive />,
     mix:      <ScreenMix />,
     you:      <ScreenYou />,

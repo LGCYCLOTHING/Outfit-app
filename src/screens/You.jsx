@@ -5,6 +5,8 @@ import {
 } from '../lib/shared.jsx';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
 import { calculateWeeklyScore } from '../lib/fitScore.js';
+import { getWardrobeCompletion } from '../lib/wardrobe.js';
+import { UNLOCK_THRESHOLD, getTotalFitCount, computeStyleDNA } from '../lib/styleDNA.js';
 
 export default function ScreenYou() {
   const t = useTheme();
@@ -16,15 +18,29 @@ export default function ScreenYou() {
 
   // Weekly Fit Score for the profile stats row (refreshes on save).
   const [fitScore, setFitScore] = React.useState(() => calculateWeeklyScore().score);
+  // Wardrobe completion + total fits (for Style DNA preview).
+  const [wardrobePct, setWardrobePct] = React.useState(() => getWardrobeCompletion().percent);
+  const [totalFitsCount, setTotalFitsCount] = React.useState(() => getTotalFitCount());
   React.useEffect(() => {
-    const refresh = () => setFitScore(calculateWeeklyScore().score);
+    const refresh = () => {
+      setFitScore(calculateWeeklyScore().score);
+      setWardrobePct(getWardrobeCompletion().percent);
+      setTotalFitsCount(getTotalFitCount());
+    };
     window.addEventListener('archive:fitschanged', refresh);
     window.addEventListener('archive:scorechanged', refresh);
+    window.addEventListener('storage', refresh);
     return () => {
       window.removeEventListener('archive:fitschanged', refresh);
       window.removeEventListener('archive:scorechanged', refresh);
+      window.removeEventListener('storage', refresh);
     };
   }, []);
+  const styleUnlocked = totalFitsCount >= UNLOCK_THRESHOLD;
+  const stylePrimary = React.useMemo(
+    () => styleUnlocked ? computeStyleDNA().primary : null,
+    [styleUnlocked, totalFitsCount]
+  );
 
   const swatches = ['ivory', 'slate', 'forest', 'dusk', 'ember', 'noir'].map(id => THEMES[id]);
   // Icon picker uses themes that have actual icon-<id>.png files
@@ -96,8 +112,54 @@ export default function ScreenYou() {
           }} />
           <div>
             <div className="h-display" style={{ fontSize: 26 }}>Your <em>archive</em></div>
-            <div style={{ fontSize: 14, color: 'var(--text-primary)', marginTop: 4, letterSpacing: -0.35, fontFamily: '"DM Sans", sans-serif' }}>312 FITS · 47 DAY STREAK · {fitScore} THIS WEEK</div>
+            <div style={{ fontSize: 14, color: 'var(--text-primary)', marginTop: 4, letterSpacing: -0.35, fontFamily: '"DM Sans", sans-serif' }}>312 FITS · 47 DAY STREAK · {fitScore} THIS WEEK · {wardrobePct}% CATALOGED</div>
           </div>
+        </div>
+
+        {/* Style DNA preview row */}
+        <div
+          onClick={() => window.__archiveGo && window.__archiveGo('styledna')}
+          className="archive-pressable"
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '14px 16px', borderRadius: 14,
+            background: 'rgba(255,240,220,0.04)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,240,220,0.07)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
+            marginBottom: 18, cursor: 'pointer',
+          }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: 12,
+              background: stylePrimary ? stylePrimary.color : 'rgba(255,255,255,0.08)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: stylePrimary
+                ? `0 0 12px -2px ${stylePrimary.color}`
+                : 'inset 0 0 0 0.5px rgba(255,255,255,0.10)',
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="3.5"/>
+                <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/>
+              </svg>
+            </div>
+            <div>
+              <div style={{
+                fontSize: 14, fontWeight: 500, color: '#fff', letterSpacing: -0.2,
+              }}>Style DNA</div>
+              <div style={{
+                fontSize: 11.5, color: 'var(--text-secondary)', marginTop: 2,
+              }}>
+                {styleUnlocked && stylePrimary
+                  ? `${stylePrimary.label} · ${stylePrimary.pct}%`
+                  : `Log ${UNLOCK_THRESHOLD - totalFitsCount} more ${UNLOCK_THRESHOLD - totalFitsCount === 1 ? 'fit' : 'fits'} to unlock`}
+              </div>
+            </div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.45)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 6l6 6-6 6"/>
+          </svg>
         </div>
 
         {/* ────────── APPEARANCE first ────────── */}

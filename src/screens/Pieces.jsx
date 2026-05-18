@@ -4,6 +4,10 @@ import {
   ArchiveBurger, StatusBar, TabBar,
 } from '../lib/shared.jsx';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
+import {
+  TARGET_OPTIONS, getWardrobeTarget, setWardrobeTarget, getWardrobeCompletion,
+} from '../lib/wardrobe.js';
+import { syncAchievementsAndGetNew, ACHIEVEMENTS } from '../lib/achievements.js';
 
 const CATEGORIES = ['Tops', 'Bottoms', 'Shoes', 'Accessories', 'Outerwear'];
 
@@ -57,6 +61,42 @@ export default function ScreenPieces() {
   const [pieces, setPieces] = React.useState(() => readPieces());
   const [adding, setAdding] = React.useState(false);
   const [pro, setPro] = React.useState(() => isPro());
+
+  // Wardrobe target — show a one-time prompt if it hasn't been set yet.
+  const [target, setTargetState] = React.useState(() => getWardrobeTarget());
+  const [askTarget, setAskTarget] = React.useState(() => getWardrobeTarget() == null);
+  const chooseTarget = (n) => {
+    setWardrobeTarget(n);
+    setTargetState(n);
+    setAskTarget(false);
+  };
+
+  // Toast for any newly-unlocked wardrobe milestone.
+  const [toast, setToast] = React.useState(null);
+  React.useEffect(() => {
+    const { fresh } = syncAchievementsAndGetNew();
+    const wardrobeFresh = fresh.filter(id => id.startsWith('wardrobe-'));
+    if (wardrobeFresh.length) {
+      const newest = ACHIEVEMENTS.find(a => a.id === wardrobeFresh[wardrobeFresh.length - 1]);
+      if (newest) {
+        const toastMap = {
+          'wardrobe-25':  'Quarter of your wardrobe cataloged ✦',
+          'wardrobe-50':  'Halfway there. Keep going ✦',
+          'wardrobe-75':  'Almost complete ✦',
+          'wardrobe-100': "Wardrobe complete. You're a legend ✦",
+        };
+        setToast(toastMap[newest.id] || `Achievement unlocked · ${newest.title}`);
+        const t = setTimeout(() => setToast(null), 3000);
+        return () => clearTimeout(t);
+      }
+    }
+  }, [pieces.length]);
+
+  const completion = (() => {
+    if (!target) return { count: pieces.length, target: null, percent: 0 };
+    const percent = Math.min(100, Math.round((pieces.length / target) * 100));
+    return { count: pieces.length, target, percent };
+  })();
 
   // form state
   const [name, setName] = React.useState('');
@@ -256,6 +296,95 @@ export default function ScreenPieces() {
             <span style={{ fontSize: 13, color: 'var(--text-primary)', fontWeight: 500 }}>Add</span>
           </div>
         </div>
+
+        {/* ── Wardrobe completion ring (or target prompt the first time) ── */}
+        {askTarget ? (
+          <div style={{
+            margin: '0 24px 24px', padding: '18px 18px 14px',
+            borderRadius: 18,
+            background: 'rgba(255,240,220,0.04)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,240,220,0.07)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
+          }}>
+            <div style={{
+              fontSize: 9.5, color: 'var(--text-secondary)', letterSpacing: 1.5,
+              fontWeight: 500, marginBottom: 8,
+            }}>WARDROBE SETUP</div>
+            <div style={{
+              fontSize: 16, color: '#fff', fontWeight: 500, letterSpacing: -0.2,
+              marginBottom: 12,
+            }}>How many pieces do you own, roughly?</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {TARGET_OPTIONS.map(o => (
+                <div key={o.value}
+                  onClick={() => chooseTarget(o.value)}
+                  className="archive-pressable lg-pill"
+                  style={{
+                    padding: '8px 14px', borderRadius: 100, cursor: 'pointer',
+                    fontSize: 13, fontWeight: 500, color: '#fff', letterSpacing: -0.1,
+                  }}>
+                  {o.label}
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : target && (() => {
+          // Big SVG ring
+          const size = 140, stroke = 14;
+          const r = (size - stroke) / 2;
+          const c = 2 * Math.PI * r;
+          const dash = Math.max(0, Math.min(1, completion.percent / 100)) * c;
+          return (
+            <div style={{
+              margin: '0 24px 22px', padding: '20px 16px 16px',
+              borderRadius: 20,
+              background: 'rgba(255,240,220,0.04)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255,240,220,0.07)',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+            }}>
+              <div style={{ position: 'relative', width: size, height: size }}>
+                <svg width={size} height={size} style={{ display: 'block' }}>
+                  <circle cx={size/2} cy={size/2} r={r}
+                    stroke="rgba(255,255,255,0.10)" strokeWidth={stroke} fill="none" />
+                  <circle cx={size/2} cy={size/2} r={r}
+                    stroke={accent} strokeWidth={stroke} fill="none"
+                    strokeLinecap="round"
+                    strokeDasharray={`${dash} ${c}`}
+                    transform={`rotate(-90 ${size/2} ${size/2})`}
+                    style={{
+                      filter: `drop-shadow(0 0 6px ${accent})`,
+                      transition: 'stroke-dasharray .6s cubic-bezier(.34,1.56,.64,1)',
+                    }}
+                  />
+                </svg>
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <div style={{
+                    fontSize: 32, fontWeight: 700, color: '#fff',
+                    letterSpacing: -1, lineHeight: 1,
+                    fontFamily: '"DM Sans", sans-serif',
+                  }}>{completion.percent}%</div>
+                  <div style={{
+                    fontSize: 10, color: 'rgba(255,255,255,0.55)',
+                    letterSpacing: 2, fontWeight: 500, marginTop: 4,
+                  }}>WARDROBE CATALOGED</div>
+                </div>
+              </div>
+              <div style={{
+                fontSize: 12, color: 'var(--text-secondary)',
+              }}>
+                {completion.count} of {completion.target} pieces
+              </div>
+            </div>
+          );
+        })()}
 
         {pieces.length === 0 ? (
           // Empty state
@@ -495,6 +624,28 @@ export default function ScreenPieces() {
       )}
 
       <TabBar active="pieces" />
+
+      {toast && (
+        <div style={{
+          position: 'absolute', left: '50%', bottom: 'calc(100px + var(--archive-safe-bottom, 0px))',
+          transform: 'translateX(-50%)',
+          padding: '10px 18px', borderRadius: 999,
+          background: `linear-gradient(135deg, rgba(${accentRgba},0.95), rgba(${accentRgba},0.75))`,
+          color: '#0a0a0a', fontSize: 13, fontWeight: 600, letterSpacing: -0.1,
+          boxShadow: `0 14px 40px -6px rgba(${accentRgba},0.7), 0 0 28px -4px rgba(${accentRgba},0.6)`,
+          zIndex: 60,
+          animation: 'archive-toast 3s ease forwards',
+          pointerEvents: 'none',
+        }}>{toast}</div>
+      )}
+      <style>{`
+        @keyframes archive-toast {
+          0%   { opacity: 0; transform: translate(-50%, 14px); }
+          15%  { opacity: 1; transform: translate(-50%, 0); }
+          85%  { opacity: 1; transform: translate(-50%, 0); }
+          100% { opacity: 0; transform: translate(-50%, 14px); }
+        }
+      `}</style>
     </div>
   );
 }
