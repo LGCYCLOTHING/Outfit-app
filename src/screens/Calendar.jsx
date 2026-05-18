@@ -49,6 +49,8 @@ export default function ScreenCalendar() {
   ];
 
   const [year, setYear] = React.useState(2026);
+  const [yearOpen, setYearOpen] = React.useState(false);
+  const yearOptions = [2026, 2025, 2024, 2023, 2022];
 
   return (
     <div style={{
@@ -62,27 +64,61 @@ export default function ScreenCalendar() {
 
       <div style={{ position: 'relative', zIndex: 2, padding: 'calc(20px + var(--archive-safe-top, 54px)) 0 calc(120px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
 
-        {/* Header — year selector + calendar icon */}
-        <div style={{ padding: '0 22px', marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div onClick={() => setYear(y => y - 1)} className="archive-pressable" style={{
+        {/* Header — year picker (tap to open) + close (X, no circle) */}
+        <div style={{ padding: '0 22px', marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
+          <div onClick={() => setYearOpen(o => !o)} className="archive-pressable" style={{
             display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
           }}>
             <span style={{ fontSize: 26, color: 'var(--text-primary)', fontWeight: 500, letterSpacing: -0.4 }}>
               {year}
             </span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.75)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.75)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+              style={{ transform: yearOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform .2s ease' }}>
               <path d="M6 9l6 6 6-6"/>
             </svg>
           </div>
-          <div onClick={() => window.__archiveGo && window.__archiveGo('archive')} className="liquid-glass archive-pressable" style={{
-            width: 38, height: 38, borderRadius: 19,
+          <div onClick={() => window.__archiveGo && window.__archiveGo('archive')} className="archive-pressable" style={{
+            width: 38, height: 38,
             display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+            filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))',
           }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F5F0E8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="5" width="18" height="16" rx="2"/>
-              <path d="M3 10h18M8 3v4M16 3v4"/>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 6l12 12M18 6L6 18"/>
             </svg>
           </div>
+
+          {/* Year dropdown */}
+          {yearOpen && (
+            <>
+              {/* tap-anywhere-to-close scrim */}
+              <div onClick={() => setYearOpen(false)} style={{
+                position: 'fixed', inset: 0, zIndex: 40, background: 'transparent',
+              }} />
+              <div className="lg-sheet" style={{
+                position: 'absolute', top: 'calc(100% + 8px)', left: 22,
+                zIndex: 41, minWidth: 110,
+                borderRadius: 14, padding: 6,
+                boxShadow: '0 14px 40px -8px rgba(0,0,0,0.5)',
+              }}>
+                {yearOptions.map(y => {
+                  const active = y === year;
+                  return (
+                    <div key={y}
+                      onClick={() => { setYear(y); setYearOpen(false); }}
+                      className="archive-pressable"
+                      style={{
+                        padding: '10px 14px', borderRadius: 10,
+                        fontSize: 16, fontWeight: active ? 500 : 400,
+                        color: active ? '#fff' : 'rgba(255,255,255,0.65)',
+                        background: active ? 'rgba(255,255,255,0.08)' : 'transparent',
+                        cursor: 'pointer',
+                        letterSpacing: -0.2,
+                      }}>{y}</div>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Month cards — stacked, each with a big watermark month name + colored ambient ring */}
@@ -92,22 +128,25 @@ export default function ScreenCalendar() {
             return (
             <div key={m.name}
               onClick={() => window.__archiveGo && window.__archiveGo('archive')}
-              className="archive-pressable lg-border-gradient"
               style={{
                 position: 'relative',
                 aspectRatio: '16/9',
-                borderRadius: 22,
-                overflow: 'hidden',
-                background: fitGradient(m.fitId),
+                borderRadius: 24, padding: 6,
+                background: '#0a0a0a',
+                cursor: 'pointer',
+              }}>
+            <div className="archive-pressable lg-border-gradient"
+              style={{
+                position: 'relative', width: '100%', height: '100%',
+                borderRadius: 19, overflow: 'hidden',
+                background: fitBorder(m.fitId),
                 '--grad-border': fitBorder(m.fitId),
                 boxShadow:
-                  `0 0 0 1px rgba(255,255,255,0.04), ` +
                   `0 0 60px -10px ${glow}, ` +
                   `0 18px 40px -8px ${glow}, ` +
                   `0 8px 24px rgba(0,0,0,0.45), ` +
-                  `inset 0 1px 0 rgba(245,240,232,0.08), ` +
-                  `inset 0 -1px 0 rgba(0,0,0,0.25)`,
-                cursor: 'pointer',
+                  `inset 0 -60px 80px rgba(0,0,0,0.55), ` +
+                  `inset 0 30px 60px rgba(0,0,0,0.25)`,
               }}>
 
               {/* Film grain */}
@@ -183,6 +222,7 @@ export default function ScreenCalendar() {
               }}>
                 <DotsMenu />
               </div>
+            </div>
             </div>
             );
           })}
