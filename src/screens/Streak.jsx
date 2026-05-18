@@ -84,6 +84,24 @@ export default function ScreenStreak() {
   const bestStreak = computeBestStreak();
   const weekDays = getThisWeekDays();
   const last30 = getLast30Days();
+
+  // Walk back from today to find the earliest consecutive logged day —
+  // that's when the current streak started.
+  const { startLabel, daysWithoutMissing } = (() => {
+    const set = new Set(readLoggedDays());
+    const today = new Date();
+    let start = null;
+    for (let i = 0; i < 366; i++) {
+      const d = new Date(today); d.setDate(today.getDate() - i);
+      if (set.has(ymd(d))) start = d;
+      else if (i > 0) break;
+    }
+    if (!start) return { startLabel: null, daysWithoutMissing: 0 };
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const label = `${months[start.getMonth()]} ${start.getDate()}, ${start.getFullYear()}`;
+    const diff = Math.max(1, Math.round((today.setHours(0,0,0,0), today - start.setHours(0,0,0,0)) / 86400000) + 1);
+    return { startLabel: label, daysWithoutMissing: diff };
+  })();
   const loggedCount = readLoggedDays().length;
   const weekProgress = weekDays.filter(d => d.hasFit).length;
   const monthLogged = last30.filter(d => d.hasFit).length;
@@ -174,6 +192,22 @@ export default function ScreenStreak() {
           }}>
             {streak === 1 ? 'day · keep going' : 'days · keep going'}
           </div>
+          {startLabel && (
+            <>
+              <div style={{
+                fontSize: 9.5, color: 'rgba(255,255,255,0.5)', letterSpacing: 1.8,
+                textTransform: 'uppercase', marginTop: 18, textAlign: 'center',
+              }}>
+                streak started {startLabel}
+              </div>
+              <div style={{
+                fontSize: 9.5, color: 'rgba(255,255,255,0.5)', letterSpacing: 1.8,
+                textTransform: 'uppercase', marginTop: 4, textAlign: 'center',
+              }}>
+                {daysWithoutMissing} {daysWithoutMissing === 1 ? 'day' : 'days'} without missing
+              </div>
+            </>
+          )}
         </div>
 
         {/* Week glass card */}

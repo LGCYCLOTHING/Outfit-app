@@ -570,23 +570,76 @@ export default function ScreenToday() {
 
           return (
             <React.Fragment>
-              {/* Weather strip — hamburger + streak now live in the top bar above */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14 }}>
-                <WeatherIcon type={weather.icon} size={18} color="#F5F0E8" />
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-                  <span style={{
-                    fontSize: 22, color: 'var(--text-primary)',
-                    letterSpacing: '-0.05em', lineHeight: 1,
-                  }}>
-                    {weather.temp}°
-                  </span>
-                  <span style={{
-                    fontSize: 13, color: 'var(--text-secondary)',
-                    letterSpacing: '-0.02em',
-                  }}>
-                    {weather.condition}
-                  </span>
+              {/* Weather + compact This-week chip on one row */}
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                gap: 12, marginBottom: 14,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <WeatherIcon type={weather.icon} size={18} color="#F5F0E8" />
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                    <span style={{
+                      fontSize: 22, color: 'var(--text-primary)',
+                      letterSpacing: '-0.05em', lineHeight: 1,
+                    }}>
+                      {weather.temp}°
+                    </span>
+                    <span style={{
+                      fontSize: 13, color: 'var(--text-secondary)',
+                      letterSpacing: '-0.02em',
+                    }}>
+                      {weather.condition}
+                    </span>
+                  </div>
                 </div>
+                {(() => {
+                  // Compact this-week chip: stack of mini photo previews + count.
+                  const wkDays = getThisWeekDays().filter(d => !d.isFuture);
+                  const wkPhotos = wkDays.flatMap(d => getSavedFitPhotos(d.dateKey));
+                  if (wkPhotos.length === 0) return null;
+                  const preview = wkPhotos.slice(-3);
+                  const TILE = 22;
+                  const STRIDE = 13;
+                  return (
+                    <div
+                      onClick={() => window.__archiveGo && window.__archiveGo('story')}
+                      className="archive-pressable"
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 7,
+                        padding: '4px 11px 4px 5px', borderRadius: 999,
+                        background: 'rgba(255,240,220,0.04)',
+                        border: '1px solid rgba(255,240,220,0.07)',
+                        cursor: 'pointer',
+                      }}>
+                      <div style={{
+                        position: 'relative',
+                        width: 5 + preview.length * STRIDE + (TILE - STRIDE),
+                        height: TILE, flexShrink: 0,
+                      }}>
+                        {preview.map((p, i) => (
+                          <div key={i} style={{
+                            position: 'absolute', left: 5 + i * STRIDE, top: 0,
+                            width: TILE, height: TILE, borderRadius: 6,
+                            overflow: 'hidden',
+                            boxShadow:
+                              'inset 0 0 0 1px rgba(0,0,0,0.6), ' +
+                              'inset 0 0 0 1.5px rgba(255,255,255,0.18)',
+                            zIndex: preview.length - i,
+                          }}>
+                            <img src={p} alt="" style={{
+                              width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                            }} />
+                          </div>
+                        ))}
+                      </div>
+                      <span style={{
+                        fontSize: 12, color: '#fff', fontWeight: 500, letterSpacing: -0.1,
+                      }}>
+                        {wkPhotos.length} {wkPhotos.length === 1 ? 'fit' : 'fits'}
+                      </span>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* (week strip removed — replaced by the TODAY date selector + calendar dropdown at the top of the screen) */}
@@ -692,10 +745,10 @@ export default function ScreenToday() {
           );
         })()}
 
-        {/* This week — only render past + today tiles; if nothing's logged
-            yet show a single inviting empty-state card instead of 4 dead
-            future boxes. */}
-        {(() => {
+        {/* This Week — relocated as a compact chip next to weather. The
+            standalone bar below is suppressed; everything still renders the
+            current week so the IIFE stays around but returns null. */}
+        {false && (() => {
           const allDays = getThisWeekDays();
           // Drop future days from the strip entirely.
           const days = allDays.filter(d => !d.isFuture);
