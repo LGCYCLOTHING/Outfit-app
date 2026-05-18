@@ -379,25 +379,25 @@ export default function ScreenToday() {
                   display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)',
                 }}>
                   {weekDays.map((d, i) => {
-                    const onTap = () => {
-                      if (d.isFuture) return;
-                      if (d.isToday && !d.hasFit) {
-                        window.__archiveGo && window.__archiveGo('rating');
-                        return;
-                      }
-                      // Past day OR today with a logged fit → open detail for that day
+                    // The current day isn't tappable (you're already on Today).
+                    // Every other day jumps to the Detail screen pre-loaded
+                    // with that date's photo.
+                    const tappable = !d.isToday;
+                    const onTap = (e) => {
+                      if (!tappable) return;
+                      e.stopPropagation();
                       if (typeof window !== 'undefined') window.__archiveDetailKey = d.dateKey;
                       window.__archiveGo && window.__archiveGo('detail');
                     };
                     return (
                       <div key={i}
                         onClick={onTap}
-                        className={d.isFuture ? '' : 'archive-pressable'}
+                        className={tappable ? 'archive-pressable' : ''}
                         style={{
                           display: 'flex', flexDirection: 'column',
                           alignItems: 'center',
-                          cursor: d.isFuture ? 'default' : 'pointer',
-                          opacity: d.isFuture ? 0.4 : 1,
+                          cursor: tappable ? 'pointer' : 'default',
+                          opacity: d.isFuture ? 0.5 : 1,
                           padding: '4px 0',
                         }}>
                         {/* Compact pill — letter + date stacked tight */}
