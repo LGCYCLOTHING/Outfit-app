@@ -856,7 +856,7 @@ export default function ScreenToday() {
           const ease = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
           return (
             <div
-              onClick={() => window.__archiveGo && window.__archiveGo('streak')}
+              onClick={() => window.__archiveGo && window.__archiveGo('fitscore')}
               className="archive-pressable"
               style={{
                 marginTop: 14, marginBottom: 12,
