@@ -229,7 +229,7 @@ export default function ScreenStory() {
         {fit.photo && (
           <img src={fit.photo} alt="" style={{
             position: 'absolute', inset: 0,
-            width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+            width: '100%', height: '100%', objectFit: 'contain', display: 'block',
           }} />
         )}
         {/* Soft grain — only over the gradient fallback */}
