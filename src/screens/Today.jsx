@@ -501,12 +501,12 @@ export default function ScreenToday() {
 
         <div style={{
           marginTop: 22, marginBottom: 8,
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+          display: 'flex', alignItems: 'center', justifyContent: 'center'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{
-              width: 7, height: 7, borderRadius: 3.5, background: accent,
-            }} />
+            <svg width="14" height="14" viewBox="0 0 24 24" fill={accent} aria-hidden="true">
+              <path d="M12 2l1.7 5.4L19 9l-5.3 1.6L12 16l-1.7-5.4L5 9l5.3-1.6z"/>
+            </svg>
             <span style={{ fontSize: 16, color: 'var(--text-primary)', fontWeight: 500, letterSpacing: -0.1 }}>
               Today's fit
             </span>
@@ -551,20 +551,6 @@ export default function ScreenToday() {
                   <div onClick={() => window.__archiveGo && window.__archiveGo('rating')}
                     style={{ position: 'relative', padding: 0, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', cursor: 'pointer', gap: 12 }}>
                     <div style={{ borderRadius: 18, overflow: 'hidden', position: 'relative' }}>
-                      <PhotoPlaceholder ratio="4/5" radius={18} photoId={p.id} photoKey={i === 0 ? ymd(new Date()) : undefined} noBorder />
-                      <div style={{
-                        position: 'absolute', top: 12, left: 12,
-                        padding: '6px 11px', borderRadius: 100,
-                        background: 'rgba(10,8,6,0.55)', backdropFilter: 'blur(10px)',
-                        fontSize: 13, color: accent, fontWeight: 500,
-                        boxShadow: `inset 0 0 0 0.5px rgba(${accentRgba},0.35)`,
-                      }}>Fit {p.num} · {p.tag}</div>
-                      <div style={{
-                        position: 'absolute', top: 12, right: 12,
-                        padding: '6px 10px', borderRadius: 100,
-                        background: 'rgba(10,8,6,0.55)', backdropFilter: 'blur(10px)',
-                        fontSize: 12, color: '#fff', fontWeight: 600,
-                      }}>{p.pct}</div>
                       <div className="liquid-glass" onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('share'); }} style={{
                         position: 'absolute', bottom: 12, right: 12,
                         width: 32, height: 32, borderRadius: 16,
