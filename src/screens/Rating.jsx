@@ -3,6 +3,122 @@ import { useTheme, FitPhoto, getSavedFitPhotos, appendFitPhoto, replaceFitPhoto,
 import { refreshWeeklyScore, isoWeekLabel } from '../lib/fitScore.js';
 import { pushFitSave, pushFitPieces, pushWeeklyScore } from '../lib/sync.js';
 
+// Discrete slider — drag the thumb along a line of evenly-spaced dots; snaps
+// to the nearest option on release. Tapping a dot jumps directly to it.
+function DotSlider({ options, value, onChange, tickKey, accent, accentRgba }) {
+  const trackRef = React.useRef(null);
+  const [dragPct, setDragPct] = React.useState(null);
+  const valueIdx = Math.max(0, options.indexOf(value));
+  const THUMB = 26;       // thumb diameter
+  const PAD   = THUMB / 2; // horizontal padding so thumb edges stay inside the track
+
+  const pctFromX = (clientX) => {
+    const el = trackRef.current;
+    if (!el) return 0;
+    const rect = el.getBoundingClientRect();
+    const usable = Math.max(1, rect.width - 2 * PAD);
+    return Math.max(0, Math.min(1, (clientX - rect.left - PAD) / usable));
+  };
+  const snapIdx = (pct) => Math.round(pct * (options.length - 1));
+  const commitFromPct = (pct) => {
+    const next = options[snapIdx(pct)];
+    if (next !== value) onChange(next);
+  };
+
+  const onPointerDown = (e) => {
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
+    setDragPct(pctFromX(e.clientX));
+  };
+  const onPointerMove = (e) => {
+    if (dragPct === null) return;
+    setDragPct(pctFromX(e.clientX));
+  };
+  const onPointerEnd = (e) => {
+    if (dragPct === null) return;
+    commitFromPct(dragPct);
+    setDragPct(null);
+  };
+
+  const restingPct = options.length > 1 ? valueIdx / (options.length - 1) : 0;
+  const activePct = dragPct !== null ? dragPct : restingPct;
+  const previewIdx = dragPct !== null ? snapIdx(dragPct) : valueIdx;
+  const previewLabel = options[previewIdx];
+
+  return (
+    <div style={{ userSelect: 'none' }}>
+      <div
+        ref={trackRef}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerEnd}
+        onPointerCancel={onPointerEnd}
+        style={{
+          position: 'relative',
+          height: THUMB + 6,
+          padding: `0 ${PAD}px`,
+          touchAction: 'none',
+          cursor: 'pointer',
+        }}>
+        {/* Inactive track line */}
+        <div style={{
+          position: 'absolute', left: PAD, right: PAD, top: '50%',
+          height: 3, borderRadius: 2,
+          background: 'rgba(255,255,255,0.10)',
+          transform: 'translateY(-50%)',
+        }} />
+        {/* Filled portion up to the thumb */}
+        <div style={{
+          position: 'absolute', left: PAD, top: '50%',
+          width: `calc(${activePct} * (100% - ${PAD * 2}px))`,
+          height: 3, borderRadius: 2,
+          background: accent,
+          transform: 'translateY(-50%)',
+          transition: dragPct === null ? 'width .22s cubic-bezier(.34,1.56,.64,1)' : 'none',
+          boxShadow: `0 0 8px -2px rgba(${accentRgba},0.55)`,
+        }} />
+        {/* Dots */}
+        {options.map((opt, i) => {
+          const pct = options.length > 1 ? i / (options.length - 1) : 0;
+          const passed = i <= valueIdx && dragPct === null;
+          return (
+            <div key={opt}
+              onClick={(e) => { e.stopPropagation(); onChange(opt); }}
+              style={{
+                position: 'absolute',
+                left: `calc(${PAD}px + ${pct} * (100% - ${PAD * 2}px))`,
+                top: '50%', transform: 'translate(-50%, -50%)',
+                width: 10, height: 10, borderRadius: 6,
+                background: passed ? accent : 'rgba(255,255,255,0.30)',
+                cursor: 'pointer', zIndex: 1,
+                transition: 'background .15s ease',
+              }} />
+          );
+        })}
+        {/* Thumb */}
+        <div style={{
+          position: 'absolute',
+          left: `calc(${PAD}px + ${activePct} * (100% - ${PAD * 2}px))`,
+          top: '50%', transform: 'translate(-50%, -50%)',
+          width: THUMB, height: THUMB, borderRadius: THUMB / 2,
+          background: accent,
+          boxShadow: `0 0 0 4px rgba(${accentRgba},0.18), 0 2px 8px rgba(0,0,0,0.35)`,
+          zIndex: 2,
+          transition: dragPct === null ? 'left .22s cubic-bezier(.34,1.56,.64,1)' : 'none',
+        }} />
+      </div>
+      {/* Current label — pops when value changes */}
+      <div key={`${previewLabel}-${tickKey || 0}`} style={{
+        textAlign: 'center', marginTop: 4,
+        fontSize: 13, fontWeight: 500,
+        color: accent, letterSpacing: -0.1,
+        animation: 'pill-pop .25s ease',
+      }}>
+        {previewLabel}
+      </div>
+    </div>
+  );
+}
+
 function ymd(d) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -449,58 +565,22 @@ export default function ScreenRating() {
             </div>
           </div>
 
-          {/* MOOD — compact pills (single line target via tighter padding) */}
-          <div style={{ padding: '0 24px', marginBottom: 10 }}>
-            <div style={{ fontSize: 9.5, color: 'var(--text-secondary)', letterSpacing: 1.4, marginBottom: 5, fontFamily: '"DM Sans", sans-serif' }}>
+          {/* MOOD — drag-bar slider */}
+          <div style={{ padding: '0 24px', marginBottom: 12 }}>
+            <div style={{ fontSize: 9.5, color: 'var(--text-secondary)', letterSpacing: 1.4, marginBottom: 4, fontFamily: '"DM Sans", sans-serif' }}>
               MOOD
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-              {moods.map(m => {
-                const active = m === mood;
-                return (
-                  <div key={`${m}-${active ? moodTick : 0}`}
-                    onClick={() => pickMood(m)}
-                    className="archive-pressable"
-                    style={{
-                      padding: '5px 10px', borderRadius: 100,
-                      fontSize: 11.5, fontWeight: 500, whiteSpace: 'nowrap',
-                      background: active ? `rgba(${accentRgba},0.22)` : 'rgba(255,255,255,0.06)',
-                      color: active ? accent : 'rgba(255,255,255,0.78)',
-                      boxShadow: active
-                        ? `inset 0 0 0 0.5px rgba(${accentRgba},0.55)`
-                        : 'inset 0 0 0 0.5px rgba(255,255,255,0.08)',
-                      animation: active ? 'pill-pop .25s ease' : 'none',
-                    }}>{m}</div>
-                );
-              })}
-            </div>
+            <DotSlider options={moods} value={mood} onChange={pickMood}
+              tickKey={moodTick} accent={accent} accentRgba={accentRgba} />
           </div>
 
-          {/* CONTEXT — compact pills */}
+          {/* CONTEXT — drag-bar slider */}
           <div style={{ padding: '0 24px' }}>
-            <div style={{ fontSize: 9.5, color: 'var(--text-secondary)', letterSpacing: 1.4, marginBottom: 5, fontFamily: '"DM Sans", sans-serif' }}>
+            <div style={{ fontSize: 9.5, color: 'var(--text-secondary)', letterSpacing: 1.4, marginBottom: 4, fontFamily: '"DM Sans", sans-serif' }}>
               CONTEXT
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-              {contexts.map(c => {
-                const active = c === ctx;
-                return (
-                  <div key={`${c}-${active ? ctxTick : 0}`}
-                    onClick={() => pickCtx(c)}
-                    className="archive-pressable"
-                    style={{
-                      padding: '5px 10px', borderRadius: 100,
-                      fontSize: 11.5, fontWeight: 500, whiteSpace: 'nowrap',
-                      background: active ? `rgba(${accentRgba},0.22)` : 'rgba(255,255,255,0.06)',
-                      color: active ? accent : 'rgba(255,255,255,0.78)',
-                      boxShadow: active
-                        ? `inset 0 0 0 0.5px rgba(${accentRgba},0.55)`
-                        : 'inset 0 0 0 0.5px rgba(255,255,255,0.08)',
-                      animation: active ? 'pill-pop .25s ease' : 'none',
-                    }}>{c}</div>
-                );
-              })}
-            </div>
+            <DotSlider options={contexts} value={ctx} onChange={pickCtx}
+              tickKey={ctxTick} accent={accent} accentRgba={accentRgba} />
           </div>
 
           {/* PIECES WORN TODAY — tappable cards from the user's catalog */}
