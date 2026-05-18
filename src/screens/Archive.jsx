@@ -215,12 +215,7 @@ export default function ScreenArchive() {
               color: 'rgba(255,255,255,0.5)', lineHeight: 1, marginBottom: 8,
             }}>fits</div>
           </div>
-          <div style={{
-            fontSize: 11, color: 'rgba(255,255,255,0.55)', letterSpacing: 1.6, fontWeight: 500,
-            marginBottom: 22,
-          }}>
-            ACROSS 18 MONTHS · 47 DAY STREAK
-          </div>
+          <div style={{ height: 22 }} />
 
           {/* Search — pill with embedded sort selector on the right */}
           <div onClick={() => searchInputRef.current?.focus()}
@@ -250,23 +245,26 @@ export default function ScreenArchive() {
             />
             <div onClick={(e) => { e.stopPropagation(); cycleSort(); }}
               className="archive-pressable"
+              title={sortMode}
               style={{
-                display: 'flex', alignItems: 'center', gap: 5,
-                padding: '7px 12px', borderRadius: 100,
+                width: 34, height: 34, borderRadius: 17,
                 background: 'rgba(255,255,255,0.08)',
-                fontSize: 12, color: '#fff', fontWeight: 500, letterSpacing: 0.1,
-                cursor: 'pointer', whiteSpace: 'nowrap',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', flexShrink: 0,
               }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 6h13M3 12h9M3 18h5"/><path d="M17 9l4-4-4-4M21 5h-9"/>
               </svg>
-              {sortMode}
             </div>
           </div>
         </div>
 
-        {/* Filter chips — compact, modern */}
-        <div className="chip-row" style={{ display: 'flex', gap: 6, padding: '0 24px 4px', overflowX: 'auto', marginBottom: 24, marginTop: 18 }}>
+        {/* Filter labels — plain white text, no pill background, horizontally scrollable */}
+        <div className="chip-row" style={{
+          display: 'flex', gap: 22, padding: '0 24px 6px',
+          overflowX: 'auto', overflowY: 'hidden',
+          marginBottom: 24, marginTop: 18,
+        }}>
           <style>{`.chip-row::-webkit-scrollbar{display:none}`}</style>
           {tags.map((tag) => {
             const active = tag === activeTag;
@@ -275,65 +273,90 @@ export default function ScreenArchive() {
                 onClick={() => setActiveTag(tag)}
                 className="archive-pressable"
                 style={{
-                  padding: '8px 16px', borderRadius: 100, whiteSpace: 'nowrap',
-                  fontSize: 13, fontWeight: 500, cursor: 'pointer',
-                  background: active ? SAGE_BG : 'rgba(255,255,255,0.05)',
-                  boxShadow: active
-                    ? `inset 0 0 0 1px ${SAGE_BORDER}`
-                    : 'inset 0 0 0 0.5px rgba(255,255,255,0.08)',
-                  color: active ? SAGE : 'rgba(255,255,255,0.65)',
-                  transition: 'all .18s ease',
-                }}>{tag}</div>
+                  position: 'relative',
+                  padding: '6px 0', whiteSpace: 'nowrap',
+                  fontSize: 15, fontWeight: active ? 600 : 400,
+                  cursor: 'pointer', flexShrink: 0,
+                  color: '#fff',
+                  opacity: active ? 1 : 0.55,
+                  letterSpacing: -0.1,
+                  transition: 'opacity .18s ease, font-weight .18s ease',
+                }}>
+                {tag}
+                {active && (
+                  <div style={{
+                    position: 'absolute', bottom: 0, left: 0, right: 0,
+                    height: 2, borderRadius: 2,
+                    background: SAGE,
+                  }} />
+                )}
+              </div>
             );
           })}
         </div>
 
-        {/* Featured Fit banner */}
+        {/* Featured Fit banner — same color-gradient treatment as the grid cards */}
         <div style={{ padding: '0 24px', marginBottom: 28 }}>
-          <div className="lg-card archive-pressable" onClick={() => window.__archiveGo && window.__archiveGo('detail')} style={{
-            borderRadius: 20, overflow: 'hidden', position: 'relative',
-            minHeight: 200, cursor: 'pointer',
-          }}>
-            <div style={{ position: 'absolute', inset: 0, background: fitGradient(23), opacity: 0.65 }} />
-            <div style={{ position: 'absolute', inset: 0,
-              background: 'linear-gradient(90deg, rgba(20,18,16,0.85) 0%, rgba(20,18,16,0.3) 55%, transparent 100%)' }} />
-            <div style={{
-              position: 'absolute', inset: 0,
-              backgroundImage: 'url("data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence baseFrequency=%220.9%22 numOctaves=%222%22 stitchTiles=%22stitch%22/><feColorMatrix values=%220 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.45 0%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/></svg>")',
-              opacity: 0.3, mixBlendMode: 'overlay', pointerEvents: 'none',
-            }} />
-
-            <div style={{ position: 'relative', padding: '22px 22px 20px', zIndex: 1 }}>
-              <div style={{ fontSize: 10, letterSpacing: 1.6, color: '#fff', fontWeight: 500, marginBottom: 14 }}>
-                FEATURED FIT
-              </div>
-              <div className="h-display" style={{ fontSize: 30, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 10 }}>
-                Soft Structure
-              </div>
-              <div style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.4, maxWidth: 200, marginBottom: 28 }}>
-                Layered neutrals with<br/>textured contrast.
-              </div>
-              <div style={{ fontSize: 10, letterSpacing: 1.4, color: '#fff', fontWeight: 500 }}>
-                APR 26, 2026
-              </div>
-            </div>
-
-            <div className="archive-pressable" onClick={(e) => { e.stopPropagation(); toggleFav(23); }} style={{
-              position: 'absolute', top: 16, right: 16,
-              width: 38, height: 38,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+          <div onClick={() => window.__archiveGo && window.__archiveGo('detail')}
+            style={{
+              position: 'relative', borderRadius: 22, padding: 6,
+              background: '#0a0a0a', cursor: 'pointer',
             }}>
-              <HeartIcon size={20} color={favorited.has(23) ? SAGE : '#F5F0E8'} filled={favorited.has(23)} />
-            </div>
+            <div className="archive-pressable lg-border-gradient"
+              style={{
+                position: 'relative', borderRadius: 17, overflow: 'hidden',
+                minHeight: 200,
+                background: fitBorder(23),
+                '--grad-border': fitBorder(23),
+                boxShadow: 'inset 0 -50px 80px rgba(0,0,0,0.55), inset 0 30px 60px rgba(0,0,0,0.30)',
+              }}>
+              {/* Left-side darken so the title reads */}
+              <div style={{ position: 'absolute', inset: 0,
+                background: 'linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 55%, transparent 100%)',
+                pointerEvents: 'none',
+              }} />
+              <div style={{
+                position: 'absolute', inset: 0,
+                backgroundImage: 'url("data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence baseFrequency=%220.9%22 numOctaves=%222%22 stitchTiles=%22stitch%22/><feColorMatrix values=%220 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.45 0%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/></svg>")',
+                opacity: 0.3, mixBlendMode: 'overlay', pointerEvents: 'none',
+              }} />
 
-            <div className="liquid-glass archive-pressable" onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('detail'); }} style={{
-              position: 'absolute', bottom: 16, right: 16,
-              width: 44, height: 38, borderRadius: 19,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-            }}>
-              <svg width="18" height="14" viewBox="0 0 24 24" fill="none" stroke="#F5F0E8" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14M13 6l6 6-6 6"/>
-              </svg>
+              <div style={{ position: 'relative', padding: '22px 22px 20px', zIndex: 1 }}>
+                <div style={{ fontSize: 10, letterSpacing: 1.6, color: '#fff', fontWeight: 500, marginBottom: 14 }}>
+                  FEATURED FIT
+                </div>
+                <div className="h-display" style={{ fontSize: 30, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 10 }}>
+                  Soft Structure
+                </div>
+                <div style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.4, maxWidth: 200, marginBottom: 28 }}>
+                  Layered neutrals with<br/>textured contrast.
+                </div>
+                <div style={{ fontSize: 10, letterSpacing: 1.4, color: '#fff', fontWeight: 500 }}>
+                  APR 26, 2026
+                </div>
+              </div>
+
+              {/* Heart — top-right, no circle */}
+              <div className="archive-pressable" onClick={(e) => { e.stopPropagation(); toggleFav(23); }} style={{
+                position: 'absolute', top: 16, right: 16,
+                width: 38, height: 38,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))',
+              }}>
+                <HeartIcon size={22} color={favorited.has(23) ? SAGE : '#fff'} filled={favorited.has(23)} />
+              </div>
+
+              {/* Arrow — bottom-right, no circle, plain glyph */}
+              <div className="archive-pressable" onClick={(e) => { e.stopPropagation(); window.__archiveGo && window.__archiveGo('detail'); }} style={{
+                position: 'absolute', bottom: 14, right: 16,
+                width: 38, height: 38,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))',
+              }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M13 6l6 6-6 6"/>
+                </svg>
+              </div>
             </div>
           </div>
         </div>
