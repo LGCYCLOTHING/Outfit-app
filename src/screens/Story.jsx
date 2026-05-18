@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTheme, fitGradient, getSavedFitPhoto } from '../lib/shared.jsx';
+import { useTheme, fitGradient, getSavedFitPhotos } from '../lib/shared.jsx';
 
 function ymd(d) {
   const y = d.getFullYear();
@@ -14,25 +14,27 @@ function getThisWeekFits() {
     const dow = (today.getDay() + 6) % 7; // Monday = 0
     const monday = new Date(today);
     monday.setDate(today.getDate() - dow);
-    const logged = new Set(JSON.parse(localStorage.getItem('aevum_fits_logged') || '[]'));
     const monthShort = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
     const fits = [];
+    // For each day this week, emit one story entry PER saved photo so
+    // logging multiple fits on one day produces multiple slides.
     for (let i = 0; i < 7; i++) {
       const d = new Date(monday);
       d.setDate(monday.getDate() + i);
       const key = ymd(d);
-      const photo = getSavedFitPhoto(key);
-      if (logged.has(key) || photo) {
+      const photos = getSavedFitPhotos(key);
+      const isToday = d.toDateString() === today.toDateString();
+      photos.forEach((photo, photoIdx) => {
         fits.push({
-          id: key,
+          id: `${key}-${photoIdx}`,
           dateKey: key,
+          photoIdx,
           photo,
           date: `${monthShort[d.getMonth()]} ${String(d.getDate()).padStart(2, '0')}`,
-          name: d.toDateString() === today.toDateString() ? "Today's fit" : 'Logged fit',
-          // Stable fallback gradient seed derived from date
-          gradientId: ((d.getDate() * 31) + d.getMonth() * 7) % 12,
+          name: isToday ? "Today's fit" : 'Logged fit',
+          gradientId: ((d.getDate() * 31) + d.getMonth() * 7 + photoIdx) % 12,
         });
-      }
+      });
     }
     return fits;
   } catch (e) {
