@@ -16,8 +16,14 @@ function readReason(idx) {
   try { return localStorage.getItem(comboReasonKey(idx)); }
   catch (e) { return null; }
 }
+// Write a photo data-URL. Returns false if storage rejected it (e.g. quota).
 function writePhoto(idx, slot, dataUrl) {
-  try { localStorage.setItem(comboPhotoKey(idx, slot), dataUrl); } catch (e) {}
+  try {
+    localStorage.setItem(comboPhotoKey(idx, slot), dataUrl);
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 function writeReason(idx, text) {
   try {
@@ -26,15 +32,14 @@ function writeReason(idx, text) {
   } catch (e) {}
 }
 
-// Shrink a picked image down to ~1400px JPEG so 12MP iPhone photos fit
-// comfortably inside the localStorage quota across 9 combo slots.
-async function fileToDataUrl(file, maxDim = 1400, quality = 0.85) {
+// Shrink a picked image down with a target max dimension + quality.
+async function fileToDataUrl(file, maxDim, quality) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = () => reject(reader.error || new Error('read failed'));
     reader.onload = () => {
       const img = new Image();
-      img.onerror = () => resolve(reader.result); // fall back to raw data url
+      img.onerror = () => resolve(reader.result);
       img.onload = () => {
         try {
           const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
@@ -54,6 +59,22 @@ async function fileToDataUrl(file, maxDim = 1400, quality = 0.85) {
   });
 }
 
+// Encode the file and attempt to persist it. If the write fails (quota),
+// retry at progressively smaller sizes so we never lose the user's pick.
+async function encodeAndStore(file, idx, slot) {
+  const sizes = [
+    { maxDim: 1100, quality: 0.82 },
+    { maxDim: 900,  quality: 0.78 },
+    { maxDim: 720,  quality: 0.72 },
+  ];
+  for (const { maxDim, quality } of sizes) {
+    const dataUrl = await fileToDataUrl(file, maxDim, quality);
+    if (writePhoto(idx, slot, dataUrl)) return dataUrl;
+  }
+  // Last resort: clear other combo photo slots before giving up.
+  return null;
+}
+
 export default function ScreenMix() {
   const t = useTheme();
   const accent = t.light;
@@ -62,7 +83,7 @@ export default function ScreenMix() {
 
   const combos = React.useMemo(() => ([
     {
-      title: 'Soft tailoring × denim',
+      title: 'Everyday rotation',
       defaultReason: "Three relaxed pulls from your closet — different palettes, all anchored by clean white sneakers. Easy to rotate through the week.",
       conf: 92, locked: false, pieces: '3 pieces · everyday',
     },
@@ -84,17 +105,13 @@ export default function ScreenMix() {
     reason: readReason(idx),
   })));
 
-  const setPhoto = (idx, slot, dataUrl) => {
-    setComboState(prev => {
-      const next = prev.map((s, i) => {
-        if (i !== idx) return s;
-        const photos = [...s.photos];
-        photos[slot] = dataUrl;
-        return { ...s, photos };
-      });
-      return next;
-    });
-    writePhoto(idx, slot, dataUrl);
+  const setPhotoInState = (idx, slot, dataUrl) => {
+    setComboState(prev => prev.map((s, i) => {
+      if (i !== idx) return s;
+      const photos = [...s.photos];
+      photos[slot] = dataUrl;
+      return { ...s, photos };
+    }));
   };
 
   const setReason = (idx, text) => {
@@ -107,8 +124,16 @@ export default function ScreenMix() {
     const f = input.files && input.files[0];
     if (!f) return;
     try {
-      const dataUrl = await fileToDataUrl(f);
-      setPhoto(idx, slot, dataUrl);
+      // Show the (un-persisted) preview immediately so the UI feels instant,
+      // then encode + store. If every size fails, surface the in-memory image
+      // so the user at least sees what they picked this session.
+      const previewUrl = await fileToDataUrl(f, 1100, 0.82);
+      setPhotoInState(idx, slot, previewUrl);
+      const stored = await encodeAndStore(f, idx, slot);
+      if (stored && stored !== previewUrl) setPhotoInState(idx, slot, stored);
+      if (!stored && typeof window !== 'undefined') {
+        console.warn('Mix: could not persist combo photo — localStorage quota likely full');
+      }
     } catch (err) { /* swallow */ }
     try { input.value = ''; } catch (err) {}
   };
