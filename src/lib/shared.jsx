@@ -150,6 +150,39 @@ export function saveFitPhoto(key, dataUrl) {
   writeFitPhotos(key, arr);
 }
 
+// Per-fit metadata (stars, mood, context, note, savedAt) — array parallel to
+// the photo list under aevum_fit_meta_<dateKey>. Used by the weekly Fit Score.
+export function getSavedFitMeta(key) {
+  if (typeof window === 'undefined' || key == null) return [];
+  try {
+    const raw = localStorage.getItem('aevum_fit_meta_' + key);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) return arr;
+    }
+    return [];
+  } catch (e) { return []; }
+}
+function writeFitMeta(key, arr) {
+  try {
+    if (arr && arr.length) localStorage.setItem('aevum_fit_meta_' + key, JSON.stringify(arr));
+    else localStorage.removeItem('aevum_fit_meta_' + key);
+  } catch (e) {}
+}
+export function appendFitMeta(key, meta) {
+  if (typeof window === 'undefined' || key == null || !meta) return;
+  const arr = getSavedFitMeta(key);
+  arr.push(meta);
+  writeFitMeta(key, arr);
+}
+export function replaceFitMeta(key, index, meta) {
+  if (typeof window === 'undefined' || key == null || !meta) return;
+  const arr = getSavedFitMeta(key);
+  if (index < 0 || index >= arr.length) arr.push(meta);
+  else arr[index] = meta;
+  writeFitMeta(key, arr);
+}
+
 export function FitPhoto({ id = 1, label, date, ratio = '3/4', radius = 18, showNumber = true, placeholder = false, onAdd, photoKey, noBorder = false, style = {} }) {
   if (placeholder) {
     return <PhotoPlaceholder ratio={ratio} radius={radius} onAdd={onAdd} noBorder={noBorder} style={style} />;

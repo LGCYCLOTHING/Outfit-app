@@ -1,5 +1,6 @@
 import React from 'react';
-import { useTheme, FitPhoto, getSavedFitPhotos, appendFitPhoto, replaceFitPhoto } from '../lib/shared.jsx';
+import { useTheme, FitPhoto, getSavedFitPhotos, appendFitPhoto, replaceFitPhoto, appendFitMeta, replaceFitMeta } from '../lib/shared.jsx';
+import { refreshWeeklyScore } from '../lib/fitScore.js';
 
 function ymd(d) {
   const y = d.getFullYear();
@@ -148,10 +149,19 @@ export default function ScreenRating() {
 
   const saveFit = () => {
     try {
-      // Persist the draft photo: append (new card) or replace at the edit index.
+      // Persist the draft photo + metadata: append (new card) or replace at edit index.
+      const meta = { stars, mood, ctx, note, savedAt: Date.now() };
       if (photo) {
-        if (editIndex == null) appendFitPhoto(todayKey, photo);
-        else                   replaceFitPhoto(todayKey, editIndex, photo);
+        if (editIndex == null) {
+          appendFitPhoto(todayKey, photo);
+          appendFitMeta(todayKey, meta);
+        } else {
+          replaceFitPhoto(todayKey, editIndex, photo);
+          replaceFitMeta(todayKey, editIndex, meta);
+        }
+      } else if (editIndex != null) {
+        // Editing without changing photo — still update the metadata
+        replaceFitMeta(todayKey, editIndex, meta);
       }
       const logged = JSON.parse(localStorage.getItem('aevum_fits_logged') || '[]');
       if (!logged.includes(todayKey)) {
@@ -159,7 +169,10 @@ export default function ScreenRating() {
         localStorage.setItem('aevum_fits_logged', JSON.stringify(logged));
       }
       if (typeof window !== 'undefined') window.__archiveEmpty = false;
+      // Recompute the weekly score and persist + broadcast.
+      try { refreshWeeklyScore(); } catch (e) {}
       try { window.dispatchEvent(new CustomEvent('archive:fitschanged', { detail: { key: todayKey } })); } catch (e) {}
+      try { window.dispatchEvent(new CustomEvent('archive:scorechanged')); } catch (e) {}
     } catch (e) {}
     close();
   };

@@ -4,6 +4,7 @@ import {
   ArchiveBurger, StatusBar, GlowCard, Glass, TabBar,
 } from '../lib/shared.jsx';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
+import { calculateWeeklyScore } from '../lib/fitScore.js';
 
 export default function ScreenYou() {
   const t = useTheme();
@@ -12,6 +13,18 @@ export default function ScreenYou() {
   const accentHot = t.hot;
   const accentDeep = t.deep;
   const activeId = t.id;
+
+  // Weekly Fit Score for the profile stats row (refreshes on save).
+  const [fitScore, setFitScore] = React.useState(() => calculateWeeklyScore().score);
+  React.useEffect(() => {
+    const refresh = () => setFitScore(calculateWeeklyScore().score);
+    window.addEventListener('archive:fitschanged', refresh);
+    window.addEventListener('archive:scorechanged', refresh);
+    return () => {
+      window.removeEventListener('archive:fitschanged', refresh);
+      window.removeEventListener('archive:scorechanged', refresh);
+    };
+  }, []);
 
   const swatches = ['ivory', 'slate', 'forest', 'dusk', 'ember', 'noir'].map(id => THEMES[id]);
   // Icon picker uses themes that have actual icon-<id>.png files
@@ -83,7 +96,7 @@ export default function ScreenYou() {
           }} />
           <div>
             <div className="h-display" style={{ fontSize: 26 }}>Your <em>archive</em></div>
-            <div style={{ fontSize: 14, color: 'var(--text-primary)', marginTop: 4, letterSpacing: -0.35, fontFamily: '"DM Sans", sans-serif' }}>312 FITS · 47 DAY STREAK</div>
+            <div style={{ fontSize: 14, color: 'var(--text-primary)', marginTop: 4, letterSpacing: -0.35, fontFamily: '"DM Sans", sans-serif' }}>312 FITS · 47 DAY STREAK · {fitScore} THIS WEEK</div>
           </div>
         </div>
 

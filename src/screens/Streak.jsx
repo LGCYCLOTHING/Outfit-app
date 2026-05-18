@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTheme, bgColor, fgColor, StatusBar } from '../lib/shared.jsx';
 import LiquidMesh from '../lib/liquid-mesh.jsx';
+import { getWeeklyScoreHistory, calculateWeeklyScore, isoWeekLabel, persistWeeklyScore } from '../lib/fitScore.js';
 
 // Local helpers — same logic as Today's streak so numbers stay in sync
 function readLoggedDays() {
@@ -310,6 +311,69 @@ export default function ScreenStreak() {
             ))}
           </div>
         </div>
+
+        {/* ── Weekly score history bar chart ── */}
+        {(() => {
+          // Make sure this week's score is in the history before reading
+          try {
+            const current = calculateWeeklyScore();
+            persistWeeklyScore(current.score, isoWeekLabel());
+          } catch (e) {}
+          const history = getWeeklyScoreHistory();
+          const last4 = history.slice(-4);
+          // Pad with empty placeholders so the chart always shows 4 columns
+          while (last4.length < 4) last4.unshift({ week: '—', score: 0, placeholder: true });
+          const maxScore = Math.max(100, ...last4.map(e => e.score || 0));
+          const labelFor = (entry) => {
+            if (entry.placeholder) return '—';
+            const [, w] = (entry.week || '').split('-W');
+            return w ? `W${w}` : '—';
+          };
+          return (
+            <div className="lg-card no-scroll" style={{
+              marginBottom: 14, padding: '14px 16px', borderRadius: 18,
+            }}>
+              <div style={{ fontSize: 10, color: 'var(--text-secondary)', letterSpacing: 1.4, marginBottom: 12, paddingLeft: 2 }}>
+                WEEKLY SCORE HISTORY
+              </div>
+              <div style={{
+                display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
+                gap: 16, height: 92, padding: '0 4px',
+              }}>
+                {last4.map((entry, i) => {
+                  const isCurrent = i === last4.length - 1;
+                  const score = entry.score || 0;
+                  const heightPct = Math.max(4, (score / maxScore) * 100);
+                  return (
+                    <div key={i} style={{
+                      flex: 1, display: 'flex', flexDirection: 'column',
+                      alignItems: 'center', justifyContent: 'flex-end',
+                      gap: 6, height: '100%',
+                    }}>
+                      <span style={{
+                        fontSize: 10, color: isCurrent ? '#fff' : 'rgba(255,255,255,0.55)',
+                        fontWeight: 500, letterSpacing: -0.1,
+                      }}>{entry.placeholder ? '' : score}</span>
+                      <div style={{
+                        width: '100%', maxWidth: 36,
+                        height: `${heightPct}%`,
+                        borderRadius: 6,
+                        background: isCurrent
+                          ? `linear-gradient(180deg, ${accent} 0%, ${accentHot || accent} 100%)`
+                          : 'rgba(255,255,255,0.18)',
+                        boxShadow: isCurrent ? `0 0 18px -4px rgba(${accentRgba},0.65)` : 'none',
+                        transition: 'height .4s ease',
+                      }} />
+                      <span style={{
+                        fontSize: 10, color: 'rgba(255,255,255,0.5)', letterSpacing: 0.4,
+                      }}>{labelFor(entry)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Milestone badges row — all earned + locked */}
         <div className="lg-card no-scroll" style={{ marginBottom: 14, padding: '14px 14px 12px', borderRadius: 18 }}>
