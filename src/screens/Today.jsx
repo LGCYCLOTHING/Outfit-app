@@ -360,26 +360,41 @@ export default function ScreenToday() {
 
       <StatusBar />
 
-      {/* Theme-tinted blur backdrop — fades in as user scrolls past the gauge
-          so the pinned compact score has a clean fill behind it that extends
-          all the way up under the status bar / dynamic island. */}
+      {/* Solid theme backdrop ONLY for the status bar area — matches the
+          sticky top region's background inside the scroll container so the
+          two visually fuse into one bar. Fades in with scroll. */}
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0,
-        height: `calc(var(--archive-safe-top, 54px) + ${60 + 8}px)`,
+        height: 'var(--archive-safe-top, 54px)',
         zIndex: 3,
         pointerEvents: 'none',
-        opacity: Math.min(1, collapseT * 1.2),
-        background: `linear-gradient(180deg, rgba(${accentRgba}, 0.18) 0%, rgba(0,0,0,0.45) 100%)`,
-        backdropFilter: collapseT > 0.02 ? 'blur(22px) saturate(180%)' : 'none',
-        WebkitBackdropFilter: collapseT > 0.02 ? 'blur(22px) saturate(180%)' : 'none',
-        borderBottom: collapseT > 0.5 ? '0.5px solid rgba(255,255,255,0.06)' : '0.5px solid transparent',
-        transition: 'opacity .15s ease',
-        willChange: 'opacity, backdrop-filter',
+        background: accentDeep || '#14101E',
+        opacity: collapseT,
+        willChange: 'opacity',
       }} />
 
       <div ref={scrollContainerRef} style={{ position: 'absolute', zIndex: 2, top: 'var(--archive-safe-top, 54px)', left: 0, right: 0, bottom: 0, padding: '12px 28px calc(120px + var(--archive-safe-bottom, 0px))', overflow: 'auto', boxSizing: 'border-box' }}>
+        {/* ── Sticky top region — keeps top bar + gauge stationary as user
+            scrolls. Inside has a theme-color BG layer at zIndex:-1 that fades
+            in to mask scrolled content behind the gauge. ────────────────── */}
+        <div style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 6,
+          marginInline: -28,
+          padding: '12px 28px 0',
+        }}>
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: accentDeep || '#14101E',
+            opacity: collapseT,
+            zIndex: -1,
+            pointerEvents: 'none',
+            willChange: 'opacity',
+          }} />
+
         {/* ── Top bar — hamburger (left) · TODAY pill (absolute-centered) · streak (right) ──
-            Fades out as the user scrolls past the gauge; reappears smoothly on scroll-up. */}
+            Fades in place as the user scrolls; never translates. */}
         <div style={{
           position: 'relative',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -975,10 +990,8 @@ export default function ScreenToday() {
               onClick={() => window.__archiveGo && window.__archiveGo('fitscore')}
               className="archive-pressable"
               style={{
-                position: 'sticky',
-                top: 0,
-                zIndex: 5,
-                marginTop: 10,
+                position: 'relative',
+                marginTop: 0,
                 padding: `${PAD_Y}px 0`,
                 cursor: 'pointer',
               }}>
@@ -1044,6 +1057,7 @@ export default function ScreenToday() {
             </div>
           );
         })()}
+        </div>{/* end sticky top region */}
 
         <div style={{
           marginTop: 22, marginBottom: 8,
