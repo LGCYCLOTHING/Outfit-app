@@ -11,10 +11,33 @@ import { syncAchievementsAndGetNew, ACHIEVEMENTS } from '../lib/achievements.js'
 import { pushPieceSave, pushPieceDelete, pushAchievement } from '../lib/sync.js';
 
 const CATEGORIES = ['Tops', 'Bottoms', 'Shoes', 'Accessories', 'Outerwear'];
+const PHOTO_LABELS = ['Front', 'Back', 'Detail', 'Worn'];
+const MAX_PHOTOS_PER_PIECE = 6;
+
+// Backward compat: an old piece might have { photo: 'data:…' } or
+// photo_urls as an array of bare strings. Normalize everything to
+// photo_urls: [{ url, label }] and surface the cover as .photo.
+function normalizePiece(p) {
+  if (!p) return p;
+  let urls = p.photo_urls;
+  if (!Array.isArray(urls)) {
+    if (p.photo) urls = [{ url: p.photo, label: 'front' }];
+    else urls = [];
+  } else {
+    urls = urls.map(item =>
+      typeof item === 'string'
+        ? { url: item, label: null }
+        : { url: item && item.url, label: (item && item.label) || null }
+    ).filter(x => x.url);
+  }
+  return { ...p, photo_urls: urls, photo: (urls[0] && urls[0].url) || p.photo || null };
+}
 
 function readPieces() {
-  try { return JSON.parse(localStorage.getItem('aevum_pieces') || '[]'); }
-  catch (e) { return []; }
+  try {
+    const arr = JSON.parse(localStorage.getItem('aevum_pieces') || '[]');
+    return Array.isArray(arr) ? arr.map(normalizePiece) : [];
+  } catch (e) { return []; }
 }
 function writePieces(arr) {
   try { localStorage.setItem('aevum_pieces', JSON.stringify(arr)); } catch (e) {}
@@ -50,6 +73,167 @@ function CategoryIcon({ cat, size = 18, color = 'rgba(245,240,232,0.55)' }) {
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
       <path d="M5 7l4-4 3 3 3-3 4 4-3 3v11h-8V10L5 7z"/>
     </svg>
+  );
+}
+
+// Per-piece grid card — swipeable photo strip with dot indicators.
+function PieceCard({ piece, onRemove, accent, accentRgba }) {
+  const photos = piece.photo_urls || [];
+  const [idx, setIdx] = React.useState(0);
+  const [dragDx, setDragDx] = React.useState(0);
+  const dragRef = React.useRef({ active: false, startX: 0, w: 0, didDrag: false });
+  const cardRef = React.useRef(null);
+  const multi = photos.length > 1;
+
+  const onDown = (e) => {
+    if (!multi) return;
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
+    dragRef.current = {
+      active: true, startX: e.clientX,
+      w: cardRef.current ? cardRef.current.offsetWidth : 1,
+      didDrag: false,
+    };
+  };
+  const onMove = (e) => {
+    const s = dragRef.current;
+    if (!s.active) return;
+    const dx = e.clientX - s.startX;
+    if (Math.abs(dx) > 6) s.didDrag = true;
+    setDragDx(dx);
+  };
+  const onUp = () => {
+    const s = dragRef.current;
+    if (!s.active) return;
+    const threshold = s.w * 0.22;
+    let next = idx;
+    if (s.didDrag) {
+      if (dragDx <= -threshold && idx < photos.length - 1) next = idx + 1;
+      else if (dragDx >= threshold && idx > 0) next = idx - 1;
+    }
+    setIdx(next);
+    setDragDx(0);
+    s.active = false;
+  };
+
+  return (
+    <div style={{
+      position: 'relative', aspectRatio: '3/4', borderRadius: 14, overflow: 'hidden',
+      background: 'linear-gradient(180deg, #1c1a1a 0%, #100e0e 100%)',
+      boxShadow: 'inset 0 0 0 0.5px rgba(255,240,220,0.06), inset 0 -40px 60px rgba(0,0,0,0.35)',
+    }}>
+      {/* Swipeable photo strip */}
+      <div
+        ref={cardRef}
+        onPointerDown={onDown}
+        onPointerMove={onMove}
+        onPointerUp={onUp}
+        onPointerCancel={onUp}
+        style={{
+          position: 'absolute', inset: 0,
+          touchAction: multi ? 'pan-y' : 'auto',
+          cursor: multi ? 'grab' : 'default',
+        }}>
+        {photos.length === 0 ? (
+          <div style={{
+            position: 'absolute', inset: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <CategoryIcon cat={piece.category} size={36} color="rgba(245,240,232,0.22)" />
+          </div>
+        ) : (
+          <div style={{
+            position: 'absolute', top: 0, bottom: 0,
+            display: 'flex',
+            width: `${photos.length * 100}%`,
+            transform: `translateX(calc(${-idx * (100 / photos.length)}% + ${dragDx}px))`,
+            transition: dragRef.current.active ? 'none' : 'transform .32s cubic-bezier(.34,1.56,.64,1)',
+          }}>
+            {photos.map((ph, i) => (
+              <img key={i} src={ph.url} alt=""
+                draggable={false}
+                style={{
+                  width: `${100 / photos.length}%`, height: '100%',
+                  objectFit: 'cover', display: 'block',
+                  pointerEvents: 'none',
+                }} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.65) 100%)',
+        pointerEvents: 'none',
+      }} />
+
+      {/* Multi-photo badge */}
+      {multi && (
+        <div style={{
+          position: 'absolute', top: 8, left: 8,
+          padding: '3px 7px', borderRadius: 7,
+          background: 'rgba(10,8,6,0.55)', backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          display: 'flex', alignItems: 'center', gap: 4,
+          fontSize: 10, color: '#fff', fontWeight: 500, letterSpacing: 0.2,
+        }}>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          {photos.length}
+        </div>
+      )}
+
+      {/* Dots */}
+      {multi && (
+        <div style={{
+          position: 'absolute', bottom: 38, left: 0, right: 0,
+          display: 'flex', justifyContent: 'center', gap: 4,
+          pointerEvents: 'none',
+        }}>
+          {photos.map((_, i) => (
+            <div key={i} style={{
+              width: i === idx ? 14 : 5, height: 5, borderRadius: 3,
+              background: i === idx ? '#fff' : 'rgba(255,255,255,0.45)',
+              transition: 'width .2s ease, background .2s ease',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.4)',
+            }} />
+          ))}
+        </div>
+      )}
+
+      <div style={{ position: 'absolute', bottom: 10, left: 12, right: 12 }}>
+        <div style={{
+          fontSize: 13, color: 'var(--text-primary)', fontWeight: 500,
+          letterSpacing: '-0.02em', lineHeight: 1.2,
+          textShadow: '0 1px 4px rgba(0,0,0,0.6)',
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>{piece.name}</div>
+        {piece.color && (
+          <div style={{
+            fontSize: 10, color: 'var(--text-secondary)', marginTop: 2, letterSpacing: 0.4,
+            textTransform: 'uppercase',
+          }}>{piece.color}</div>
+        )}
+      </div>
+
+      <div
+        onClick={(e) => { e.stopPropagation(); onRemove && onRemove(); }}
+        className="archive-pressable"
+        style={{
+          position: 'absolute', top: 8, right: 8,
+          width: 26, height: 26, borderRadius: 13,
+          background: 'rgba(10,8,6,0.5)', backdropFilter: 'blur(10px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+        }}>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="2" strokeLinecap="round">
+          <path d="M6 6l12 12M18 6L6 18"/>
+        </svg>
+      </div>
+    </div>
   );
 }
 
@@ -103,38 +287,81 @@ export default function ScreenPieces() {
   const [name, setName] = React.useState('');
   const [color, setColor] = React.useState('');
   const [category, setCategory] = React.useState('Tops');
-  const [photo, setPhoto] = React.useState(null);
+  // photos: array of { url, label } (label = 'front'|'back'|'detail'|'worn'|null)
+  const [photos, setPhotos] = React.useState([]);
+  const [selectedPhotoIdx, setSelectedPhotoIdx] = React.useState(0);
+  const [viewerIdx, setViewerIdx] = React.useState(null); // null = closed
   const fileRef = React.useRef(null);
 
   const onPickFile = (e) => {
-    const f = e.target.files && e.target.files[0];
+    const input = e.target;
+    const f = input.files && input.files[0];
     if (!f) return;
+    if (photos.length >= MAX_PHOTOS_PER_PIECE) { try { input.value = ''; } catch (err) {} return; }
     const reader = new FileReader();
-    reader.onload = () => setPhoto(reader.result);
+    reader.onload = () => {
+      // Downscale to keep storage manageable.
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1200;
+        let w = img.width, h = img.height;
+        const scale = Math.min(1, MAX / Math.max(w, h));
+        w = Math.round(w * scale); h = Math.round(h * scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        let dataUrl;
+        try { dataUrl = canvas.toDataURL('image/jpeg', 0.82); } catch (err) { dataUrl = reader.result; }
+        // First photo defaults to 'front', rest unlabeled.
+        const isFirst = photos.length === 0;
+        setPhotos(prev => [...prev, { url: dataUrl, label: isFirst ? 'front' : null }]);
+        setSelectedPhotoIdx(photos.length); // newly-added index
+        try { input.value = ''; } catch (err) {}
+      };
+      img.onerror = () => { try { input.value = ''; } catch (err) {} };
+      img.src = reader.result;
+    };
     reader.readAsDataURL(f);
   };
 
+  const labelPhoto = (idx, label) => {
+    setPhotos(prev => prev.map((p, i) => i === idx ? { ...p, label: p.label === label ? null : label } : p));
+  };
+  const deletePhoto = (idx) => {
+    setPhotos(prev => prev.filter((_, i) => i !== idx));
+    setSelectedPhotoIdx(i => Math.max(0, Math.min(i, photos.length - 2)));
+    setViewerIdx(null);
+  };
+
   const resetForm = () => {
-    setName(''); setColor(''); setCategory('Tops'); setPhoto(null); setAdding(false);
+    setName(''); setColor(''); setCategory('Tops');
+    setPhotos([]); setSelectedPhotoIdx(0); setViewerIdx(null);
+    setAdding(false);
   };
 
   const savePiece = () => {
     if (!name.trim()) return;
-    const newPiece = {
+    const photo_urls = photos.slice(0, MAX_PHOTOS_PER_PIECE);
+    const newPiece = normalizePiece({
       id: Date.now(),
       name: name.trim(),
       color: color.trim(),
       category,
-      photo: photo || null,
+      photo_urls,
+      times_worn: 0,
+      last_worn: null,
       createdAt: Date.now(),
-    };
+    });
     const next = [...pieces, newPiece];
     setPieces(next);
     writePieces(next);
     resetForm();
-    // Write-through to Supabase (uploads photo if it's a data URL, swaps in
-    // the public URL for the persisted record).
-    pushPieceSave(newPiece).then(remoteId => {
+    // Write-through to Supabase. pushPieceSave accepts photo_urls as a list
+    // of URLs/data-URLs; rewrap our objects into bare strings for upload.
+    pushPieceSave({
+      ...newPiece,
+      photo_urls: photo_urls.map(p => p.url),
+    }).then(remoteId => {
       if (remoteId && remoteId !== newPiece.id) {
         const updated = readPieces().map(p => p.id === newPiece.id ? { ...p, id: remoteId } : p);
         setPieces(updated);
@@ -445,56 +672,10 @@ export default function ScreenPieces() {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, padding: '0 24px' }}>
                 {g.items.map(p => (
-                  <div key={p.id} style={{
-                    position: 'relative', aspectRatio: '3/4', borderRadius: 14, overflow: 'hidden',
-                    background: 'linear-gradient(180deg, #1c1a1a 0%, #100e0e 100%)',
-                    boxShadow: 'inset 0 0 0 0.5px rgba(255,240,220,0.06), inset 0 -40px 60px rgba(0,0,0,0.35)',
-                  }}>
-                    {p.photo ? (
-                      <img src={p.photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                    ) : (
-                      <div style={{
-                        position: 'absolute', inset: 0,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      }}>
-                        <CategoryIcon cat={p.category} size={36} color="rgba(245,240,232,0.22)" />
-                      </div>
-                    )}
-                    <div style={{
-                      position: 'absolute', inset: 0,
-                      background: 'linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.65) 100%)',
-                      pointerEvents: 'none',
-                    }} />
-                    <div style={{
-                      position: 'absolute', bottom: 10, left: 12, right: 12,
-                    }}>
-                      <div style={{
-                        fontSize: 13, color: 'var(--text-primary)', fontWeight: 500,
-                        letterSpacing: '-0.02em', lineHeight: 1.2,
-                        textShadow: '0 1px 4px rgba(0,0,0,0.6)',
-                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                      }}>{p.name}</div>
-                      {p.color && (
-                        <div style={{
-                          fontSize: 10, color: 'var(--text-secondary)', marginTop: 2, letterSpacing: 0.4,
-                          textTransform: 'uppercase',
-                        }}>{p.color}</div>
-                      )}
-                    </div>
-                    <div
-                      onClick={() => removePiece(p.id)}
-                      className="archive-pressable"
-                      style={{
-                        position: 'absolute', top: 8, right: 8,
-                        width: 26, height: 26, borderRadius: 13,
-                        background: 'rgba(10,8,6,0.5)', backdropFilter: 'blur(10px)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                      }}>
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="2" strokeLinecap="round">
-                        <path d="M6 6l12 12M18 6L6 18"/>
-                      </svg>
-                    </div>
-                  </div>
+                  <PieceCard
+                    key={p.id} piece={p}
+                    onRemove={() => removePiece(p.id)}
+                    accent={accent} accentRgba={accentRgba} />
                 ))}
               </div>
             </div>
@@ -520,7 +701,7 @@ export default function ScreenPieces() {
               Add piece
             </div>
 
-            {/* Photo */}
+            {/* Photo row — up to 6 photos + trailing "+" tile */}
             <div style={{ marginBottom: 14 }}>
               <input
                 ref={fileRef}
@@ -529,28 +710,81 @@ export default function ScreenPieces() {
                 onChange={onPickFile}
                 style={{ display: 'none' }}
               />
-              <div
-                onClick={() => fileRef.current && fileRef.current.click()}
-                className="archive-pressable"
-                style={{
-                  width: '100%', aspectRatio: '3/2', borderRadius: 14,
-                  background: photo ? '#000' : 'rgba(255, 240, 220, 0.04)',
-                  border: photo ? 'none' : '1px dashed rgba(255, 240, 220, 0.18)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer', overflow: 'hidden',
-                }}>
-                {photo ? (
-                  <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.5)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M3 7h3l2-2.5h8L18 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
-                      <circle cx="12" cy="13" r="3.5"/>
+              <div className="no-scroll" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+                <style>{`.no-scroll::-webkit-scrollbar{display:none}`}</style>
+                {photos.map((p, i) => (
+                  <div key={i}
+                    onClick={() => { setSelectedPhotoIdx(i); setViewerIdx(i); }}
+                    className="archive-pressable"
+                    style={{
+                      position: 'relative', flex: '0 0 auto',
+                      width: 60, height: 60, borderRadius: 10,
+                      overflow: 'hidden', cursor: 'pointer',
+                      boxShadow: i === selectedPhotoIdx
+                        ? `0 0 0 2px ${accent}, 0 0 10px -2px rgba(${accentRgba},0.55)`
+                        : 'inset 0 0 0 0.5px rgba(255,255,255,0.10)',
+                    }}>
+                    <img src={p.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    {p.label && (
+                      <div style={{
+                        position: 'absolute', bottom: 3, left: 3,
+                        padding: '1px 5px', borderRadius: 4,
+                        background: `rgba(${accentRgba},0.85)`,
+                        color: '#0a0a0a', fontSize: 8, fontWeight: 700,
+                        letterSpacing: 0.4, textTransform: 'uppercase',
+                      }}>{p.label}</div>
+                    )}
+                    {i === 0 && (
+                      <div style={{
+                        position: 'absolute', top: 3, left: 3,
+                        padding: '1px 4px', borderRadius: 3,
+                        background: 'rgba(0,0,0,0.55)',
+                        color: '#fff', fontSize: 7.5, fontWeight: 600,
+                        letterSpacing: 0.3,
+                      }}>COVER</div>
+                    )}
+                  </div>
+                ))}
+                {photos.length < MAX_PHOTOS_PER_PIECE && (
+                  <div
+                    onClick={() => fileRef.current && fileRef.current.click()}
+                    className="archive-pressable"
+                    style={{
+                      flex: '0 0 auto', width: 60, height: 60, borderRadius: 10,
+                      background: 'rgba(255,240,220,0.04)',
+                      border: '1px dashed rgba(255,240,220,0.18)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      cursor: 'pointer',
+                    }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.55)" strokeWidth="1.8" strokeLinecap="round">
+                      <path d="M12 5v14M5 12h14"/>
                     </svg>
-                    <span style={{ fontSize: 12, color: 'var(--text-muted)', letterSpacing: 0.4 }}>Tap to add photo</span>
                   </div>
                 )}
               </div>
+              {/* Label pills for the selected photo */}
+              {photos.length > 0 && (
+                <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {PHOTO_LABELS.map(lbl => {
+                    const key = lbl.toLowerCase();
+                    const active = photos[selectedPhotoIdx] && photos[selectedPhotoIdx].label === key;
+                    return (
+                      <div key={key}
+                        onClick={() => labelPhoto(selectedPhotoIdx, key)}
+                        className="archive-pressable"
+                        style={{
+                          padding: '5px 11px', borderRadius: 100,
+                          fontSize: 11, fontWeight: 500, cursor: 'pointer',
+                          background: active ? `rgba(${accentRgba},0.22)` : 'rgba(255,255,255,0.05)',
+                          color: active ? accent : 'rgba(255,255,255,0.7)',
+                          boxShadow: active
+                            ? `inset 0 0 0 0.5px rgba(${accentRgba},0.55)`
+                            : 'inset 0 0 0 0.5px rgba(255,255,255,0.08)',
+                        }}>{lbl}</div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Name */}
@@ -636,6 +870,51 @@ export default function ScreenPieces() {
       )}
 
       <TabBar active="pieces" />
+
+      {/* Fullscreen photo viewer with delete */}
+      {viewerIdx !== null && photos[viewerIdx] && (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 70,
+          background: 'rgba(0,0,0,0.92)',
+          display: 'flex', flexDirection: 'column',
+        }}
+          onClick={() => setViewerIdx(null)}>
+          <div style={{ position: 'absolute', top: 'calc(20px + var(--archive-safe-top, 54px))', left: 22, right: 22, display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 2 }}>
+            <div onClick={(e) => { e.stopPropagation(); setViewerIdx(null); }}
+              className="archive-pressable"
+              style={{
+                width: 36, height: 36, borderRadius: 18,
+                background: 'rgba(255,255,255,0.10)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer',
+              }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 6l12 12M18 6L6 18"/>
+              </svg>
+            </div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', letterSpacing: 1.6, fontWeight: 500 }}>
+              {viewerIdx + 1} / {photos.length}
+            </div>
+            <div onClick={(e) => { e.stopPropagation(); deletePhoto(viewerIdx); }}
+              className="archive-pressable"
+              style={{
+                width: 36, height: 36, borderRadius: 18,
+                background: 'rgba(180,40,40,0.30)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer',
+              }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              </svg>
+            </div>
+          </div>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+            onClick={(e) => e.stopPropagation()}>
+            <img src={photos[viewerIdx].url} alt=""
+              style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }} />
+          </div>
+        </div>
+      )}
 
       {toast && (
         <div style={{

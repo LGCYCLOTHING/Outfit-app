@@ -766,7 +766,7 @@ function SlidingBubbleNav({ items, active, itemRefs, onPointerDown, onClickItem,
             top: '50%',
             left: bubble.left,
             width: bubble.width,
-            height: 44,
+            height: 50,
             transform: `translateY(-50%) scaleX(${stretching ? 1.3 : 1})`,
             transformOrigin: 'center',
             background: 'linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 100%)',
@@ -820,8 +820,9 @@ function SlidingBubbleNav({ items, active, itemRefs, onPointerDown, onClickItem,
                 touchAction: 'none',
               } : {
                 position: 'relative', zIndex: 1,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                padding: '8px 14px',
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center', gap: 2,
+                padding: '6px 10px',
                 color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
                 cursor: 'pointer', userSelect: 'none',
                 transform: `scale(${scale})`,
@@ -829,6 +830,15 @@ function SlidingBubbleNav({ items, active, itemRefs, onPointerDown, onClickItem,
                 touchAction: 'none',
               }}>
               {it.icon}
+              {!it.isAction && it.label && (
+                <span style={{
+                  fontSize: 8.5, letterSpacing: 0.6, fontWeight: 500,
+                  fontFamily: '"DM Sans", sans-serif',
+                  textTransform: 'uppercase', lineHeight: 1,
+                  opacity: isActive ? 1 : 0.7,
+                  pointerEvents: 'none',
+                }}>{it.label}</span>
+              )}
             </div>
           );
         })}
