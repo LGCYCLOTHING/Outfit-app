@@ -360,18 +360,33 @@ export default function ScreenToday() {
 
       <StatusBar />
 
+      {/* Theme-tinted blur backdrop — fades in as user scrolls past the gauge
+          so the pinned compact score has a clean fill behind it that extends
+          all the way up under the status bar / dynamic island. */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0,
+        height: `calc(var(--archive-safe-top, 54px) + ${60 + 8}px)`,
+        zIndex: 3,
+        pointerEvents: 'none',
+        opacity: Math.min(1, collapseT * 1.2),
+        background: `linear-gradient(180deg, rgba(${accentRgba}, 0.18) 0%, rgba(0,0,0,0.45) 100%)`,
+        backdropFilter: collapseT > 0.02 ? 'blur(22px) saturate(180%)' : 'none',
+        WebkitBackdropFilter: collapseT > 0.02 ? 'blur(22px) saturate(180%)' : 'none',
+        borderBottom: collapseT > 0.5 ? '0.5px solid rgba(255,255,255,0.06)' : '0.5px solid transparent',
+        transition: 'opacity .15s ease',
+        willChange: 'opacity, backdrop-filter',
+      }} />
+
       <div ref={scrollContainerRef} style={{ position: 'absolute', zIndex: 2, top: 'var(--archive-safe-top, 54px)', left: 0, right: 0, bottom: 0, padding: '12px 28px calc(120px + var(--archive-safe-bottom, 0px))', overflow: 'auto', boxSizing: 'border-box' }}>
         {/* ── Top bar — hamburger (left) · TODAY pill (absolute-centered) · streak (right) ──
-            Fades + lifts as the user scrolls past the gauge so it gets out of the way of
-            the pinned compact score. Reappears smoothly when they scroll back up. */}
+            Fades out as the user scrolls past the gauge; reappears smoothly on scroll-up. */}
         <div style={{
           position: 'relative',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           marginBottom: 14, minHeight: 36,
           opacity: 1 - Math.min(1, collapseT * 1.5),
-          transform: `translateY(${-Math.min(1, collapseT * 1.5) * 8}px)`,
           pointerEvents: collapseT > 0.6 ? 'none' : 'auto',
-          willChange: 'opacity, transform',
+          willChange: 'opacity',
         }}>
           {/* Hamburger */}
           <div
@@ -934,16 +949,14 @@ export default function ScreenToday() {
           const lerp = (a, b, v) => a + (b - a) * v;
 
           // Single gauge — everything interpolates between full and compact.
-          const R       = lerp(80, 22, t);
-          const STROKE  = lerp(14, 5, t);
-          const NUM     = lerp(48, 16, t);
-          const LABEL   = lerp(10, 0, t);          // fades to 0
-          const PAD_Y   = lerp(8, 8, t);
-          const GAP     = lerp(6, 0, t);           // gap below the arc
-          const SVG_MAX = lerp(240, 60, t);        // gauge SVG max-width
-          // Full-width blurred bar appears as the gauge becomes pinned so
-          // scrolled content doesn't bleed through behind the score.
-          const BAR_BG_A = lerp(0, 0.55, Math.min(1, t * 1.4));
+          // Smaller starting size per design feedback.
+          const R       = lerp(60, 20, t);
+          const STROKE  = lerp(11, 5, t);
+          const NUM     = lerp(36, 14, t);
+          const LABEL   = lerp(9, 0, t);           // fades to 0
+          const PAD_Y   = lerp(8, 6, t);
+          const GAP     = lerp(5, 0, t);           // gap below the arc
+          const SVG_MAX = lerp(180, 56, t);        // gauge SVG max-width
 
           // Arc geometry — derives from the interpolated R / STROKE.
           const SPAD = STROKE / 2 + 4;
@@ -966,16 +979,8 @@ export default function ScreenToday() {
                 top: 0,
                 zIndex: 5,
                 marginTop: 10,
-                marginInline: -28, // extend edge-to-edge across the scroll container
-                padding: `${PAD_Y}px 28px`,
+                padding: `${PAD_Y}px 0`,
                 cursor: 'pointer',
-                background: `rgba(10,8,6,${BAR_BG_A.toFixed(3)})`,
-                backdropFilter: t > 0.05 ? `blur(${lerp(0, 22, t).toFixed(1)}px) saturate(180%)` : 'none',
-                WebkitBackdropFilter: t > 0.05 ? `blur(${lerp(0, 22, t).toFixed(1)}px) saturate(180%)` : 'none',
-                borderBottom: t > 0.6
-                  ? '0.5px solid rgba(255,255,255,0.06)'
-                  : '0.5px solid transparent',
-                willChange: 'background, backdrop-filter',
               }}>
               <div style={{
                 position: 'relative',
