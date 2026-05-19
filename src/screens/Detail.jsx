@@ -155,7 +155,7 @@ export default function ScreenDetail() {
 
       <div style={{
         position: 'absolute', zIndex: 2,
-        top: 'calc(var(--archive-safe-top, 54px) + 24px)',
+        top: 'var(--archive-safe-top, 54px)',
         left: 0, right: 0, bottom: 0,
         padding: '0 0 calc(120px + var(--archive-safe-bottom, 0px))',
         overflow: 'auto', boxSizing: 'border-box',

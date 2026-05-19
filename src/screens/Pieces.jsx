@@ -391,7 +391,7 @@ export default function ScreenPieces() {
 
         <div style={{
           position: 'absolute', zIndex: 2,
-          top: 'calc(var(--archive-safe-top, 54px) + 24px)',
+          top: 'var(--archive-safe-top, 54px)',
           left: 0, right: 0, bottom: 0,
           padding: '0 24px calc(120px + var(--archive-safe-bottom, 0px))',
           overflow: 'auto', boxSizing: 'border-box',
@@ -508,7 +508,7 @@ export default function ScreenPieces() {
 
       <div style={{
         position: 'relative', zIndex: 2,
-        position: 'absolute', zIndex: 2, top: 'calc(var(--archive-safe-top, 54px) + 24px)', left: 0, right: 0, bottom: 0, padding: '0 0 calc(120px + var(--archive-safe-bottom, 0px))',
+        position: 'absolute', zIndex: 2, top: 'var(--archive-safe-top, 54px)', left: 0, right: 0, bottom: 0, padding: '0 0 calc(120px + var(--archive-safe-bottom, 0px))',
         height: '100%', overflow: 'auto', boxSizing: 'border-box',
       }}>
         {/* Header */}

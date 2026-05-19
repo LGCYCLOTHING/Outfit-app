@@ -179,7 +179,7 @@ export default function ScreenArchive() {
       <LiquidMesh seed={1} intensity={1} />
       <StatusBar />
 
-      <div style={{ position: 'absolute', zIndex: 2, top: 'calc(var(--archive-safe-top, 54px) + 24px)', left: 0, right: 0, bottom: 0, padding: '0 0 calc(120px + var(--archive-safe-bottom, 0px))', overflow: 'auto', boxSizing: 'border-box' }}>
+      <div style={{ position: 'absolute', zIndex: 2, top: 'var(--archive-safe-top, 54px)', left: 0, right: 0, bottom: 0, padding: '0 0 calc(120px + var(--archive-safe-bottom, 0px))', overflow: 'auto', boxSizing: 'border-box' }}>
         {(typeof window !== 'undefined' && window.__archiveEmpty) ? (
           <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 30 }}>

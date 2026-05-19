@@ -333,7 +333,7 @@ export default function ScreenToday() {
 
       <StatusBar />
 
-      <div style={{ position: 'relative', zIndex: 2, padding: 'calc(12px + var(--archive-safe-top, 54px)) 28px calc(120px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
+      <div style={{ position: 'absolute', zIndex: 2, top: 'var(--archive-safe-top, 54px)', left: 0, right: 0, bottom: 0, padding: '12px 28px calc(120px + var(--archive-safe-bottom, 0px))', overflow: 'auto', boxSizing: 'border-box' }}>
         {/* ── Top bar — hamburger (left) · TODAY pill (absolute-centered) · streak (right) ── */}
         <div style={{
           position: 'relative',

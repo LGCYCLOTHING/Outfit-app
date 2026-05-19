@@ -62,7 +62,7 @@ export default function ScreenCalendar() {
       <LiquidMesh seed={7} intensity={0.7} />
       <StatusBar />
 
-      <div style={{ position: 'absolute', zIndex: 2, top: 'calc(var(--archive-safe-top, 54px) + 24px)', left: 0, right: 0, bottom: 0, padding: '0 0 calc(120px + var(--archive-safe-bottom, 0px))', overflow: 'auto', boxSizing: 'border-box' }}>
+      <div style={{ position: 'absolute', zIndex: 2, top: 'var(--archive-safe-top, 54px)', left: 0, right: 0, bottom: 0, padding: '0 0 calc(120px + var(--archive-safe-bottom, 0px))', overflow: 'auto', boxSizing: 'border-box' }}>
 
         {/* Header — year picker (tap to open) + close (X, no circle) */}
         <div style={{ padding: '0 22px', marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>

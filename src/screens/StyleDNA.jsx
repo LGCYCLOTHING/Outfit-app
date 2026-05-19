@@ -82,9 +82,10 @@ export default function ScreenStyleDNA() {
       <LiquidMesh seed={6} intensity={0.9} />
       <StatusBar />
       <div style={{
-        position: 'relative', zIndex: 2,
-        padding: 'calc(16px + var(--archive-safe-top, 54px)) 22px calc(40px + var(--archive-safe-bottom, 0px))',
-        height: '100%', overflow: 'auto', boxSizing: 'border-box',
+        position: 'absolute', zIndex: 2,
+        top: 'var(--archive-safe-top, 54px)', left: 0, right: 0, bottom: 0,
+        padding: '16px 22px calc(40px + var(--archive-safe-bottom, 0px))',
+        overflow: 'auto', boxSizing: 'border-box',
       }}>
         {/* Header */}
         <div style={{
