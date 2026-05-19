@@ -284,16 +284,39 @@ export default function App() {
   // When the Rating modal is open, keep the previous screen visible behind it.
   const [modalBgScreen, setModalBgScreen] = React.useState(null);
   // One-shot flag — set by callers (e.g. the bottom nav bar) that want the
-  // next navigation to skip the slide-in-from-right animation. Cleared after
-  // the render commits.
+  // next navigation to skip the slide-in/out animation. Cleared after the
+  // render commits.
   const noSlideOnceRef = React.useRef(false);
+  // Push/pop transition state. `outgoing` keeps the prior screen rendered for
+  // the duration of the slide so the user can see the destination underneath
+  // (forward) or watch the current screen slide off-stage (back).
+  const [outgoing, setOutgoing] = React.useState(null);
+  const [direction, setDirection] = React.useState('forward'); // 'forward' | 'back'
+  const transitionTimerRef = React.useRef(null);
 
   const go = React.useCallback((id, opts) => {
-    if (opts && opts.noSlide) noSlideOnceRef.current = true;
+    const noSlide = !!(opts && opts.noSlide);
+    if (noSlide) noSlideOnceRef.current = true;
+
+    const prev = (typeof window !== 'undefined') ? window.__archiveScreen : null;
+    if (prev && prev !== id && !noSlide) {
+      // Back if the target matches the previously-recorded prev screen
+      // (i.e., a close/back button). Anything else is a forward push.
+      const isBack = (typeof window !== 'undefined') && id === window.__archivePrevScreen;
+      setDirection(isBack ? 'back' : 'forward');
+      setOutgoing(prev);
+      clearTimeout(transitionTimerRef.current);
+      transitionTimerRef.current = setTimeout(() => setOutgoing(null), 540);
+    } else {
+      // No animation — clear any in-flight outgoing immediately.
+      setOutgoing(null);
+      clearTimeout(transitionTimerRef.current);
+    }
+
     if (id === 'rating') {
       setRatingVisit(v => v + 1);
       // Remember whatever screen we came from so it stays visible underneath
-      setModalBgScreen(prev => prev || (typeof window !== 'undefined' ? (window.__archiveScreen || 'today') : 'today'));
+      setModalBgScreen(prev2 => prev2 || (typeof window !== 'undefined' ? (window.__archiveScreen || 'today') : 'today'));
     } else {
       setModalBgScreen(null);
     }
@@ -353,12 +376,19 @@ export default function App() {
     <>
       <div style={{ position: 'absolute', inset: 0 }}>
         {Object.keys(screens).map(id => {
-          const visible = screen === id || (screen === 'rating' && id === 'today');
+          const isActive = screen === id;
+          const isOutgoing = !isActive && outgoing === id;
+          const isModalBg = screen === 'rating' && id === 'today';
+          const visible = isActive || isOutgoing || isModalBg;
           // Screens with their own custom entrance/dismiss flow opt out of the
-          // global slide-in-from-right transition. The bottom tab bar also
-          // sets noSlideOnceRef so tab switches don't slide.
+          // global push/pop animations. The bottom tab bar also sets
+          // noSlideOnceRef so tab switches don't slide.
           const NO_SLIDE = new Set(['rating', 'story', 'splash', 'onboarding']);
-          const slide = (!NO_SLIDE.has(id) && !noSlideOnceRef.current) ? 'yes' : 'no';
+          let slide = 'no';
+          if (visible && !NO_SLIDE.has(id) && !noSlideOnceRef.current) {
+            if (isActive && direction === 'forward')  slide = 'in-right';
+            else if (isOutgoing && direction === 'back') slide = 'out-right';
+          }
           return (
             <div key={id}
               data-slide={slide}
