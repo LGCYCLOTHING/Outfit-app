@@ -293,17 +293,36 @@ export default function App() {
   const [outgoing, setOutgoing] = React.useState(null);
   const [direction, setDirection] = React.useState('forward'); // 'forward' | 'back'
   const transitionTimerRef = React.useRef(null);
+  // Real navigation stack — robust back detection. Forward = push; visiting a
+  // screen already in the stack = pop back to it. Tab switches (noSlide)
+  // replace the top of the stack so cross-tab → drill-in → close still pops
+  // back to the right tab.
+  const navStackRef = React.useRef([screen]);
 
   const go = React.useCallback((id, opts) => {
     const noSlide = !!(opts && opts.noSlide);
     if (noSlide) noSlideOnceRef.current = true;
 
     const prev = (typeof window !== 'undefined') ? window.__archiveScreen : null;
+    const stack = navStackRef.current;
+    let dir = 'forward';
+    const top = stack[stack.length - 1];
+    if (id === top) {
+      // re-navigating to current screen — no stack change
+    } else if (noSlide) {
+      // Tab-bar switch: replace top of stack instead of pushing
+      stack[stack.length - 1] = id;
+    } else if (stack.includes(id)) {
+      // Back pop — pop every entry above the target
+      while (stack[stack.length - 1] !== id) stack.pop();
+      dir = 'back';
+    } else {
+      // Forward push
+      stack.push(id);
+    }
+
     if (prev && prev !== id && !noSlide) {
-      // Back if the target matches the previously-recorded prev screen
-      // (i.e., a close/back button). Anything else is a forward push.
-      const isBack = (typeof window !== 'undefined') && id === window.__archivePrevScreen;
-      setDirection(isBack ? 'back' : 'forward');
+      setDirection(dir);
       setOutgoing(prev);
       clearTimeout(transitionTimerRef.current);
       transitionTimerRef.current = setTimeout(() => setOutgoing(null), 540);
