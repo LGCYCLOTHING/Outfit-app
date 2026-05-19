@@ -139,33 +139,6 @@ export default function ScreenToday() {
     return () => cancelAnimationFrame(r);
   }, [fitScore.score]);
 
-  // Scroll-driven collapse of the Fit Score gauge. Tracks the Today scroll
-  // container's scrollTop and exposes a 0–1 progress that drives all the
-  // gauge interpolation below.
-  const scrollContainerRef = React.useRef(null);
-  const [collapseT, setCollapseT] = React.useState(0);
-  React.useEffect(() => {
-    const el = scrollContainerRef.current;
-    if (!el) return;
-    let raf = 0;
-    const onScroll = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        const y = el.scrollTop;
-        const p = Math.max(0, Math.min(1, y / 120));
-        // cubic-bezier(0.25, 0.1, 0.25, 1) → ease-out approximation
-        const eased = 1 - Math.pow(1 - p, 3);
-        setCollapseT(eased);
-      });
-    };
-    el.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      el.removeEventListener('scroll', onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
-
   // Per-PHOTO like state. The set holds composite keys like "2026-05-18#0"
   // so multiple photos on the same day can be liked individually (a bare
   // "2026-05-18" is treated as legacy = the first photo).
@@ -360,48 +333,12 @@ export default function ScreenToday() {
 
       <StatusBar />
 
-      {/* Solid theme backdrop ONLY for the status bar area — matches the
-          sticky top region's background inside the scroll container so the
-          two visually fuse into one bar. Fades in with scroll. */}
-      <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0,
-        height: 'var(--archive-safe-top, 54px)',
-        zIndex: 3,
-        pointerEvents: 'none',
-        background: accentDeep || '#14101E',
-        opacity: collapseT,
-        willChange: 'opacity',
-      }} />
-
-      <div ref={scrollContainerRef} style={{ position: 'absolute', zIndex: 2, top: 'var(--archive-safe-top, 54px)', left: 0, right: 0, bottom: 0, padding: '12px 28px calc(120px + var(--archive-safe-bottom, 0px))', overflow: 'auto', boxSizing: 'border-box' }}>
-        {/* ── Sticky top region — keeps top bar + gauge stationary as user
-            scrolls. Inside has a theme-color BG layer at zIndex:-1 that fades
-            in to mask scrolled content behind the gauge. ────────────────── */}
-        <div style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 6,
-          marginInline: -28,
-          padding: '12px 28px 0',
-        }}>
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: accentDeep || '#14101E',
-            opacity: collapseT,
-            zIndex: -1,
-            pointerEvents: 'none',
-            willChange: 'opacity',
-          }} />
-
-        {/* ── Top bar — hamburger (left) · TODAY pill (absolute-centered) · streak (right) ──
-            Fades in place as the user scrolls; never translates. */}
+      <div style={{ position: 'absolute', zIndex: 2, top: 'var(--archive-safe-top, 54px)', left: 0, right: 0, bottom: 0, padding: '12px 28px calc(120px + var(--archive-safe-bottom, 0px))', overflow: 'auto', boxSizing: 'border-box' }}>
+        {/* ── Top bar — hamburger (left) · TODAY pill (absolute-centered) · streak (right) ── */}
         <div style={{
           position: 'relative',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           marginBottom: 14, minHeight: 36,
-          opacity: 1 - Math.min(1, collapseT * 1.5),
-          pointerEvents: collapseT > 0.6 ? 'none' : 'auto',
-          willChange: 'opacity',
         }}>
           {/* Hamburger */}
           <div
@@ -955,54 +892,32 @@ export default function ScreenToday() {
           </div>
         }
 
-        {/* ── Fit Score gauge — Whoop-style continuous shrink on scroll ── */}
+        {/* ── Fit Score gauge — compact, no card wrapper ── */}
         {(() => {
           const score = fitScore.score;
-          const tier = scoreTier(score);
-          const p = gaugeProgress;     // arc fill (0–1)
-          const t = collapseT;         // scroll collapse (0–1, eased)
-          const lerp = (a, b, v) => a + (b - a) * v;
-
-          // Single gauge — everything interpolates between full and compact.
-          // Smaller starting size per design feedback.
-          const R       = lerp(60, 20, t);
-          const STROKE  = lerp(11, 5, t);
-          const NUM     = lerp(36, 14, t);
-          const LABEL   = lerp(9, 0, t);           // fades to 0
-          const PAD_Y   = lerp(8, 6, t);
-          const GAP     = lerp(5, 0, t);           // gap below the arc
-          const SVG_MAX = lerp(180, 56, t);        // gauge SVG max-width
-
-          // Arc geometry — derives from the interpolated R / STROKE.
-          const SPAD = STROKE / 2 + 4;
-          const cx = R + SPAD;
-          const cy = R + SPAD;
+          const R = 58, STROKE = 11;
+          const PAD = STROKE / 2 + 3;
+          const cx = R + PAD;
+          const cy = R + PAD;
           const vbW = cx * 2;
-          const vbH = cy + STROKE / 2 + 4;
+          const vbH = cy + STROKE / 2 + 2;
           const fullLen = Math.PI * R;
+          const p = gaugeProgress;
           const angle = Math.PI * (1 - p);
           const dotX = cx + R * Math.cos(angle);
           const dotY = cy - R * Math.sin(angle);
           const arcD = `M ${cx - R} ${cy} A ${R} ${R} 0 0 1 ${cx + R} ${cy}`;
-
+          const ease = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
           return (
             <div
               onClick={() => window.__archiveGo && window.__archiveGo('fitscore')}
               className="archive-pressable"
               style={{
-                position: 'relative',
-                marginTop: 0,
-                padding: `${PAD_Y}px 0`,
+                marginTop: 10, marginBottom: 6,
                 cursor: 'pointer',
               }}>
-              <div style={{
-                position: 'relative',
-                width: '100%',
-                maxWidth: SVG_MAX,
-                margin: '0 auto',
-              }}>
-                <svg viewBox={`0 0 ${vbW} ${vbH}`}
-                  style={{ width: '100%', display: 'block', overflow: 'visible' }}>
+              <div style={{ position: 'relative', width: 170, margin: '0 auto' }}>
+                <svg viewBox={`0 0 ${vbW} ${vbH}`} style={{ width: '100%', display: 'block', overflow: 'visible' }}>
                   <defs>
                     <linearGradient id="fit-gauge-grad" x1="0%" y1="0%" x2="100%" y2="0%">
                       <stop offset="0%"  stopColor="rgba(255,255,255,0.22)" />
@@ -1010,12 +925,15 @@ export default function ScreenToday() {
                       <stop offset="100%" stopColor={accent} />
                     </linearGradient>
                   </defs>
-                  <path d={arcD}
+                  <path
+                    d={arcD}
                     stroke="rgba(255,255,255,0.10)"
                     strokeWidth={STROKE}
                     strokeLinecap="round"
-                    fill="none" />
-                  <path d={arcD}
+                    fill="none"
+                  />
+                  <path
+                    d={arcD}
                     stroke="url(#fit-gauge-grad)"
                     strokeWidth={STROKE}
                     strokeLinecap="round"
@@ -1023,41 +941,48 @@ export default function ScreenToday() {
                     strokeDasharray={fullLen}
                     strokeDashoffset={fullLen - fullLen * p}
                     style={{
-                      filter: `drop-shadow(0 0 ${lerp(6, 2, t).toFixed(2)}px ${accent})`,
-                      transition: 'stroke-dashoffset 1200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-                    }} />
-                  <circle cx={dotX} cy={dotY} r={Math.max(2, STROKE / 2 - 1.5)} fill="#fff"
+                      filter: `drop-shadow(0 0 4px ${accent})`,
+                      transition: `stroke-dashoffset 1200ms ${ease}`,
+                    }}
+                  />
+                  <circle
+                    cx={dotX}
+                    cy={dotY}
+                    r={STROKE / 2 - 1.5}
+                    fill="#fff"
                     style={{
                       filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.35))',
-                      transition: 'cx 1200ms cubic-bezier(0.34, 1.56, 0.64, 1), cy 1200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-                    }} />
+                      transition: `cx 1200ms ${ease}, cy 1200ms ${ease}`,
+                    }}
+                  />
                 </svg>
                 <div style={{
-                  position: 'absolute', left: 0, right: 0,
-                  top: `${(cy - lerp(14, 6, t)) / vbH * 100}%`,
+                  position: 'absolute',
+                  left: 0, right: 0,
+                  top: `${(cy - 8) / vbH * 100}%`,
                   transform: 'translateY(-50%)',
-                  textAlign: 'center', pointerEvents: 'none',
+                  textAlign: 'center',
+                  pointerEvents: 'none',
                 }}>
                   <div style={{
-                    fontSize: NUM, fontWeight: 700, color: '#fff',
-                    letterSpacing: lerp(-1.8, -0.6, t), lineHeight: 1,
+                    fontSize: 28, fontWeight: 700, color: '#fff',
+                    letterSpacing: -1, lineHeight: 1,
                     fontFamily: '"DM Sans", -apple-system, system-ui, sans-serif',
-                  }}>{score}</div>
+                  }}>
+                    {score}
+                  </div>
                   <div style={{
-                    fontSize: LABEL, color: 'rgba(255,255,255,0.55)',
-                    letterSpacing: 2.4, fontWeight: 500,
-                    marginTop: GAP,
-                    opacity: 1 - t,
+                    fontSize: 8.5, color: 'rgba(255,255,255,0.55)',
+                    letterSpacing: 2, fontWeight: 500, marginTop: 3,
                     fontFamily: '"DM Sans", sans-serif',
-                    height: LABEL,
-                    overflow: 'hidden',
-                  }}>FIT SCORE</div>
+                  }}>
+                    FIT SCORE
+                  </div>
                 </div>
               </div>
             </div>
           );
         })()}
-        </div>{/* end sticky top region */}
 
         <div style={{
           marginTop: 22, marginBottom: 8,
