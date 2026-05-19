@@ -252,17 +252,23 @@ export default function App() {
 
   React.useEffect(() => {
     const h = () => {
-      document.body.classList.toggle('archive-light', !!window.__archiveLight);
-      document.body.dataset.theme = window.__archiveTheme || 'dusk';
+      const clean = window.__archiveDynamicThemes === false;
+      document.body.classList.toggle('archive-light', !!window.__archiveLight && !clean);
+      document.body.classList.toggle('aevum-clean', clean);
+      document.body.classList.toggle('aevum-clean-light', clean && !!window.__archiveLight);
+      document.body.dataset.theme = clean
+        ? (window.__archiveLight ? 'clean-light' : 'clean-dark')
+        : (window.__archiveTheme || 'dusk');
       force();
     };
     window.addEventListener('archive:themechange', h);
     window.addEventListener('archive:lightchange', h);
-    document.body.classList.toggle('archive-light', !!window.__archiveLight);
-    document.body.dataset.theme = window.__archiveTheme || 'dusk';
+    window.addEventListener('archive:cleanchange', h);
+    h();
     return () => {
       window.removeEventListener('archive:themechange', h);
       window.removeEventListener('archive:lightchange', h);
+      window.removeEventListener('archive:cleanchange', h);
     };
   }, []);
 

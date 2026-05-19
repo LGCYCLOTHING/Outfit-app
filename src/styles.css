@@ -820,6 +820,163 @@ body * {
   border-radius: 16px;
   box-shadow: inset 0 1px 0 rgba(200,170,100,0.1), 0 4px 16px rgba(0,0,0,0.3);
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   CLEAN MODE — Dynamic Themes toggle OFF.
+   Two flavours: dark (.aevum-clean) and light (.aevum-clean.aevum-clean-light).
+   Override the glass system, nav, text vars; replace gradient bg with
+   a flat fill + subtle pattern overlay.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* CLEAN DARK — default when .aevum-clean is on without .aevum-clean-light */
+body.aevum-clean {
+  --text-primary:   #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.65);
+  --text-muted:     rgba(255, 255, 255, 0.35);
+}
+/* CLEAN LIGHT — paper-feel, dark text on warm cream */
+body.aevum-clean.aevum-clean-light {
+  --text-primary:   #0A0A0A;
+  --text-secondary: rgba(0, 0, 0, 0.55);
+  --text-muted:     rgba(0, 0, 0, 0.35);
+}
+
+/* In clean light mode, kill the legacy archive-light text shadow + glass
+   overrides so they don't fight the new monochrome treatment. */
+body.aevum-clean.aevum-clean-light .archive-screen *:not(svg):not(path):not(circle):not(rect):not(ellipse):not(line) {
+  text-shadow: none !important;
+}
+
+/* Soft pattern overlay across every screen — dot grid (dark) or noise (light).
+   Sits on top of the LiquidMesh container so it shows even on screens that
+   skip the mesh. */
+body.aevum-clean .archive-screen::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 0;
+}
+body.aevum-clean.aevum-clean-light .archive-screen::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 220px 220px;
+  opacity: 0.04;
+  mix-blend-mode: multiply;
+}
+
+/* ────── GLASS SURFACES — clean dark ────── */
+body.aevum-clean .lg-card,
+body.aevum-clean .lg-chip,
+body.aevum-clean .lg-pill,
+body.aevum-clean .liquid-glass {
+  background: rgba(255, 255, 255, 0.07) !important;
+  backdrop-filter: blur(20px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+body.aevum-clean .lg-active,
+body.aevum-clean .lg-pill.active {
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(20px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.15),
+    0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  color: #FFFFFF !important;
+}
+body.aevum-clean .lg-sheet {
+  background: rgba(14, 14, 14, 0.92) !important;
+  backdrop-filter: blur(40px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(160%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.6) !important;
+}
+body.aevum-clean .nav-bar {
+  background: rgba(20, 20, 20, 0.9) !important;
+  backdrop-filter: blur(40px) !important;
+  -webkit-backdrop-filter: blur(40px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 20px 60px rgba(0, 0, 0, 0.3) !important;
+}
+body.aevum-clean .lg-input {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+body.aevum-clean .lg-input:focus-within {
+  border-color: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* Kill the top specular highlight arc on glass surfaces — too noisy on flat dark */
+body.aevum-clean .lg-card::before,
+body.aevum-clean .lg-chip::before,
+body.aevum-clean .lg-pill::before,
+body.aevum-clean .lg-pill.active::before,
+body.aevum-clean .lg-active::before,
+body.aevum-clean .lg-sheet::before,
+body.aevum-clean .nav-bar::before {
+  display: none !important;
+}
+
+/* ────── GLASS SURFACES — clean light ────── */
+body.aevum-clean.aevum-clean-light .lg-card,
+body.aevum-clean.aevum-clean-light .lg-chip,
+body.aevum-clean.aevum-clean-light .lg-pill,
+body.aevum-clean.aevum-clean-light .liquid-glass {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(20px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 2px 16px rgba(0, 0, 0, 0.06) !important;
+}
+body.aevum-clean.aevum-clean-light .lg-active,
+body.aevum-clean.aevum-clean-light .lg-pill.active {
+  background: rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 2px 16px rgba(0, 0, 0, 0.08) !important;
+  color: #0A0A0A !important;
+}
+body.aevum-clean.aevum-clean-light .lg-sheet {
+  background: rgba(245, 240, 232, 0.92) !important;
+  backdrop-filter: blur(40px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(160%) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.15) !important;
+}
+body.aevum-clean.aevum-clean-light .nav-bar {
+  background: rgba(245, 240, 232, 0.85) !important;
+  backdrop-filter: blur(40px) !important;
+  -webkit-backdrop-filter: blur(40px) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 4px 20px rgba(0, 0, 0, 0.08),
+    0 20px 60px rgba(0, 0, 0, 0.06) !important;
+}
+body.aevum-clean.aevum-clean-light .lg-input {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+body.aevum-clean.aevum-clean-light .lg-input:focus-within {
+  border-color: rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Burger lines: white in clean dark, near-black in clean light */
+body.aevum-clean .morph-burger-line { background: #FFFFFF !important; }
+body.aevum-clean.aevum-clean-light .morph-burger-line { background: #0A0A0A !important; }
 .lg-badge {
   background: var(--glass-ultra-thin);
   backdrop-filter: var(--blur-thin);

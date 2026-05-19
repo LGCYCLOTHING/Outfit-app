@@ -6,13 +6,24 @@ export const ARCHIVE_AMBER = '#C8956C';
 export const ARCHIVE_AMBER_HOT = '#A87852';
 export const ARCHIVE_AMBER_DEEP = '#200E06';
 
+// Clean-mode background tokens — solid color when Dynamic Themes is off.
+export const CLEAN_BG_DARK  = '#0A0A0A';
+export const CLEAN_BG_LIGHT = '#F5F0E8';
+
 export function useLight() {
   return typeof window !== 'undefined' && !!window.__archiveLight;
 }
+// Returns true when Dynamic Themes is OFF (clean mode is active).
+export function useCleanMode() {
+  if (typeof window === 'undefined') return false;
+  return window.__archiveDynamicThemes === false;
+}
 export function bgColor() {
+  if (useCleanMode()) return useLight() ? CLEAN_BG_LIGHT : CLEAN_BG_DARK;
   return useLight() ? ARCHIVE_BG_LIGHT : ARCHIVE_BG;
 }
 export function fgColor() {
+  if (useCleanMode()) return useLight() ? '#0A0A0A' : '#FFFFFF';
   return useLight() ? '#1a1612' : '#fff';
 }
 
@@ -24,9 +35,17 @@ export const THEMES = {
   ember:  { id:'ember',  name:'Ember',  sub:'warm amber',     light:'#C8956C', hot:'#A87852', deep:'#200E06', softRgba:'200,149,108', darkBg:'/themes/bg-6.png' },
   noir:   { id:'noir',   name:'Noir',   sub:'pure black',     light:'#888888', hot:'#555555', deep:'#000000', softRgba:'160,160,160', darkBg:'/backgrounds/bg-noir.png', darkOnly: true },
 };
+// Synthetic "themes" used while clean mode is active — every accent collapses
+// to monochrome so existing components keep working without a per-screen
+// rewrite.
+export const CLEAN_THEME_DARK  = { id:'clean-dark',  name:'Clean Dark',  sub:'monochrome',  light:'#FFFFFF', hot:'rgba(255,255,255,0.85)', deep:'#0A0A0A', softRgba:'255,255,255' };
+export const CLEAN_THEME_LIGHT = { id:'clean-light', name:'Clean Light', sub:'paper',       light:'#0A0A0A', hot:'rgba(10,10,10,0.85)',    deep:'#F5F0E8', softRgba:'10,10,10' };
 export const DEFAULT_THEME = 'dusk';
 
 export function useTheme() {
+  if (typeof window !== 'undefined' && window.__archiveDynamicThemes === false) {
+    return window.__archiveLight ? CLEAN_THEME_LIGHT : CLEAN_THEME_DARK;
+  }
   return THEMES[(typeof window !== 'undefined' && window.__archiveTheme) || DEFAULT_THEME];
 }
 

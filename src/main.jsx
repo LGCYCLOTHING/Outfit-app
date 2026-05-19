@@ -75,6 +75,19 @@ if (typeof window !== 'undefined') {
     window.__archiveLight = true;
   }
   window.__archiveTheme = window.__archiveTheme || 'dusk';
+  // Dynamic Themes toggle — when false, the app drops gradient backgrounds and
+  // switches to a clean white/black mode. Default ON.
+  try {
+    const raw = localStorage.getItem('aevum_dynamic_themes');
+    window.__archiveDynamicThemes = raw == null ? true : raw === 'true';
+  } catch (e) { window.__archiveDynamicThemes = true; }
+  // Apply the initial body classes so first paint is right.
+  try {
+    if (!window.__archiveDynamicThemes) {
+      document.body.classList.add('aevum-clean');
+      if (window.__archiveLight) document.body.classList.add('aevum-clean-light');
+    }
+  } catch (e) {}
   try {
     if ((location.search + location.hash).match(/[?&#]empty(=1)?\b/)) {
       window.__archiveEmpty = true;

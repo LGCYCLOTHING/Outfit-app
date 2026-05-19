@@ -92,6 +92,23 @@ export default function ScreenYou() {
     window.dispatchEvent(new CustomEvent('archive:lightchange'));
   };
 
+  // Dynamic Themes toggle — when OFF, the app renders clean mode (white text on
+  // black for dark, dark text on warm cream for light) and the 6 gradient
+  // swatches are hidden. Default ON.
+  const [dynamicOn, setDynamicOn] = React.useState(() => {
+    try {
+      const raw = localStorage.getItem('aevum_dynamic_themes');
+      return raw == null ? true : raw === 'true';
+    } catch (e) { return true; }
+  });
+  const toggleDynamic = () => {
+    const next = !dynamicOn;
+    setDynamicOn(next);
+    try { localStorage.setItem('aevum_dynamic_themes', String(next)); } catch (e) {}
+    window.__archiveDynamicThemes = next;
+    window.dispatchEvent(new CustomEvent('archive:cleanchange'));
+  };
+
   return (
     <div style={{
       width: '100%', height: '100%', position: 'relative', overflow: 'hidden',
@@ -202,7 +219,48 @@ export default function ScreenYou() {
           </span>
         </div>
 
-        <div style={{
+        {/* Dynamic Themes toggle — gates the swatch grid below it */}
+        <div
+          onClick={toggleDynamic}
+          className="archive-pressable"
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '14px 16px', borderRadius: 14,
+            background: 'rgba(255,240,220,0.04)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,240,220,0.07)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
+            marginBottom: 14, cursor: 'pointer',
+          }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{
+              fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: -0.2,
+            }}>Dynamic Themes</div>
+            <div style={{
+              fontSize: 11.5, color: 'var(--text-secondary)', marginTop: 2,
+            }}>
+              Atmospheric gradient backgrounds
+            </div>
+          </div>
+          {/* iOS-style toggle */}
+          <div style={{
+            position: 'relative', width: 44, height: 26, borderRadius: 13,
+            background: dynamicOn ? accent : 'rgba(255,255,255,0.15)',
+            transition: 'background .25s ease',
+            flexShrink: 0,
+          }}>
+            <div style={{
+              position: 'absolute', top: 2, left: dynamicOn ? 20 : 2,
+              width: 22, height: 22, borderRadius: 11,
+              background: '#FFFFFF',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+              transition: 'left .25s cubic-bezier(.16,1,.3,1)',
+            }} />
+          </div>
+        </div>
+
+        {dynamicOn && (<div style={{
           display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10,
           marginBottom: 18,
         }}>
@@ -272,7 +330,7 @@ export default function ScreenYou() {
               </div>
             );
           })}
-        </div>
+        </div>)}
 
         {/* App icon — tucked into Appearance as a single expandable row, since
            people change theme often but rarely the icon */}

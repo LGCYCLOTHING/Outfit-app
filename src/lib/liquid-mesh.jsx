@@ -17,15 +17,20 @@ function parseVariant(key) {
 export default function LiquidMesh({ seed = 0, intensity = 1 }) {
   const initialTheme = (typeof window !== 'undefined' && window.__archiveTheme) || 'dusk';
   const initialLight = typeof window !== 'undefined' && !!window.__archiveLight;
+  const initialClean = typeof window !== 'undefined' && window.__archiveDynamicThemes === false;
   const [current, setCurrent] = React.useState(variantKey(initialTheme, initialLight));
   const [previous, setPrevious] = React.useState(null);
+  const [clean, setClean] = React.useState(initialClean);
+  const [cleanLight, setCleanLight] = React.useState(initialLight);
 
-  // One handler covers both: theme change AND dark/light flip.
-  // Builds the next variant key, crossfades if it differs from the current.
+  // One handler covers theme change, dark/light flip, AND clean-mode toggle.
   React.useEffect(() => {
     const handler = () => {
       const theme = (typeof window !== 'undefined' && window.__archiveTheme) || 'dusk';
       const light = typeof window !== 'undefined' && !!window.__archiveLight;
+      const isClean = typeof window !== 'undefined' && window.__archiveDynamicThemes === false;
+      setClean(isClean);
+      setCleanLight(light);
       const next = variantKey(theme, light);
       setCurrent(prev => {
         if (next === prev) return prev;
@@ -36,9 +41,11 @@ export default function LiquidMesh({ seed = 0, intensity = 1 }) {
     };
     window.addEventListener('archive:themechange', handler);
     window.addEventListener('archive:lightchange', handler);
+    window.addEventListener('archive:cleanchange', handler);
     return () => {
       window.removeEventListener('archive:themechange', handler);
       window.removeEventListener('archive:lightchange', handler);
+      window.removeEventListener('archive:cleanchange', handler);
     };
   }, []);
 
@@ -72,6 +79,33 @@ export default function LiquidMesh({ seed = 0, intensity = 1 }) {
   };
 
   const { light: currentLight } = parseVariant(current);
+
+  // CLEAN MODE — replace the theme image stack with a flat fill plus a subtle
+  // pattern overlay (dot grid for dark, noise grain for light). No crossfade
+  // between theme variants here; the only transition is dark <-> light, which
+  // is handled by swapping `background` on this container.
+  if (clean) {
+    return (
+      <div data-liquid-mesh="true" data-clean="true" style={{
+        position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none',
+        background: cleanLight ? '#F5F0E8' : '#0A0A0A',
+        transition: 'background 320ms ease',
+      }}>
+        <style>{keyframes}</style>
+        {/* Pattern overlay — dot grid (dark) or noise grain (light) */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: cleanLight
+            ? `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")`
+            : `radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)`,
+          backgroundSize: cleanLight ? '220px 220px' : '24px 24px',
+          opacity: 0.04,
+          mixBlendMode: cleanLight ? 'multiply' : 'normal',
+          pointerEvents: 'none',
+        }} />
+      </div>
+    );
+  }
 
   return (
     <div data-liquid-mesh="true" style={{
