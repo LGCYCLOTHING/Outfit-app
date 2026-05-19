@@ -139,6 +139,33 @@ export default function ScreenToday() {
     return () => cancelAnimationFrame(r);
   }, [fitScore.score]);
 
+  // Scroll-driven collapse of the Fit Score gauge. Tracks the Today scroll
+  // container's scrollTop and exposes a 0–1 progress that drives all the
+  // gauge interpolation below.
+  const scrollContainerRef = React.useRef(null);
+  const [collapseT, setCollapseT] = React.useState(0);
+  React.useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const y = el.scrollTop;
+        const p = Math.max(0, Math.min(1, y / 120));
+        // cubic-bezier(0.25, 0.1, 0.25, 1) → ease-out approximation
+        const eased = 1 - Math.pow(1 - p, 3);
+        setCollapseT(eased);
+      });
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      el.removeEventListener('scroll', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   // Per-PHOTO like state. The set holds composite keys like "2026-05-18#0"
   // so multiple photos on the same day can be liked individually (a bare
   // "2026-05-18" is treated as legacy = the first photo).
@@ -333,7 +360,7 @@ export default function ScreenToday() {
 
       <StatusBar />
 
-      <div style={{ position: 'absolute', zIndex: 2, top: 'var(--archive-safe-top, 54px)', left: 0, right: 0, bottom: 0, padding: '12px 28px calc(120px + var(--archive-safe-bottom, 0px))', overflow: 'auto', boxSizing: 'border-box' }}>
+      <div ref={scrollContainerRef} style={{ position: 'absolute', zIndex: 2, top: 'var(--archive-safe-top, 54px)', left: 0, right: 0, bottom: 0, padding: '12px 28px calc(120px + var(--archive-safe-bottom, 0px))', overflow: 'auto', boxSizing: 'border-box' }}>
         {/* ── Top bar — hamburger (left) · TODAY pill (absolute-centered) · streak (right) ── */}
         <div style={{
           position: 'relative',
@@ -892,92 +919,161 @@ export default function ScreenToday() {
           </div>
         }
 
-        {/* ── Fit Score gauge — compact, no card wrapper ── */}
+        {/* ── Fit Score gauge — sticky collapsing on scroll ── */}
         {(() => {
           const score = fitScore.score;
-          const R = 58, STROKE = 11;
-          const PAD = STROKE / 2 + 3;
-          const cx = R + PAD;
-          const cy = R + PAD;
-          const vbW = cx * 2;
-          const vbH = cy + STROKE / 2 + 2;
-          const fullLen = Math.PI * R;
-          const p = gaugeProgress;
-          const angle = Math.PI * (1 - p);
-          const dotX = cx + R * Math.cos(angle);
-          const dotY = cy - R * Math.sin(angle);
-          const arcD = `M ${cx - R} ${cy} A ${R} ${R} 0 0 1 ${cx + R} ${cy}`;
-          const ease = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
+          const tier = scoreTier(score);
+          const tierLabel = scoreLabel(score);
+          const p = gaugeProgress;     // arc fill (0–1)
+          const t = collapseT;         // scroll collapse (0–1, eased)
+          const lerp = (a, b, v) => a + (b - a) * v;
+
+          // Expanded gauge geometry (R=80 → 200-ish wide, generous card)
+          const BIG_R = 80, BIG_STROKE = 14, BIG_PAD = BIG_STROKE / 2 + 4;
+          const Bcx = BIG_R + BIG_PAD, Bcy = BIG_R + BIG_PAD;
+          const BvbW = Bcx * 2, BvbH = Bcy + BIG_STROKE / 2 + 4;
+          const BfullLen = Math.PI * BIG_R;
+          const Bangle = Math.PI * (1 - p);
+          const BdotX = Bcx + BIG_R * Math.cos(Bangle);
+          const BdotY = Bcy - BIG_R * Math.sin(Bangle);
+          const BarcD = `M ${Bcx - BIG_R} ${Bcy} A ${BIG_R} ${BIG_R} 0 0 1 ${Bcx + BIG_R} ${Bcy}`;
+
+          // Collapsed gauge geometry (R=22 → 60-wide compact)
+          const SM_R = 22, SM_STROKE = 5, SM_PAD = SM_STROKE / 2 + 2;
+          const Scx = SM_R + SM_PAD, Scy = SM_R + SM_PAD;
+          const SvbW = Scx * 2, SvbH = Scy + SM_STROKE / 2 + 2;
+          const SfullLen = Math.PI * SM_R;
+          const Sangle = Math.PI * (1 - p);
+          const SdotX = Scx + SM_R * Math.cos(Sangle);
+          const SdotY = Scy - SM_R * Math.sin(Sangle);
+          const SarcD = `M ${Scx - SM_R} ${Scy} A ${SM_R} ${SM_R} 0 0 1 ${Scx + SM_R} ${Scy}`;
+
+          const wrapperPadY  = lerp(20, 6, t);
+          const wrapperPadX  = lerp(20, 14, t);
+          const wrapperRad   = lerp(20, 0, t);
+          const wrapperMarginX = lerp(0, -28, t); // pull edge-to-edge in scroll container
+          const cardBgAlpha  = lerp(0.04, 0.08, t);
+          const cardBorder   = `1px solid rgba(255,240,220,${lerp(0.07, 0.10, t).toFixed(3)})`;
+
           return (
             <div
               onClick={() => window.__archiveGo && window.__archiveGo('fitscore')}
               className="archive-pressable"
               style={{
-                marginTop: 10, marginBottom: 6,
+                position: 'sticky',
+                top: 0,
+                zIndex: 5,
+                marginTop: 10,
+                marginInline: `${wrapperMarginX}px`,
+                padding: `${wrapperPadY}px ${wrapperPadX}px`,
+                borderRadius: wrapperRad,
+                background: `rgba(255,240,220,${cardBgAlpha.toFixed(3)})`,
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: cardBorder,
+                boxShadow: tier === 'glow'
+                  ? `0 4px 16px rgba(0,0,0,0.22), 0 0 32px -4px rgba(${accentRgba},${0.30 * (1 - t)})`
+                  : '0 4px 16px rgba(0,0,0,0.22)',
                 cursor: 'pointer',
+                willChange: 'padding, margin, border-radius',
               }}>
-              <div style={{ position: 'relative', width: 170, margin: '0 auto' }}>
-                <svg viewBox={`0 0 ${vbW} ${vbH}`} style={{ width: '100%', display: 'block', overflow: 'visible' }}>
+
+              {/* Expanded layer */}
+              <div style={{
+                opacity: 1 - Math.min(1, t * 1.3),
+                pointerEvents: t > 0.5 ? 'none' : 'auto',
+                position: t > 0.5 ? 'absolute' : 'relative',
+                inset: t > 0.5 ? 0 : undefined,
+              }}>
+                <div style={{ position: 'relative', width: '100%', maxWidth: 240, margin: '0 auto' }}>
+                  <svg viewBox={`0 0 ${BvbW} ${BvbH}`} style={{ width: '100%', display: 'block', overflow: 'visible' }}>
+                    <defs>
+                      <linearGradient id="fit-gauge-grad-big" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%"  stopColor="rgba(255,255,255,0.22)" />
+                        <stop offset="55%" stopColor={accent} stopOpacity="0.85" />
+                        <stop offset="100%" stopColor={accent} />
+                      </linearGradient>
+                    </defs>
+                    <path d={BarcD} stroke="rgba(255,255,255,0.10)" strokeWidth={BIG_STROKE} strokeLinecap="round" fill="none" />
+                    <path d={BarcD}
+                      stroke="url(#fit-gauge-grad-big)"
+                      strokeWidth={BIG_STROKE}
+                      strokeLinecap="round"
+                      fill="none"
+                      strokeDasharray={BfullLen}
+                      strokeDashoffset={BfullLen - BfullLen * p}
+                      style={{
+                        filter: `drop-shadow(0 0 6px ${accent})`,
+                        transition: 'stroke-dashoffset 1200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+                      }}
+                    />
+                    <circle cx={BdotX} cy={BdotY} r={BIG_STROKE / 2 - 1.5} fill="#fff"
+                      style={{
+                        filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.35))',
+                        transition: 'cx 1200ms cubic-bezier(0.34, 1.56, 0.64, 1), cy 1200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+                      }} />
+                  </svg>
+                  <div style={{
+                    position: 'absolute', left: 0, right: 0,
+                    top: `${(Bcy - 14) / BvbH * 100}%`,
+                    transform: 'translateY(-50%)',
+                    textAlign: 'center', pointerEvents: 'none',
+                  }}>
+                    <div style={{
+                      fontSize: 48, fontWeight: 700, color: '#fff',
+                      letterSpacing: -1.8, lineHeight: 1,
+                      fontFamily: '"DM Sans", -apple-system, system-ui, sans-serif',
+                    }}>{score}</div>
+                    <div style={{
+                      fontSize: 10, color: 'rgba(255,255,255,0.55)',
+                      letterSpacing: 2.4, fontWeight: 500, marginTop: 6,
+                      fontFamily: '"DM Sans", sans-serif',
+                    }}>FIT SCORE</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Collapsed layer — small arc + score + label in a row */}
+              <div style={{
+                opacity: Math.max(0, (t - 0.4) / 0.6),
+                pointerEvents: t > 0.5 ? 'auto' : 'none',
+                position: t > 0.5 ? 'relative' : 'absolute',
+                inset: t > 0.5 ? undefined : 0,
+                display: 'flex', alignItems: 'center', gap: 10,
+                minHeight: 36,
+              }}>
+                <svg width={SvbW} height={SvbH} viewBox={`0 0 ${SvbW} ${SvbH}`} style={{ overflow: 'visible', flexShrink: 0 }}>
                   <defs>
-                    <linearGradient id="fit-gauge-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <linearGradient id="fit-gauge-grad-sm" x1="0%" y1="0%" x2="100%" y2="0%">
                       <stop offset="0%"  stopColor="rgba(255,255,255,0.22)" />
                       <stop offset="55%" stopColor={accent} stopOpacity="0.85" />
                       <stop offset="100%" stopColor={accent} />
                     </linearGradient>
                   </defs>
-                  <path
-                    d={arcD}
-                    stroke="rgba(255,255,255,0.10)"
-                    strokeWidth={STROKE}
+                  <path d={SarcD} stroke="rgba(255,255,255,0.10)" strokeWidth={SM_STROKE} strokeLinecap="round" fill="none" />
+                  <path d={SarcD}
+                    stroke="url(#fit-gauge-grad-sm)"
+                    strokeWidth={SM_STROKE}
                     strokeLinecap="round"
                     fill="none"
+                    strokeDasharray={SfullLen}
+                    strokeDashoffset={SfullLen - SfullLen * p}
+                    style={{ filter: `drop-shadow(0 0 3px ${accent})` }}
                   />
-                  <path
-                    d={arcD}
-                    stroke="url(#fit-gauge-grad)"
-                    strokeWidth={STROKE}
-                    strokeLinecap="round"
-                    fill="none"
-                    strokeDasharray={fullLen}
-                    strokeDashoffset={fullLen - fullLen * p}
-                    style={{
-                      filter: `drop-shadow(0 0 4px ${accent})`,
-                      transition: `stroke-dashoffset 1200ms ${ease}`,
-                    }}
-                  />
-                  <circle
-                    cx={dotX}
-                    cy={dotY}
-                    r={STROKE / 2 - 1.5}
-                    fill="#fff"
-                    style={{
-                      filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.35))',
-                      transition: `cx 1200ms ${ease}, cy 1200ms ${ease}`,
-                    }}
-                  />
+                  <circle cx={SdotX} cy={SdotY} r={SM_STROKE / 2 - 0.5} fill="#fff" />
                 </svg>
                 <div style={{
-                  position: 'absolute',
-                  left: 0, right: 0,
-                  top: `${(cy - 8) / vbH * 100}%`,
-                  transform: 'translateY(-50%)',
-                  textAlign: 'center',
-                  pointerEvents: 'none',
+                  fontSize: 18, fontWeight: 700, color: '#fff',
+                  letterSpacing: -0.6, lineHeight: 1,
+                  fontFamily: '"DM Sans", sans-serif',
+                }}>{score}</div>
+                <div style={{
+                  fontSize: 10, color: 'rgba(255,255,255,0.62)',
+                  letterSpacing: 1.6, fontWeight: 500,
+                  fontFamily: '"DM Sans", sans-serif',
+                  textTransform: 'uppercase',
                 }}>
-                  <div style={{
-                    fontSize: 28, fontWeight: 700, color: '#fff',
-                    letterSpacing: -1, lineHeight: 1,
-                    fontFamily: '"DM Sans", -apple-system, system-ui, sans-serif',
-                  }}>
-                    {score}
-                  </div>
-                  <div style={{
-                    fontSize: 8.5, color: 'rgba(255,255,255,0.55)',
-                    letterSpacing: 2, fontWeight: 500, marginTop: 3,
-                    fontFamily: '"DM Sans", sans-serif',
-                  }}>
-                    FIT SCORE
-                  </div>
+                  Fit Score · {tierLabel}
                 </div>
               </div>
             </div>
