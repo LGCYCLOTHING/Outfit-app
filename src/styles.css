@@ -389,9 +389,13 @@ html, body { height: 100%; }
   font-family: 'DM Sans', -apple-system, system-ui, sans-serif;
   pointer-events: none;
 }
-/* Instant tab switching — no transition */
+/* Slide-in from the right when navigating to a new screen.
+   Old screen fades out (handled by opacity transition); the new screen
+   plays the slide keyframe on activation. Screens with their own custom
+   transition (Rating modal, Story takeover) opt out via data-slide="no". */
 .screen-wrap {
   position: absolute; inset: 0;
+  transition: opacity 220ms ease;
 }
 .screen-wrap.hidden {
   opacity: 0;
@@ -401,6 +405,14 @@ html, body { height: 100%; }
 .screen-wrap:not(.hidden) {
   visibility: visible;
   opacity: 1;
+}
+.screen-wrap:not(.hidden)[data-slide="yes"] {
+  animation: archive-screen-in 340ms cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 2;
+}
+@keyframes archive-screen-in {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
 }
 
 /* Kill italic globally — applies to <em>, <i>, and anything with inline fontStyle italic */

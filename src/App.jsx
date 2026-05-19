@@ -335,11 +335,20 @@ export default function App() {
   return (
     <>
       <div style={{ position: 'absolute', inset: 0 }}>
-        {Object.keys(screens).map(id => (
-          <div key={id} className={'screen-wrap archive-screen' + ((screen === id || (screen === 'rating' && id === 'today')) ? '' : ' hidden')}>
-            {screens[id]}
-          </div>
-        ))}
+        {Object.keys(screens).map(id => {
+          const visible = screen === id || (screen === 'rating' && id === 'today');
+          // Screens with their own custom entrance/dismiss flow opt out of the
+          // global slide-in-from-right transition.
+          const NO_SLIDE = new Set(['rating', 'story', 'splash', 'onboarding']);
+          const slide = !NO_SLIDE.has(id) ? 'yes' : 'no';
+          return (
+            <div key={id}
+              data-slide={slide}
+              className={'screen-wrap archive-screen' + (visible ? '' : ' hidden')}>
+              {screens[id]}
+            </div>
+          );
+        })}
       </div>
       <FloatingNav current={screen} go={go} />
     </>
