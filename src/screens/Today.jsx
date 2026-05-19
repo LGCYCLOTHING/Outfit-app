@@ -932,12 +932,7 @@ export default function ScreenToday() {
           const STROKE  = lerp(14, 5, t);
           const NUM     = lerp(48, 16, t);
           const LABEL   = lerp(10, 0, t);          // fades to 0
-          const PAD_Y   = lerp(20, 6, t);
-          const PAD_X   = lerp(20, 14, t);
-          const RADIUS  = lerp(20, 0, t);
-          const MARGIN_X = lerp(0, -28, t);        // pull edge-to-edge when locked
-          const BG_A    = lerp(0.04, 0.08, t);
-          const BORDER_A = lerp(0.07, 0.10, t);
+          const PAD_Y   = lerp(8, 2, t);
           const GAP     = lerp(6, 0, t);           // gap below the arc
           const SVG_MAX = lerp(240, 60, t);        // gauge SVG max-width
 
@@ -962,18 +957,8 @@ export default function ScreenToday() {
                 top: 0,
                 zIndex: 5,
                 marginTop: 10,
-                marginInline: `${MARGIN_X}px`,
-                padding: `${PAD_Y}px ${PAD_X}px`,
-                borderRadius: RADIUS,
-                background: `rgba(255,240,220,${BG_A.toFixed(3)})`,
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                border: `1px solid rgba(255,240,220,${BORDER_A.toFixed(3)})`,
-                boxShadow: tier === 'glow'
-                  ? `0 4px 16px rgba(0,0,0,0.22), 0 0 32px -4px rgba(${accentRgba},${(0.30 * (1 - t)).toFixed(3)})`
-                  : '0 4px 16px rgba(0,0,0,0.22)',
+                padding: `${PAD_Y}px 0`,
                 cursor: 'pointer',
-                willChange: 'padding, margin, border-radius',
               }}>
               <div style={{
                 position: 'relative',
