@@ -390,9 +390,11 @@ export default function ScreenPieces() {
         <StatusBar />
 
         <div style={{
-          position: 'relative', zIndex: 2,
-          padding: 'calc(36px + var(--archive-safe-top, 54px)) 24px calc(120px + var(--archive-safe-bottom, 0px))',
-          height: '100%', overflow: 'auto', boxSizing: 'border-box',
+          position: 'absolute', zIndex: 2,
+          top: 'calc(var(--archive-safe-top, 54px) + 24px)',
+          left: 0, right: 0, bottom: 0,
+          padding: '0 24px calc(120px + var(--archive-safe-bottom, 0px))',
+          overflow: 'auto', boxSizing: 'border-box',
           display: 'flex', flexDirection: 'column',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
@@ -506,7 +508,7 @@ export default function ScreenPieces() {
 
       <div style={{
         position: 'relative', zIndex: 2,
-        padding: 'calc(36px + var(--archive-safe-top, 54px)) 0 calc(120px + var(--archive-safe-bottom, 0px))',
+        position: 'absolute', zIndex: 2, top: 'calc(var(--archive-safe-top, 54px) + 24px)', left: 0, right: 0, bottom: 0, padding: '0 0 calc(120px + var(--archive-safe-bottom, 0px))',
         height: '100%', overflow: 'auto', boxSizing: 'border-box',
       }}>
         {/* Header */}

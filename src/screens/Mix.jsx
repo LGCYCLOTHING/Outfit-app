@@ -161,7 +161,7 @@ export default function ScreenMix() {
 
       <StatusBar />
 
-      <div style={{ position: 'relative', zIndex: 2, padding: 'calc(36px + var(--archive-safe-top, 54px)) 24px calc(120px + var(--archive-safe-bottom, 0px))', height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
+      <div style={{ position: 'absolute', zIndex: 2, top: 'calc(var(--archive-safe-top, 54px) + 24px)', left: 0, right: 0, bottom: 0, padding: '0 24px calc(120px + var(--archive-safe-bottom, 0px))', overflow: 'auto', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 6 }}>
           <ArchiveBurger />
           <div style={{ width: 3, height: 14, borderRadius: 1.5, background: accent }} />
