@@ -283,8 +283,13 @@ export default function App() {
   const [ratingVisit, setRatingVisit] = React.useState(0);
   // When the Rating modal is open, keep the previous screen visible behind it.
   const [modalBgScreen, setModalBgScreen] = React.useState(null);
+  // One-shot flag — set by callers (e.g. the bottom nav bar) that want the
+  // next navigation to skip the slide-in-from-right animation. Cleared after
+  // the render commits.
+  const noSlideOnceRef = React.useRef(false);
 
-  const go = React.useCallback((id) => {
+  const go = React.useCallback((id, opts) => {
+    if (opts && opts.noSlide) noSlideOnceRef.current = true;
     if (id === 'rating') {
       setRatingVisit(v => v + 1);
       // Remember whatever screen we came from so it stays visible underneath
@@ -304,6 +309,12 @@ export default function App() {
     }
   }, []);
   React.useEffect(() => { window.__archiveGo = go; }, [go]);
+
+  // Clear the one-shot no-slide flag after the screen change has rendered, so
+  // the next navigation gets the slide unless it explicitly opts out again.
+  React.useEffect(() => {
+    noSlideOnceRef.current = false;
+  }, [screen]);
 
   // Multi-step onboarding flow: splash → onboarding → auth → paywall → today (empty)
   const goOnboarding = React.useCallback(() => setScreen('onboarding'), []);
@@ -344,9 +355,10 @@ export default function App() {
         {Object.keys(screens).map(id => {
           const visible = screen === id || (screen === 'rating' && id === 'today');
           // Screens with their own custom entrance/dismiss flow opt out of the
-          // global slide-in-from-right transition.
+          // global slide-in-from-right transition. The bottom tab bar also
+          // sets noSlideOnceRef so tab switches don't slide.
           const NO_SLIDE = new Set(['rating', 'story', 'splash', 'onboarding']);
-          const slide = !NO_SLIDE.has(id) ? 'yes' : 'no';
+          const slide = (!NO_SLIDE.has(id) && !noSlideOnceRef.current) ? 'yes' : 'no';
           return (
             <div key={id}
               data-slide={slide}

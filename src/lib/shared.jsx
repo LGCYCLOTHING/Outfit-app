@@ -620,7 +620,10 @@ export function TabBar({ active = 'today', theme }) {
   const onClickItem = (idx) => {
     // Suppress click if we just finished a drag
     if (dragActive || absorbIdx !== null) return;
-    typeof window !== 'undefined' && window.__archiveGo && window.__archiveGo(items[idx].id);
+    // Tab-bar navigation skips the global slide-in transition — only Log opens
+    // its own modal flow and keeps its own animation.
+    const noSlide = items[idx].id !== 'rating';
+    typeof window !== 'undefined' && window.__archiveGo && window.__archiveGo(items[idx].id, { noSlide });
   };
 
   // Global pointer-move + pointer-up while drag active
@@ -637,7 +640,8 @@ export function TabBar({ active = 'today', theme }) {
       if (target !== null) {
         setAbsorbIdx(target);
         setTimeout(() => {
-          typeof window !== 'undefined' && window.__archiveGo && window.__archiveGo(items[target].id);
+          const noSlide = items[target].id !== 'rating';
+          typeof window !== 'undefined' && window.__archiveGo && window.__archiveGo(items[target].id, { noSlide });
           setAbsorbIdx(null);
         }, 220);
       }
