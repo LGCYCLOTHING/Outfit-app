@@ -391,7 +391,7 @@ export default function ScreenPieces() {
 
         <div style={{
           position: 'relative', zIndex: 2,
-          padding: 'calc(20px + var(--archive-safe-top, 54px)) 24px calc(120px + var(--archive-safe-bottom, 0px))',
+          padding: 'calc(36px + var(--archive-safe-top, 54px)) 24px calc(120px + var(--archive-safe-bottom, 0px))',
           height: '100%', overflow: 'auto', boxSizing: 'border-box',
           display: 'flex', flexDirection: 'column',
         }}>
@@ -506,7 +506,7 @@ export default function ScreenPieces() {
 
       <div style={{
         position: 'relative', zIndex: 2,
-        padding: 'calc(20px + var(--archive-safe-top, 54px)) 0 calc(120px + var(--archive-safe-bottom, 0px))',
+        padding: 'calc(36px + var(--archive-safe-top, 54px)) 0 calc(120px + var(--archive-safe-bottom, 0px))',
         height: '100%', overflow: 'auto', boxSizing: 'border-box',
       }}>
         {/* Header */}
