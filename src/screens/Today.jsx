@@ -361,11 +361,17 @@ export default function ScreenToday() {
       <StatusBar />
 
       <div ref={scrollContainerRef} style={{ position: 'absolute', zIndex: 2, top: 'var(--archive-safe-top, 54px)', left: 0, right: 0, bottom: 0, padding: '12px 28px calc(120px + var(--archive-safe-bottom, 0px))', overflow: 'auto', boxSizing: 'border-box' }}>
-        {/* ── Top bar — hamburger (left) · TODAY pill (absolute-centered) · streak (right) ── */}
+        {/* ── Top bar — hamburger (left) · TODAY pill (absolute-centered) · streak (right) ──
+            Fades + lifts as the user scrolls past the gauge so it gets out of the way of
+            the pinned compact score. Reappears smoothly when they scroll back up. */}
         <div style={{
           position: 'relative',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           marginBottom: 14, minHeight: 36,
+          opacity: 1 - Math.min(1, collapseT * 1.5),
+          transform: `translateY(${-Math.min(1, collapseT * 1.5) * 8}px)`,
+          pointerEvents: collapseT > 0.6 ? 'none' : 'auto',
+          willChange: 'opacity, transform',
         }}>
           {/* Hamburger */}
           <div
@@ -932,9 +938,12 @@ export default function ScreenToday() {
           const STROKE  = lerp(14, 5, t);
           const NUM     = lerp(48, 16, t);
           const LABEL   = lerp(10, 0, t);          // fades to 0
-          const PAD_Y   = lerp(8, 2, t);
+          const PAD_Y   = lerp(8, 8, t);
           const GAP     = lerp(6, 0, t);           // gap below the arc
           const SVG_MAX = lerp(240, 60, t);        // gauge SVG max-width
+          // Full-width blurred bar appears as the gauge becomes pinned so
+          // scrolled content doesn't bleed through behind the score.
+          const BAR_BG_A = lerp(0, 0.55, Math.min(1, t * 1.4));
 
           // Arc geometry — derives from the interpolated R / STROKE.
           const SPAD = STROKE / 2 + 4;
@@ -957,8 +966,16 @@ export default function ScreenToday() {
                 top: 0,
                 zIndex: 5,
                 marginTop: 10,
-                padding: `${PAD_Y}px 0`,
+                marginInline: -28, // extend edge-to-edge across the scroll container
+                padding: `${PAD_Y}px 28px`,
                 cursor: 'pointer',
+                background: `rgba(10,8,6,${BAR_BG_A.toFixed(3)})`,
+                backdropFilter: t > 0.05 ? `blur(${lerp(0, 22, t).toFixed(1)}px) saturate(180%)` : 'none',
+                WebkitBackdropFilter: t > 0.05 ? `blur(${lerp(0, 22, t).toFixed(1)}px) saturate(180%)` : 'none',
+                borderBottom: t > 0.6
+                  ? '0.5px solid rgba(255,255,255,0.06)'
+                  : '0.5px solid transparent',
+                willChange: 'background, backdrop-filter',
               }}>
               <div style={{
                 position: 'relative',
