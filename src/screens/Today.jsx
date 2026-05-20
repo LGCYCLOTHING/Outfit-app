@@ -199,6 +199,19 @@ export default function ScreenToday() {
   // ── Today's fit carousel — scroll-driven active dot ──
   const [picksIdx, setPicksIdx] = React.useState(0);
   const picksRowRef = React.useRef(null);
+
+  // ── Scroll-driven collapse for the sticky top bar (hamburger / TODAY pill /
+  // streak). 0 = fully expanded, 1 = fully collapsed. Saturates over the first
+  // 90px of scroll — quick enough to feel responsive, long enough to be smooth.
+  const scrollRef = React.useRef(null);
+  const [collapseT, setCollapseT] = React.useState(0);
+  const onContentScroll = React.useCallback((e) => {
+    const y = e.currentTarget.scrollTop || 0;
+    const t = Math.max(0, Math.min(1, y / 90));
+    setCollapseT(prev => (Math.abs(prev - t) < 0.005 ? prev : t));
+  }, []);
+  // Linear-interp helper for the collapse calcs below
+  const lerp = (a, b) => a + (b - a) * collapseT;
   const onPicksScroll = React.useCallback((e) => {
     const el = e.currentTarget;
     const viewportCenter = el.scrollLeft + el.clientWidth / 2;
@@ -333,25 +346,35 @@ export default function ScreenToday() {
 
       <StatusBar />
 
-      <div style={{ position: 'absolute', zIndex: 2, top: 'var(--archive-safe-top, 54px)', left: 0, right: 0, bottom: 0, padding: '12px 28px calc(120px + var(--archive-safe-bottom, 0px))', overflow: 'auto', boxSizing: 'border-box' }}>
-        {/* ── Top bar — hamburger (left) · TODAY pill (absolute-centered) · streak (right) ── */}
+      <div ref={scrollRef} onScroll={onContentScroll} style={{ position: 'absolute', zIndex: 2, top: 'var(--archive-safe-top, 54px)', left: 0, right: 0, bottom: 0, padding: '0 28px calc(120px + var(--archive-safe-bottom, 0px))', overflow: 'auto', boxSizing: 'border-box' }}>
+        {/* ── Top bar — hamburger (left) · TODAY pill (absolute-centered) · streak (right) ──
+            Sticky so it stays pinned at the top while the content scrolls. Pill +
+            streak shrink with `collapseT` (driven by onContentScroll). */}
         <div style={{
-          position: 'relative',
+          position: 'sticky', top: 0, zIndex: 10,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          marginBottom: 14, minHeight: 36,
+          paddingTop: lerp(12, 6), paddingBottom: lerp(10, 6),
+          marginBottom: 8,
+          // Glass backdrop fades in as the bar pins so scrolled content
+          // doesn't bleed through behind hamburger / TODAY pill / streak.
+          background: `rgba(0,0,0,${0.32 * collapseT})`,
+          backdropFilter: `blur(${14 * collapseT}px) saturate(${1 + 0.4 * collapseT})`,
+          WebkitBackdropFilter: `blur(${14 * collapseT}px) saturate(${1 + 0.4 * collapseT})`,
+          marginLeft: -28, marginRight: -28, paddingLeft: 28, paddingRight: 28,
+          transition: 'background .15s linear',
         }}>
           {/* Hamburger */}
           <div
             onClick={() => window.__archiveToggleNav && window.__archiveToggleNav()}
             className="archive-pressable"
             style={{
-              width: 24, height: 22,
-              display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 5,
+              width: lerp(24, 20), height: lerp(22, 18),
+              display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: lerp(5, 3.5),
               cursor: 'pointer', flexShrink: 0,
             }}>
-            <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: 'var(--text-primary)' }} />
-            <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: 'var(--text-primary)' }} />
-            <div style={{ width: 22, height: 2.5, borderRadius: 1.5, background: 'var(--text-primary)' }} />
+            <div style={{ width: lerp(22, 18), height: lerp(2.5, 2), borderRadius: 1.5, background: 'var(--text-primary)' }} />
+            <div style={{ width: lerp(22, 18), height: lerp(2.5, 2), borderRadius: 1.5, background: 'var(--text-primary)' }} />
+            <div style={{ width: lerp(22, 18), height: lerp(2.5, 2), borderRadius: 1.5, background: 'var(--text-primary)' }} />
           </div>
 
           {/* TODAY pill — rounded-rectangle outer with a raised inner button.
@@ -360,7 +383,7 @@ export default function ScreenToday() {
             position: 'absolute', left: '50%', top: '50%',
             transform: 'translate(-50%, -50%)',
             display: 'flex', alignItems: 'center',
-            padding: '4px 6px', borderRadius: 14,
+            padding: `${lerp(4, 2)}px ${lerp(6, 4)}px`, borderRadius: lerp(14, 12),
             background: 'rgba(18,16,14,0.72)',
             border: '0.5px solid rgba(255,255,255,0.08)',
             boxShadow:
@@ -371,35 +394,35 @@ export default function ScreenToday() {
           }}>
             {/* Prev — yesterday */}
             <div onClick={goPrevDay} className="archive-pressable" style={{
-              width: 20, height: 28,
+              width: lerp(20, 16), height: lerp(28, 22),
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
             }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round">
+              <svg width={lerp(14, 11)} height={lerp(14, 11)} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M15 6l-6 6 6 6"/>
               </svg>
             </div>
             {/* TODAY — raised, slightly-rounded button */}
             <div onClick={() => setCalOpen(o => !o)} className="archive-pressable" style={{
-              padding: '7px 14px', borderRadius: 10,
-              margin: '0 4px',
+              padding: `${lerp(7, 5)}px ${lerp(14, 10)}px`, borderRadius: lerp(10, 8),
+              margin: `0 ${lerp(4, 3)}px`,
               background: 'linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.06) 100%)',
               boxShadow:
                 'inset 0 0.5px 0 rgba(255,255,255,0.30), ' +
                 'inset 0 -0.5px 0 rgba(0,0,0,0.20), ' +
                 '0 1px 2px rgba(0,0,0,0.35)',
-              fontSize: 11, fontWeight: 700, letterSpacing: 1.4, color: '#fff',
+              fontSize: lerp(11, 9.5), fontWeight: 700, letterSpacing: lerp(1.4, 1.1), color: '#fff',
               cursor: 'pointer',
             }}>
               TODAY
             </div>
             {/* Next — disabled */}
             <div style={{
-              width: 20, height: 28,
+              width: lerp(20, 16), height: lerp(28, 22),
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               opacity: 0.4, cursor: 'default',
             }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round">
+              <svg width={lerp(14, 11)} height={lerp(14, 11)} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 6l6 6-6 6"/>
               </svg>
             </div>
@@ -410,19 +433,20 @@ export default function ScreenToday() {
             onClick={() => window.__archiveGo && window.__archiveGo('streak')}
             className="archive-pressable"
             style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              padding: '5px 14px 5px 11px', borderRadius: 999,
+              display: 'flex', alignItems: 'center', gap: lerp(6, 4),
+              padding: `${lerp(5, 3)}px ${lerp(14, 11)}px ${lerp(5, 3)}px ${lerp(11, 9)}px`,
+              borderRadius: 999,
               background: 'rgba(0,0,0,0.35)',
               border: '1px solid rgba(255,255,255,0.10)',
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
               cursor: 'pointer', flexShrink: 0,
             }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFFFFF"
+            <svg width={lerp(18, 14)} height={lerp(18, 14)} viewBox="0 0 24 24" fill="#FFFFFF"
               style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.35))' }}>
               <path d="M12 2c1 4-3 6-3 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-2 3 0-3-1-5-3-8z"/>
             </svg>
-            <span style={{ fontSize: 18, color: '#FFFFFF', letterSpacing: '-0.04em', lineHeight: 1, fontWeight: 600 }}>
+            <span style={{ fontSize: lerp(18, 14), color: '#FFFFFF', letterSpacing: '-0.04em', lineHeight: 1, fontWeight: 600 }}>
               {computeStreak()}
             </span>
           </div>
