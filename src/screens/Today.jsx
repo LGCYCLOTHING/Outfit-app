@@ -179,6 +179,25 @@ export default function ScreenToday() {
 
   // ── TODAY date selector + month-calendar dropdown ─────────────────────
   const [calOpen, setCalOpen] = React.useState(false);
+  const calRef = React.useRef(null);
+  // Outside-click dismiss — once the calendar is open, any pointerdown that
+  // doesn't land inside the dropdown closes it. setTimeout defers attachment
+  // so the same pointerdown that opened the calendar doesn't immediately
+  // close it.
+  React.useEffect(() => {
+    if (!calOpen) return;
+    const onDown = (e) => {
+      if (calRef.current && calRef.current.contains(e.target)) return;
+      setCalOpen(false);
+    };
+    const id = setTimeout(() => {
+      document.addEventListener('pointerdown', onDown, true);
+    }, 0);
+    return () => {
+      clearTimeout(id);
+      document.removeEventListener('pointerdown', onDown, true);
+    };
+  }, [calOpen]);
   const [calCursor, setCalCursor] = React.useState(() => {
     const d = new Date();
     return { year: d.getFullYear(), month: d.getMonth() };
@@ -355,13 +374,7 @@ export default function ScreenToday() {
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           paddingTop: lerp(12, 6), paddingBottom: lerp(10, 6),
           marginBottom: 8,
-          // Glass backdrop fades in as the bar pins so scrolled content
-          // doesn't bleed through behind hamburger / TODAY pill / streak.
-          background: `rgba(0,0,0,${0.32 * collapseT})`,
-          backdropFilter: `blur(${14 * collapseT}px) saturate(${1 + 0.4 * collapseT})`,
-          WebkitBackdropFilter: `blur(${14 * collapseT}px) saturate(${1 + 0.4 * collapseT})`,
-          marginLeft: -28, marginRight: -28, paddingLeft: 28, paddingRight: 28,
-          transition: 'background .15s linear',
+          // No backdrop — the bar elements float over the content underneath.
         }}>
           {/* Hamburger */}
           <div
@@ -451,13 +464,10 @@ export default function ScreenToday() {
             </span>
           </div>
 
-          {/* Calendar dropdown — slides in below the pill */}
-          {calOpen && (
-            <div onClick={() => setCalOpen(false)} style={{
-              position: 'fixed', inset: 0, zIndex: 40, background: 'transparent',
-            }} />
-          )}
-          <div className="lg-sheet" style={{
+          {/* Calendar dropdown — slides in below the pill. Outside-click
+              dismiss is handled by a document-level pointerdown listener
+              installed below (see calOpen useEffect). */}
+          <div ref={calRef} className="lg-sheet" style={{
             position: 'absolute', top: 'calc(100% + 10px)', left: -4, right: -4,
             zIndex: 41,
             borderRadius: 22, padding: 16,
@@ -469,9 +479,7 @@ export default function ScreenToday() {
               'transform .42s cubic-bezier(.16,1,.3,1), ' +
               'opacity .25s ease',
             boxShadow: '0 24px 60px -10px rgba(0,0,0,0.55)',
-          }}
-            onClick={(e) => e.stopPropagation()}
-          >
+          }}>
             {(() => {
               const { year, month } = calCursor;
               const monthName = ['January','February','March','April','May','June','July','August','September','October','November','December'][month];
